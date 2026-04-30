@@ -14,7 +14,8 @@ import com.example.markmyday2.ui.viewmodel.UserState
 @Composable
 fun LoginScreen(
     viewModel: AuthViewModel,
-    onLoginSuccess: (String) -> Unit
+    onLoginSuccess: (String) -> Unit,
+    onRegisterClick: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -62,6 +63,11 @@ fun LoginScreen(
             ) {
                 Text("Login")
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        TextButton(onClick = onRegisterClick) {
+            Text("Don't have an account? Register")
         }
 
         if (userState is UserState.Error) {

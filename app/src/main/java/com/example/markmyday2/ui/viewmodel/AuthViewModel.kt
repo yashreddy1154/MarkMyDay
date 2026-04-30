@@ -43,6 +43,18 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         }
     }
 
+    fun register(name: String, email: String, pass: String, role: com.example.markmyday2.data.model.UserRole) {
+        viewModelScope.launch {
+            _userState.value = UserState.Loading
+            val result = repository.register(name, email, pass, role)
+            result.onSuccess { user ->
+                _userState.value = UserState.Authenticated(user)
+            }.onFailure { error ->
+                _userState.value = UserState.Error(error.message ?: "Registration failed")
+            }
+        }
+    }
+
     fun logout() {
         repository.logout()
         _userState.value = UserState.Idle

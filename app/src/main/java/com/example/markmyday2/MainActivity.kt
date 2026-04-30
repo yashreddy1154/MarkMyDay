@@ -24,20 +24,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Safe Firebase Initialization
-        try {
-            if (FirebaseApp.getApps(this).isEmpty()) {
-                val options = FirebaseOptions.Builder()
-                    .setApplicationId("1:1234567890:android:dummy") // Placeholder ID
-                    .setProjectId("markmyday-dummy")
-                    .setApiKey("dummy-api-key")
-                    .build()
-                FirebaseApp.initializeApp(this, options)
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Firebase Init Error: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-
         enableEdgeToEdge()
         setContent {
             MarkMYDay2Theme {
@@ -84,6 +70,30 @@ fun AppNavigation(navController: NavHostController) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }
                     }
+                },
+                onRegisterClick = {
+                    navController.navigate(Screen.Register.route)
+                }
+            )
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                viewModel = authViewModel,
+                onRegisterSuccess = { role ->
+                    when (role) {
+                        "ADMIN" -> navController.navigate(Screen.AdminDashboard.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                        "TEACHER" -> navController.navigate(Screen.TeacherDashboard.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                        "STUDENT" -> navController.navigate(Screen.StudentDashboard.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                    }
+                },
+                onBackToLogin = {
+                    navController.popBackStack()
                 }
             )
         }
