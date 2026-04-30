@@ -47,6 +47,9 @@ fun AdminDashboard(
                     IconButton(onClick = { adminViewModel.loadData() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = MaterialTheme.colorScheme.primary)
                     }
+                    IconButton(onClick = { adminViewModel.seedClasses() }) {
+                        Icon(Icons.Default.Add, contentDescription = "Seed Classes", tint = MaterialTheme.colorScheme.secondary)
+                    }
                     TextButton(onClick = { 
                         authViewModel.logout()
                         onLogout()

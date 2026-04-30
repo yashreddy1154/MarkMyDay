@@ -112,4 +112,13 @@ class AdminViewModel(private val repository: AdminRepository = AdminRepository()
             loadData()
         }
     }
+
+    fun seedClasses() {
+        viewModelScope.launch {
+            for (i in 1..10) {
+                repository.createClass(ClassInfo(className = "Class $i", teacherId = "system_default"))
+            }
+            loadData()
+        }
+    }
 }
