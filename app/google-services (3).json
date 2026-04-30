@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "656443965196",
+    "project_id": "markmyday-1b478",
+    "storage_bucket": "markmyday-1b478.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656443965196:android:5f550b1e064bda1d481329",
+        "android_client_info": {
+          "package_name": "com.project.markmyday"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpjuATeDTC8mP_2gZIRkGTMUI8rafFQDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
