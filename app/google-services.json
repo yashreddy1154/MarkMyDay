@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "67758009903",
+    "project_id": "attdanceapp",
+    "storage_bucket": "attdanceapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67758009903:android:d6654cd852010c6cd7e0da",
+        "android_client_info": {
+          "package_name": "com.example.markmyday2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSvy7M4dkU3N8VlGC5XKvs284qhqgOIv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
