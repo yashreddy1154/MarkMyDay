@@ -71,46 +71,5 @@ fun LoginScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-        HorizontalDivider()
-        Text(text = "Demo Login (Bypass Firebase)", style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(8.dp))
-        
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { viewModel.loginAsDemo(UserRole.ADMIN) }) { Text("Admin") }
-            OutlinedButton(onClick = { viewModel.loginAsDemo(UserRole.STUDENT) }) { Text("Student") }
-        }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Demo Teachers", style = MaterialTheme.typography.labelSmall)
-        
-        val demoTeachers = listOf(
-            "Dr. Smith" to "teacher_1",
-            "Prof. Jones" to "teacher_2",
-            "Ms. Davis" to "teacher_3",
-            "Mr. Wilson" to "teacher_4",
-            "Dr. Brown" to "teacher_5",
-            "Ms. Taylor" to "teacher_6",
-            "Prof. Clark" to "teacher_7"
-        )
-
-        androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
-            columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
-            modifier = Modifier.height(150.dp),
-            contentPadding = PaddingValues(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(demoTeachers.size) { index ->
-                val (name, id) = demoTeachers[index]
-                OutlinedButton(
-                    onClick = { viewModel.loginAsDemo(UserRole.TEACHER, id, name) },
-                    contentPadding = PaddingValues(2.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(name, style = MaterialTheme.typography.labelSmall, maxLines = 1)
-                }
-            }
-        }
     }
 }

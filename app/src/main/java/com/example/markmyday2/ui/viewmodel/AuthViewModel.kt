@@ -47,16 +47,6 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         repository.logout()
         _userState.value = UserState.Idle
     }
-
-    fun loginAsDemo(role: com.example.markmyday2.data.model.UserRole, demoId: String = "demo_id", name: String? = null) {
-        val dummyUser = User(
-            userId = demoId,
-            name = name ?: "Demo ${role.name}",
-            email = "demo_${demoId}@example.com",
-            role = role
-        )
-        _userState.value = UserState.Authenticated(dummyUser)
-    }
 }
 
 sealed class UserState {
