@@ -242,8 +242,8 @@ fun DashboardBottomBar(
             )
         )
         NavigationBarItem(
-            selected = currentRoute == "rms",
-            onClick = { onNavigate("rms") },
+            selected = currentRoute == "SKP",
+            onClick = { onNavigate("SKP") },
             icon = { Icon(Icons.Default.EditNote, contentDescription = null) },
             label = { Text("RMS") },
             colors = NavigationBarItemDefaults.colors(

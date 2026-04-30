@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.markmyday.ui.theme.MarkMyDayTheme
+import com.google.firebase.messaging.FirebaseMessaging
 import android.util.Log
 import com.project.markmyday.ui.navigation.AppNavigation
 import android.Manifest

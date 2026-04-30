@@ -54,7 +54,7 @@ fun StudentDashboard(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            WelcomeSection(name = "Rahul Kumar", role = "B.Tech CSE - 2nd Year")
+            WelcomeSection(name = "Rahul Kumar", role = "Class 1")
             
             TimetableSection(entries = timetable)
             
