@@ -13,6 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MarkMyDay">
+        <activity
+            android:name=".ui.screens.AddStaff"
+            android:exported="false"
+            android:label="@string/title_activity_add_staff"
+            android:theme="@style/Theme.MarkMyDay" />
 
         <service
             android:name=".MyFirebaseMessagingService"

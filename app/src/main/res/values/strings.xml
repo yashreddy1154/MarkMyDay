@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MarkMyDay</string>
+    <string name="title_activity_add_staff">AddStaff</string>
 </resources>
