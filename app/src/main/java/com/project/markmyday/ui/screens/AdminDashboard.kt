@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,6 +29,8 @@ import com.project.markmyday.R
 
 @Composable
 fun AdminDashboard(
+    userName: String = "Principal Sharma",
+    userRole: String = "Administrator",
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
@@ -37,12 +40,12 @@ fun AdminDashboard(
     val adminTiles = listOf(
         DashboardTile("notices", "Send Notices", Icons.Default.Campaign),
         DashboardTile("add_staff", "Add Staff", Icons.Default.PersonAdd),
-        DashboardTile("timetable", "Timetables", Icons.Default.EventNote),
+        DashboardTile("timetable", "Timetables", Icons.AutoMirrored.Filled.EventNote),
         DashboardTile("students", "Students", Icons.Default.People),
         DashboardTile("admissions", "Admissions", Icons.Default.School),
         DashboardTile("updates", "Global Updates", Icons.Default.Update),
         DashboardTile("reports", "Reports", Icons.Default.Assessment),
-        DashboardTile("settings", "Settings", Icons.Default.Settings)
+        DashboardTile("settings", "Settings", Icons.Default.Settings),
     )
 
     Scaffold(
@@ -81,8 +84,8 @@ fun AdminDashboard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     WelcomeSection(
-                        name = "Principal Sharma",
-                        role = "Administrator"
+                        name = userName,
+                        role = userRole
                     )
                     
                     Surface(

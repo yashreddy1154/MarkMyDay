@@ -28,6 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TeacherDashboard(
+    userName: String = "Dr. Anuj Sharma",
+    userRole: String = "Senior Faculty",
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
@@ -79,7 +81,7 @@ fun TeacherDashboard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    WelcomeSection(name = "Dr. Anuj Sharma", role = "Senior Faculty")
+                    WelcomeSection(name = userName, role = userRole)
                     
                     Surface(
                         modifier = Modifier

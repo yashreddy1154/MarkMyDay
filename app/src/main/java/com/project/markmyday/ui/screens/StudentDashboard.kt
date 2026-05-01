@@ -37,6 +37,8 @@ import com.project.markmyday.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentDashboard(
+    userName: String = "Rahul Kumar",
+    userRole: String = "Class 1 - A",
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
@@ -87,6 +89,8 @@ fun StudentDashboard(
         ) {
             when (currentSubScreen) {
                 "home" -> StudentDashboardHomeContent(
+                    userName = userName,
+                    userRole = userRole,
                     onTileClick = { id ->
                         when (id) {
                             "attendance" -> currentSubScreen = "attendance"
@@ -104,6 +108,8 @@ fun StudentDashboard(
 
 @Composable
 fun StudentDashboardHomeContent(
+    userName: String,
+    userRole: String,
     onTileClick: (String) -> Unit
 ) {
     val studentTiles = listOf(
@@ -139,7 +145,7 @@ fun StudentDashboardHomeContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                WelcomeSection(name = "Rahul Kumar", role = "Class 1 - A")
+                WelcomeSection(name = userName, role = userRole)
 
                 Surface(
                     modifier = Modifier

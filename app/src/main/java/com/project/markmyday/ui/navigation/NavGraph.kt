@@ -3,16 +3,20 @@ package com.project.markmyday.ui.navigation
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.project.markmyday.ui.screens.*
+import com.project.markmyday.ui.auth.AuthenticationScreen
 
 sealed class Screen(val route: String) {
+    object Authentication : Screen("auth")
     object RoleSelector : Screen("role_selector")
-    object StudentDashboard : Screen("student_dashboard")
-    object TeacherDashboard : Screen("teacher_dashboard")
-    object AdminDashboard : Screen("admin_dashboard")
+    object StudentDashboard : Screen("student_dashboard/{name}/{role}")
+    object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}")
+    object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
     object Notifications : Screen("notifications")
     object Admissions : Screen("admissions")
     object AddStaff : Screen("add_staff")
@@ -26,7 +30,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
+fun AppNavigation(startDestination: String = Screen.Authentication.route) {
     val navController = rememberNavController()
     
     // Track the last dashboard route to know where "Home" should go
@@ -34,38 +38,48 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
     var lastDashboardRoute by rememberSaveable { mutableStateOf(Screen.StudentDashboard.route) }
 
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screen.RoleSelector.route) {
-            RoleSelectorScreen(onRoleSelected = { role ->
-                // Navigate to Login Screen instead of directly to dashboard
-                navController.navigate(Screen.Login.route)
+        composable(Screen.Authentication.route) {
+            AuthenticationScreen(onLoginSuccess = { name, role ->
+                // Routing logic based on user role
+                val baseRoute = when (role.lowercase()) {
+                    "principal", "headmaster", "admin" -> "admin_dashboard"
+                    "teacher" -> "teacher_dashboard"
+                    "student" -> "student_dashboard"
+                    else -> "student_dashboard" // Default fallback
+                }
+
+                val destination = "$baseRoute/$name/$role"
+                lastDashboardRoute = destination
+
+                navController.navigate(destination) {
+                    popUpTo(Screen.Authentication.route) { inclusive = true }
+                    launchSingleTop = true
+                }
             })
         }
 
-        composable(Screen.Login.route) {
-            LoginScreen(
-                onLoginSuccess = { role ->
-                    // Routing logic based on user role
-                    val destination = when (role.lowercase()) {
-                        "principal", "headmaster", "admin" -> Screen.AdminDashboard.route
-                        "teacher" -> Screen.TeacherDashboard.route
-                        "student" -> Screen.StudentDashboard.route
-                        else -> Screen.StudentDashboard.route // Default fallback
-                    }
-                    
-                    lastDashboardRoute = destination
-                    
-                    navController.navigate(destination) {
-                        // Pop the login screen off the backstack so the user can't go back to it
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                },
-                onBack = { navController.popBackStack() }
-            )
+        composable(Screen.RoleSelector.route) {
+            RoleSelectorScreen(onRoleSelected = { role ->
+                // Navigate to Login (AuthenticationScreen will show LoginContent)
+                navController.navigate(Screen.Authentication.route)
+            })
         }
+
+        // Screen.Login is no longer used as a separate route
         
-        composable(Screen.StudentDashboard.route) {
+        composable(
+            Screen.StudentDashboard.route,
+            arguments = listOf(
+                navArgument("name") { type = NavType.StringType },
+                navArgument("role") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: "Student"
+            val role = backStackEntry.arguments?.getString("role") ?: "Student"
+            
             StudentDashboard(
+                userName = name,
+                userRole = role,
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onTileClick = { id ->
                     when (id) {
@@ -78,8 +92,19 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
             )
         }
         
-        composable(Screen.TeacherDashboard.route) {
+        composable(
+            Screen.TeacherDashboard.route,
+            arguments = listOf(
+                navArgument("name") { type = NavType.StringType },
+                navArgument("role") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: "Teacher"
+            val role = backStackEntry.arguments?.getString("role") ?: "Teacher"
+
             TeacherDashboard(
+                userName = name,
+                userRole = role,
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onTileClick = { id ->
                     when (id) {
@@ -91,8 +116,19 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
             )
         }
         
-        composable(Screen.AdminDashboard.route) {
+        composable(
+            Screen.AdminDashboard.route,
+            arguments = listOf(
+                navArgument("name") { type = NavType.StringType },
+                navArgument("role") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name") ?: "Admin"
+            val role = backStackEntry.arguments?.getString("role") ?: "Administrator"
+
             AdminDashboard(
+                userName = name,
+                userRole = role,
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onTileClick = { id -> 
                     when (id) {
