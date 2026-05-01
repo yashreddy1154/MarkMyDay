@@ -89,7 +89,7 @@ fun AdminDashboard(
                         modifier = Modifier
                             .size(70.dp)
                             .clip(CircleShape),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface,
                         shadowElevation = 4.dp
                     ) {
                         Icon(
@@ -177,16 +177,28 @@ fun AdminDashboard(
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Favorite, contentDescription = null, tint = Color.Red.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Favorite, contentDescription = null, tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Made for bright futures",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun AdminDashboardDarkPreview() {
+    MarkMyDayTheme {
+        AdminDashboard(
+            onNotificationClick = {},
+            onTileClick = {},
+            onNavigate = {}
+        )
     }
 }
 

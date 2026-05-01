@@ -26,8 +26,6 @@ fun LeaveScreen(
     onBack: () -> Unit,
     onApply: () -> Unit
 ) {
-    var leaveType by remember { mutableStateOf("Sick Leave") }
-    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -40,54 +38,66 @@ fun LeaveScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+        LeaveScreenContent(
+            onApply = onApply,
+            modifier = Modifier.padding(padding)
+        )
+    }
+}
+
+@Composable
+fun LeaveScreenContent(
+    onApply: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var leaveType by remember { mutableStateOf("Sick Leave") }
+    
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text("Select Leave Type", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            listOf("Sick Leave", "Casual", "Medical").forEach { type ->
+                LeaveChip(text = type, selected = leaveType, onClick = { leaveType = it })
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Text("Select Dates", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        CalendarPlaceholder()
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        FakeDateBox("Starts: 15 Oct 2023")
+        Spacer(modifier = Modifier.height(8.dp))
+        FakeDateBox("Ends: 16 Oct 2023")
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Text("Reason for Leave", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            modifier = Modifier.fillMaxWidth().height(120.dp),
+            placeholder = { Text("Enter your reason here...") },
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Button(
+            onClick = onApply,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Select Leave Type", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                listOf("Sick Leave", "Casual", "Medical").forEach { type ->
-                    LeaveChip(text = type, selected = leaveType, onClick = { leaveType = it })
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Text("Select Dates", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            CalendarPlaceholder()
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            FakeDateBox("Starts: 15 Oct 2023")
-            Spacer(modifier = Modifier.height(8.dp))
-            FakeDateBox("Ends: 16 Oct 2023")
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Text("Reason for Leave", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth().height(120.dp),
-                placeholder = { Text("Enter your reason here...") },
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            Button(
-                onClick = onApply,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Text("Submit Application", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            }
+            Text("Submit Application", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

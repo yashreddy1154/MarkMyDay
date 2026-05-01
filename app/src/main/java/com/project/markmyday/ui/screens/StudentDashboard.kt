@@ -1,5 +1,6 @@
 package com.project.markmyday.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -32,52 +34,77 @@ import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.R
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentDashboard(
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
 ) {
-    var currentScreen by remember { mutableStateOf("student_dashboard") }
+    var currentSubScreen by remember { mutableStateOf("home") }
 
-    when (currentScreen) {
-        "student_dashboard" -> {
-            StudentDashboardHome(
-                onNotificationClick = onNotificationClick,
-                onTileClick = { id ->
-                    when (id) {
-                        "attendance" -> currentScreen = "attendance"
-                        "leave" -> currentScreen = "leave"
-                        else -> onTileClick(id)
+    // Handle back button to go back to home if we are in a sub-screen
+    BackHandler(enabled = currentSubScreen != "home") {
+        currentSubScreen = "home"
+    }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            when (currentSubScreen) {
+                "home" -> DashboardTopBar(
+                    icon = Icons.Default.Face,
+                    title = "My School Life",
+                    onNotificationClick = onNotificationClick,
+                    notificationCount = 12
+                )
+                "attendance" -> TopAppBar(
+                    title = { Text("My Attendance", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = { currentSubScreen = "home" }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
-                },
-                onNavigate = onNavigate
-            )
-        }
-
-        "attendance" -> {
-            AttendanceScreen {
-                currentScreen = "student_dashboard"
+                )
+                "leave" -> TopAppBar(
+                    title = { Text("Apply Leave", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = { currentSubScreen = "home" }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
             }
+        },
+        bottomBar = {
+            DashboardBottomBar(currentRoute = "dashboard", onNavigate = onNavigate)
         }
-
-        "leave" -> {
-            LeaveScreen(
-                onBack = { currentScreen = "student_dashboard" },
-                onApply = {
-                    // logic for leave application can be added here later
-                    currentScreen = "student_dashboard"
-                }
-            )
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            when (currentSubScreen) {
+                "home" -> StudentDashboardHomeContent(
+                    onTileClick = { id ->
+                        when (id) {
+                            "attendance" -> currentSubScreen = "attendance"
+                            "leave" -> currentSubScreen = "leave"
+                            else -> onTileClick(id)
+                        }
+                    }
+                )
+                "attendance" -> AttendanceScreenContent()
+                "leave" -> LeaveScreenContent(onApply = { currentSubScreen = "home" })
+            }
         }
     }
 }
 
 @Composable
-fun StudentDashboardHome(
-    onNotificationClick: () -> Unit,
-    onTileClick: (String) -> Unit,
-    onNavigate: (String) -> Unit
+fun StudentDashboardHomeContent(
+    onTileClick: (String) -> Unit
 ) {
     val studentTiles = listOf(
         DashboardTile("attendance", "Attendance", Icons.Default.CalendarMonth, badgeText = "85%"),
@@ -97,119 +124,102 @@ fun StudentDashboardHome(
         TimetableEntry("Telugu", "TU101", "04:00 - 05:00 PM", "Room 10")
     )
 
-
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            DashboardTopBar(
-                icon = Icons.Default.Face,
-                title = "My School Life",
-                onNotificationClick = onNotificationClick,
-                notificationCount = 12
-            )
-        },
-        bottomBar = {
-            DashboardBottomBar(currentRoute = "dashboard", onNavigate = onNavigate)
-        }
-    ) { padding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        Box(
             modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                WelcomeSection(name = "Rahul Kumar", role = "Class 1 - A")
+
+                Surface(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape),
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 4.dp
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.School,
+                        contentDescription = "App Icon",
+                        modifier = Modifier.padding(12.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
+        // Student banner
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    )
+                    .padding(20.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    WelcomeSection(name = "Rahul Kumar", role = "Class 1 - A")
-
-                    Surface(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape),
-                        color = Color.White,
-                        shadowElevation = 4.dp
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = "App Icon",
-                            modifier = Modifier.padding(12.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Keep Learning! 🚀",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            "You have 3 assignments due soon.",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp
                         )
                     }
+                    Icon(
+                        Icons.Default.RocketLaunch,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.5f),
+                        modifier = Modifier.size(40.dp)
+                    )
                 }
             }
-
-            // Student banner
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary
-                                )
-                            )
-                        )
-                        .padding(20.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "Keep Learning! 🚀",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                "You have 3 assignments due soon.",
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 13.sp
-                            )
-                        }
-                        Icon(
-                            Icons.Default.RocketLaunch,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TimetableSection(entries = timetable)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "My Dashboard",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            DashboardTileGrid(tiles = studentTiles, onTileClick = { onTileClick(it.id) })
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TimetableSection(entries = timetable)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "My Dashboard",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        DashboardTileGrid(tiles = studentTiles, onTileClick = { onTileClick(it.id) })
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 

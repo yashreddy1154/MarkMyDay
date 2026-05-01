@@ -211,7 +211,7 @@ fun DashboardTileCard(tile: DashboardTile, onClick: (DashboardTile) -> Unit) {
             .fillMaxWidth()
             .height(110.dp)
             .clickable { onClick(tile) },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -266,13 +266,13 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        placeholder = { Text("Search anything...", color = Color.Gray) },
+        placeholder = { Text("Search anything...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.primary) },
         shape = RoundedCornerShape(20.dp),
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedContainerColor = Color.White,
-            focusedContainerColor = Color.White,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedBorderColor = Color.Transparent,
             focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
         )
@@ -285,9 +285,9 @@ fun DashboardBottomBar(
     onNavigate: (String) -> Unit
 ) {
     NavigationBar(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
-        modifier = Modifier.background(Color.White)
+        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
     ) {
         val items = listOf(
             Triple("dashboard", "Home", Icons.Default.Home),
@@ -305,8 +305,8 @@ fun DashboardBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = Color.Gray.copy(alpha = 0.6f),
-                    unselectedTextColor = Color.Gray.copy(alpha = 0.6f),
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                 )
             )

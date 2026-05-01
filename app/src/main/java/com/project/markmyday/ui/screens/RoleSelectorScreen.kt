@@ -59,7 +59,7 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 shadowElevation = 8.dp
             ) {
                 Icon(
@@ -76,12 +76,12 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
                 "MarkMyDay",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
                 "Your School, Managed Simply",
                 fontSize = 16.sp,
-                color = Color.White.copy(alpha = 0.9f)
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
             )
 
             Spacer(modifier = Modifier.height(60.dp))
@@ -135,7 +135,7 @@ fun RoleCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
@@ -170,14 +170,14 @@ fun RoleCard(
                 Text(
                     subtitle,
                     fontSize = 13.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             
             Icon(
                 Icons.Default.ArrowForward,
                 contentDescription = null,
-                tint = Color.LightGray
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
             )
         }
     }

@@ -35,38 +35,42 @@ fun AttendanceScreen(onBack: () -> Unit) {
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+        AttendanceScreenContent(modifier = Modifier.padding(padding))
+    }
+}
+
+@Composable
+fun AttendanceScreenContent(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        // Overall percentage card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            // Overall percentage card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Overall Attendance", color = Color.White.copy(alpha = 0.8f))
-                    Text("85%", fontSize = 48.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
-                    Text("You're doing great!", color = Color.White.copy(alpha = 0.9f))
-                }
+                Text("Overall Attendance", color = Color.White.copy(alpha = 0.8f))
+                Text("85%", fontSize = 48.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                Text("You're doing great!", color = Color.White.copy(alpha = 0.9f))
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            Text("Subject-wise Details", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AttendanceItem("Mathematics", "22/25", 88)
-            AttendanceItem("Physics", "18/25", 72)
-            AttendanceItem("English", "24/25", 96)
-            AttendanceItem("Telugu", "20/25", 80)
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Text("Subject-wise Details", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        AttendanceItem("Mathematics", "22/25", 88)
+        AttendanceItem("Physics", "18/25", 72)
+        AttendanceItem("English", "24/25", 96)
+        AttendanceItem("Telugu", "20/25", 80)
     }
 }
 

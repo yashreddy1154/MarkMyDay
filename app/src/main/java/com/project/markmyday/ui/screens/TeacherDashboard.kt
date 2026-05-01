@@ -85,7 +85,7 @@ fun TeacherDashboard(
                         modifier = Modifier
                             .size(60.dp)
                             .clip(CircleShape),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface,
                         shadowElevation = 4.dp
                     ) {
                         Icon(

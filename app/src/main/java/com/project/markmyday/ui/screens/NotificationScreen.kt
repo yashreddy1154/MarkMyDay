@@ -13,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +66,7 @@ fun NotificationCard(notification: NotificationItem) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (notification.isRead) Color.White else MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+            containerColor = if (notification.isRead) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -93,7 +92,7 @@ fun NotificationCard(notification: NotificationItem) {
                 Text(
                     text = notification.description,
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2
                 )
                 Spacer(modifier = Modifier.height(4.dp))

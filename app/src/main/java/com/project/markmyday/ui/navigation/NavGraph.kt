@@ -1,6 +1,7 @@
 package com.project.markmyday.ui.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +15,7 @@ sealed class Screen(val route: String) {
     object AdminDashboard : Screen("admin_dashboard")
     object Notifications : Screen("notifications")
     object Admissions : Screen("admissions")
+    object AddStaff : Screen("add_staff")
     
     // Bottom Bar Screens
     object Happenings : Screen("happenings")
@@ -27,7 +29,8 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
     val navController = rememberNavController()
     
     // Track the last dashboard route to know where "Home" should go
-    var lastDashboardRoute by remember { mutableStateOf(Screen.StudentDashboard.route) }
+    // Use rememberSaveable to survive configuration changes
+    var lastDashboardRoute by rememberSaveable { mutableStateOf(Screen.StudentDashboard.route) }
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.RoleSelector.route) {
@@ -40,7 +43,9 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
                 }
                 lastDashboardRoute = destination
                 navController.navigate(destination) {
-                    popUpTo(Screen.RoleSelector.route) { inclusive = true }
+                    // Don't pop inclusive if the user wants to go back to "Navigation screen" (RoleSelector)
+                    // But usually, dashboards are root. Let's keep it for now as per "Navigation screen" hint.
+                    // Actually, let's NOT pop inclusive to allow back to RoleSelector.
                 }
             })
         }
@@ -52,7 +57,7 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "results" -> navController.navigate(Screen.Reports.route)
-                        // Add more routing as screens are implemented
+                        "notifications" -> navController.navigate(Screen.Notifications.route)
                     }
                 },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
@@ -80,6 +85,7 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
                         "admissions" -> navController.navigate(Screen.Admissions.route)
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "reports" -> navController.navigate(Screen.Reports.route)
+                        "add_staff" -> navController.navigate(Screen.AddStaff.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -87,6 +93,10 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
             )
         }
         
+        composable(Screen.AddStaff.route) {
+            AddStaffScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(Screen.Admissions.route) {
             AdmissionsScreen(
                 role = "Administrator",
@@ -131,17 +141,19 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
 private fun handleBottomNav(route: String, navController: NavHostController, lastDashboardRoute: String) {
     val destination = if (route == "dashboard") lastDashboardRoute else route
     
+    if (navController.currentBackStackEntry?.destination?.route == destination) {
+        return
+    }
+
     navController.navigate(destination) {
-        // Pop up to the start destination of the graph to
-        // avoid building up a large stack of destinations
-        // on the back stack as users select items
+        // Pop up to the dashboard route if it's in the stack. 
+        // We use popUpTo with the route name directly.
+        // If it's not found, Navigation usually handles it by not popping.
         popUpTo(lastDashboardRoute) {
             saveState = true
         }
-        // Avoid multiple copies of the same destination when
-        // reselecting the same item
+        
         launchSingleTop = true
-        // Restore state when reselecting a previously selected item
         restoreState = true
     }
 }
