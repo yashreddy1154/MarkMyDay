@@ -57,10 +57,13 @@ dependencies {
     
     // Firebase BoM
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
 
     implementation(libs.firebase.messaging)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

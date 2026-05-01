@@ -22,6 +22,7 @@ sealed class Screen(val route: String) {
     object Learning : Screen("SKP")
     object Reports : Screen("marks")
     object GlobalUpdates : Screen("global_updates")
+    object Login : Screen("login")
 }
 
 @Composable
@@ -35,19 +36,32 @@ fun AppNavigation(startDestination: String = Screen.RoleSelector.route) {
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.RoleSelector.route) {
             RoleSelectorScreen(onRoleSelected = { role ->
-                val destination = when (role) {
-                    "student" -> Screen.StudentDashboard.route
-                    "teacher" -> Screen.TeacherDashboard.route
-                    "admin" -> Screen.AdminDashboard.route
-                    else -> Screen.StudentDashboard.route
-                }
-                lastDashboardRoute = destination
-                navController.navigate(destination) {
-                    // Don't pop inclusive if the user wants to go back to "Navigation screen" (RoleSelector)
-                    // But usually, dashboards are root. Let's keep it for now as per "Navigation screen" hint.
-                    // Actually, let's NOT pop inclusive to allow back to RoleSelector.
-                }
+                // Navigate to Login Screen instead of directly to dashboard
+                navController.navigate(Screen.Login.route)
             })
+        }
+
+        composable(Screen.Login.route) {
+            LoginScreen(
+                onLoginSuccess = { role ->
+                    // Routing logic based on user role
+                    val destination = when (role.lowercase()) {
+                        "principal", "headmaster", "admin" -> Screen.AdminDashboard.route
+                        "teacher" -> Screen.TeacherDashboard.route
+                        "student" -> Screen.StudentDashboard.route
+                        else -> Screen.StudentDashboard.route // Default fallback
+                    }
+                    
+                    lastDashboardRoute = destination
+                    
+                    navController.navigate(destination) {
+                        // Pop the login screen off the backstack so the user can't go back to it
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onBack = { navController.popBackStack() }
+            )
         }
         
         composable(Screen.StudentDashboard.route) {
