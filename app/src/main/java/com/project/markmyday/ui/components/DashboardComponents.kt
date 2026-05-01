@@ -126,7 +126,7 @@ fun TimetableSection(entries: List<TimetableEntry>) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("School Schedule 📅", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text("School Schedule ", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             TextButton(onClick = { /* TODO */ }) {
                 Text("View All", color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
             }

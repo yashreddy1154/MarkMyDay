@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.project.markmyday.ui.theme.OrangeGradientStart
+// Removed: import com.project.markmyday.ui.theme.OrangeGradientStart
 
 data class NotificationItem(
     val id: Int,
@@ -67,7 +67,7 @@ fun NotificationCard(notification: NotificationItem) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (notification.isRead) Color.White else OrangeGradientStart.copy(alpha = 0.05f)
+            containerColor = if (notification.isRead) Color.White else MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -78,10 +78,10 @@ fun NotificationCard(notification: NotificationItem) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(OrangeGradientStart.copy(alpha = 0.1f), CircleShape),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Notifications, contentDescription = null, tint = OrangeGradientStart)
+                Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -100,11 +100,11 @@ fun NotificationCard(notification: NotificationItem) {
                 Text(
                     text = notification.time,
                     fontSize = 12.sp,
-                    color = OrangeGradientStart
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             if (!notification.isRead) {
-                Box(modifier = Modifier.size(8.dp).background(OrangeGradientStart, CircleShape))
+                Box(modifier = Modifier.size(8.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
             }
         }
     }

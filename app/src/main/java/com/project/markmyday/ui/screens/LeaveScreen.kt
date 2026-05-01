@@ -156,3 +156,9 @@ fun LeaveScreenPreview() {
         LeaveScreen(onBack = {}, onApply = {})
     }
 }
+
+
+@Composable
+fun LeaveApproveScareen(){
+
+}

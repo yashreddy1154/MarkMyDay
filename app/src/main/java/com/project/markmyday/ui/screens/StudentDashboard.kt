@@ -1,6 +1,5 @@
 package com.project.markmyday.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -36,7 +35,8 @@ import com.project.markmyday.R
 @Composable
 fun StudentDashboard(
     onNotificationClick: () -> Unit,
-    onTileClick: (String) -> Unit
+    onTileClick: (String) -> Unit,
+    onNavigate: (String) -> Unit,
 ) {
     var currentScreen by remember { mutableStateOf("student_dashboard") }
 
@@ -50,18 +50,21 @@ fun StudentDashboard(
                         "leave" -> currentScreen = "leave"
                         else -> onTileClick(id)
                     }
-                }
+                },
+                onNavigate = onNavigate
             )
         }
+
         "attendance" -> {
-            AttendanceScreen(
-                onBack = { currentScreen = "student_dashboard" }
-            )
+            AttendanceScreen {
+                currentScreen = "student_dashboard"
+            }
         }
+
         "leave" -> {
             LeaveScreen(
                 onBack = { currentScreen = "student_dashboard" },
-                onApply = { 
+                onApply = {
                     // logic for leave application can be added here later
                     currentScreen = "student_dashboard"
                 }
@@ -73,16 +76,18 @@ fun StudentDashboard(
 @Composable
 fun StudentDashboardHome(
     onNotificationClick: () -> Unit,
-    onTileClick: (String) -> Unit
-)
-{
-        val studentTiles = listOf(
+    onTileClick: (String) -> Unit,
+    onNavigate: (String) -> Unit
+) {
+    val studentTiles = listOf(
         DashboardTile("attendance", "Attendance", Icons.Default.CalendarMonth, badgeText = "85%"),
         DashboardTile("assignments", "Assignments", Icons.Default.Task, badgeCount = 3),
         DashboardTile("results", "My Results", Icons.Default.Grade),
-            DashboardTile("leave", "Apply Leave", Icons.Default.HistoryEdu),
+        DashboardTile("leave", "Apply Leave", Icons.Default.HistoryEdu),
+        DashboardTile("updates", "Global Updates", Icons.Default.Update),
         DashboardTile("exams", "Upcoming Exams", Icons.Default.History, badgeCount = 1),
-        DashboardTile("fees", "Fee Statement", Icons.Default.Payments)
+        DashboardTile("fees", "Fee Statement", Icons.Default.Payments),
+        DashboardTile("settings", "Settings", Icons.Default.Settings)
     )
 
     val timetable = listOf(
@@ -104,7 +109,7 @@ fun StudentDashboardHome(
             )
         },
         bottomBar = {
-            DashboardBottomBar(currentRoute = "dashboard", onNavigate = {})
+            DashboardBottomBar(currentRoute = "dashboard", onNavigate = onNavigate)
         }
     ) { padding ->
         Column(
@@ -124,7 +129,7 @@ fun StudentDashboardHome(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     WelcomeSection(name = "Rahul Kumar", role = "Class 1 - A")
-                    
+
                     Surface(
                         modifier = Modifier
                             .size(60.dp)
@@ -141,7 +146,7 @@ fun StudentDashboardHome(
                     }
                 }
             }
-            
+
             // Student banner
             Card(
                 modifier = Modifier
@@ -188,11 +193,11 @@ fun StudentDashboardHome(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             TimetableSection(entries = timetable)
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "My Dashboard",
                 style = MaterialTheme.typography.titleMedium,
@@ -200,9 +205,9 @@ fun StudentDashboardHome(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.onBackground
             )
-            
+
             DashboardTileGrid(tiles = studentTiles, onTileClick = { onTileClick(it.id) })
-            
+
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
@@ -212,6 +217,6 @@ fun StudentDashboardHome(
 @Composable
 fun StudentDashboardPreview() {
     MarkMyDayTheme {
-        StudentDashboard(onNotificationClick = {}, onTileClick = {})
+        StudentDashboard(onNotificationClick = {}, onTileClick = {}, onNavigate = {})
     }
 }

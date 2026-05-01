@@ -1,6 +1,5 @@
 package com.project.markmyday.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -30,7 +29,8 @@ import com.project.markmyday.R
 @Composable
 fun AdminDashboard(
     onNotificationClick: () -> Unit,
-    onTileClick: (String) -> Unit
+    onTileClick: (String) -> Unit,
+    onNavigate: (String) -> Unit,
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -58,7 +58,7 @@ fun AdminDashboard(
         bottomBar = {
             DashboardBottomBar(
                 currentRoute = "dashboard",
-                onNavigate = {}
+                onNavigate = onNavigate
             )
         }
     ) { padding ->
@@ -196,7 +196,8 @@ fun AdminDashboardPreview() {
     MarkMyDayTheme {
         AdminDashboard(
             onNotificationClick = {},
-            onTileClick = {}
+            onTileClick = {},
+            onNavigate = {}
         )
     }
 }

@@ -1,24 +1,36 @@
 package com.project.markmyday.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.project.markmyday.ui.components.*
 import com.project.markmyday.ui.models.DashboardTile
 import com.project.markmyday.ui.models.TimetableEntry
+import com.project.markmyday.ui.theme.MarkMyDayTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TeacherDashboard(
     onNotificationClick: () -> Unit,
-    onTileClick: (String) -> Unit
+    onTileClick: (String) -> Unit,
+    onNavigate: (String) -> Unit,
 ) {
     val teacherTiles = listOf(
         DashboardTile("attendance", "Mark Attendance", Icons.Default.Checklist, badgeText = "80%"),
@@ -26,7 +38,9 @@ fun TeacherDashboard(
         DashboardTile("results", "Post Results", Icons.Default.Description),
         DashboardTile("leave", "Leave Request", Icons.Default.EventBusy),
         DashboardTile("exams", "Manage Exams", Icons.Default.Quiz, badgeCount = 2),
-        DashboardTile("messages", "Messages", Icons.AutoMirrored.Filled.Chat, badgeCount = 5)
+        DashboardTile("updates", "Global Updates", Icons.Default.Update),
+        DashboardTile("messages", "Messages", Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
+        DashboardTile("settings", "Settings", Icons.Default.Settings)
     )
 
     val timetable = listOf(
@@ -36,15 +50,17 @@ fun TeacherDashboard(
     )
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             DashboardTopBar(
-                title = "Teacher Dashboard",
+                icon = Icons.Default.CastForEducation,
+                title = "Teacher Hub",
                 onNotificationClick = onNotificationClick,
                 notificationCount = 8
             )
         },
         bottomBar = {
-            DashboardBottomBar(currentRoute = "dashboard", onNavigate = {})
+            DashboardBottomBar(currentRoute = "dashboard", onNavigate = onNavigate)
         }
     ) { padding ->
         Column(
@@ -53,11 +69,105 @@ fun TeacherDashboard(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            WelcomeSection(name = "Dr. Anuj Sharma", role = "Senior Faculty")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    WelcomeSection(name = "Dr. Anuj Sharma", role = "Senior Faculty")
+                    
+                    Surface(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape),
+                        color = Color.White,
+                        shadowElevation = 4.dp
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.School,
+                            contentDescription = "App Icon",
+                            modifier = Modifier.padding(12.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            // Teacher banner
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.secondary
+                                )
+                            )
+                        )
+                        .padding(20.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "Class In Session 👩‍🏫",
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "Your next class starts in 15 mins.",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 13.sp
+                            )
+                        }
+                        Icon(
+                            Icons.Default.Timer,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.5f),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
             
             TimetableSection(entries = timetable)
             
-            DashboardTileGrid(tiles = teacherTiles, onTileClick = { onTileClick(it.id) })
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Faculty Portal",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            DashboardTileGrid(tiles = teacherTiles) { onTileClick(it.id) }
+            
+            Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TeacherDashboardPreview() {
+    MarkMyDayTheme {
+        TeacherDashboard(onNotificationClick = {}, onTileClick = {}, onNavigate = {})
     }
 }

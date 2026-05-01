@@ -13,6 +13,8 @@ googleGmsGoogleServices = "4.4.4"
 googleFirebaseCrashlytics = "3.0.7"
 navigationCompose = "2.9.8"
 materialIconsExtended = "1.7.8"
+remoteCreationCore = "1.0.0-alpha09"
+media3Effect = "1.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +37,8 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+androidx-compose-remote-creation-core = { group = "androidx.compose.remote", name = "remote-creation-core", version.ref = "remoteCreationCore" }
+androidx-media3-effect = { group = "androidx.media3", name = "media3-effect", version.ref = "media3Effect" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
