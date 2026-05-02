@@ -13,7 +13,12 @@ import kotlinx.coroutines.tasks.await
 sealed class AuthResult {
     object Idle : AuthResult()
     object Loading : AuthResult()
-    data class Success(val name: String, val role: String) : AuthResult()
+    data class Success(
+        val name: String,
+        val role: String,
+        val homeSection: String? = null,
+        val subject: String? = null
+    ) : AuthResult()
     data class Error(val message: String) : AuthResult()
 }
 
@@ -38,10 +43,13 @@ class AuthViewModel : ViewModel() {
                     val document = firestore.collection("users").document(uid).get().await()
                     
                     if (document.exists()) {
-                        // 3. Extract name and role strings
+                        // 3. Extract name, role, and teacher specific fields
                         val name = document.getString("name") ?: "User"
                         val role = document.getString("role") ?: "unknown"
-                        _authState.value = AuthResult.Success(name, role)
+                        val homeSection = document.getString("homeSection")
+                        val subject = document.getString("subject")
+                        
+                        _authState.value = AuthResult.Success(name, role, homeSection, subject)
                     } else {
                         _authState.value = AuthResult.Error("User document not found in Firestore.")
                     }

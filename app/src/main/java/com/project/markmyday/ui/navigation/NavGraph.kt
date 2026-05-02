@@ -8,18 +8,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.ui.screens.*
 import com.project.markmyday.ui.auth.AuthenticationScreen
+import com.project.markmyday.viewmodel.TeacherViewModel
 
 sealed class Screen(val route: String) {
     object Authentication : Screen("auth")
     object RoleSelector : Screen("role_selector")
     object StudentDashboard : Screen("student_dashboard/{name}/{role}")
-    object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}")
+    object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}/{section}/{subject}")
     object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
     object Notifications : Screen("notifications")
     object Admissions : Screen("admissions")
     object AddStaff : Screen("add_staff")
+    object StaffManagement : Screen("staff_management")
     
     // Bottom Bar Screens
     object Happenings : Screen("happenings")
@@ -39,16 +42,16 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Authentication.route) {
-            AuthenticationScreen(onLoginSuccess = { name, role ->
+            AuthenticationScreen(onLoginSuccess = { name, role, section, subject ->
                 // Routing logic based on user role
                 val baseRoute = when (role.lowercase()) {
-                    "principal", "headmaster", "admin" -> "admin_dashboard"
-                    "teacher" -> "teacher_dashboard"
-                    "student" -> "student_dashboard"
-                    else -> "student_dashboard" // Default fallback
+                    "principal", "headmaster", "admin" -> "admin_dashboard/$name/$role"
+                    "teacher" -> "teacher_dashboard/$name/$role/${section ?: "N/A"}/${subject ?: "N/A"}"
+                    "student" -> "student_dashboard/$name/$role"
+                    else -> "student_dashboard/$name/$role" // Default fallback
                 }
 
-                val destination = "$baseRoute/$name/$role"
+                val destination = baseRoute
                 lastDashboardRoute = destination
 
                 navController.navigate(destination) {
@@ -96,15 +99,21 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
             Screen.TeacherDashboard.route,
             arguments = listOf(
                 navArgument("name") { type = NavType.StringType },
-                navArgument("role") { type = NavType.StringType }
+                navArgument("role") { type = NavType.StringType },
+                navArgument("section") { type = NavType.StringType },
+                navArgument("subject") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: "Teacher"
             val role = backStackEntry.arguments?.getString("role") ?: "Teacher"
+            val section = backStackEntry.arguments?.getString("section") ?: "N/A"
+            val subject = backStackEntry.arguments?.getString("subject") ?: "N/A"
 
             TeacherDashboard(
                 userName = name,
                 userRole = role,
+                homeSection = section,
+                subject = subject,
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onTileClick = { id ->
                     when (id) {
@@ -136,6 +145,7 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "reports" -> navController.navigate(Screen.Reports.route)
                         "add_staff" -> navController.navigate(Screen.AddStaff.route)
+                        "staff_management" -> navController.navigate(Screen.StaffManagement.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -144,7 +154,22 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
         }
         
         composable(Screen.AddStaff.route) {
-            AddStaffScreen(onBack = { navController.popBackStack() })
+            val teacherViewModel: TeacherViewModel = viewModel()
+            AddStaffScreen(
+                onBack = { navController.popBackStack() },
+                onSubmit = { formState ->
+                    teacherViewModel.registerTeacher(formState)
+                }
+            )
+        }
+
+        composable(Screen.StaffManagement.route) {
+            StaffManagementScreen(
+                teachers = emptyList(), // Should be from ViewModel
+                onEditTeacher = { /* Handle edit */ },
+                onDeleteTeacher = { /* Handle delete */ },
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable(Screen.Admissions.route) {

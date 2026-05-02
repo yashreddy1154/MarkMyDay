@@ -29,7 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun TeacherDashboard(
     userName: String = "Dr. Anuj Sharma",
-    userRole: String = "Senior Faculty",
+    userRole: String = "Teacher",
+    homeSection: String = "N/A",
+    subject: String = "N/A",
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
@@ -41,6 +43,7 @@ fun TeacherDashboard(
         DashboardTile("leave", "Leave Request", Icons.Default.EventBusy),
         DashboardTile("exams", "Manage Exams", Icons.Default.Quiz, badgeCount = 2),
         DashboardTile("updates", "Global Updates", Icons.Default.Update),
+        DashboardTile("admissions", "New  Admission", Icons.Default.School),
         DashboardTile("messages", "Messages", Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", "Settings", Icons.Default.Settings)
     )
@@ -81,7 +84,12 @@ fun TeacherDashboard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    WelcomeSection(name = userName, role = userRole)
+                    WelcomeSection(
+                        name = userName,
+                        role = userRole,
+                        homeSection = homeSection,
+                        subject = subject
+                    )
                     
                     Surface(
                         modifier = Modifier

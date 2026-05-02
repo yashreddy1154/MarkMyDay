@@ -95,7 +95,12 @@ fun DashboardTopBar(
 }
 
 @Composable
-fun WelcomeSection(name: String, role: String) {
+fun WelcomeSection(
+    name: String,
+    role: String,
+    homeSection: String? = null,
+    subject: String? = null
+) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             "Hello 👋,", 
@@ -109,12 +114,27 @@ fun WelcomeSection(name: String, role: String) {
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.onBackground
         )
-        Text(
-            role, 
-            fontSize = 14.sp, 
-            color = MaterialTheme.colorScheme.primary, 
-            fontWeight = FontWeight.Bold
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                role, 
+                fontSize = 14.sp, 
+                color = MaterialTheme.colorScheme.primary, 
+                fontWeight = FontWeight.Bold
+            )
+            if (homeSection != null || subject != null) {
+                Text(
+                    " | ",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+                )
+                Text(
+                    "${homeSection ?: ""} ${if (subject != null) "($subject)" else ""}",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
     }
 }
 

@@ -40,7 +40,7 @@ enum class AuthState {
 }
 
 @Composable
-fun AuthenticationScreen(onLoginSuccess: (String, String) -> Unit) {
+fun AuthenticationScreen(onLoginSuccess: (String, String, String?, String?) -> Unit) {
     var authState by remember { mutableStateOf(AuthState.PRE_LOGIN) }
 
     AnimatedContent(
@@ -130,7 +130,7 @@ fun PreLoginContent(onStart: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginContent(
-    onLogin: (String, String) -> Unit,
+    onLogin: (String, String, String?, String?) -> Unit,
     onBack: () -> Unit
 ) {
     val viewModel: AuthViewModel = viewModel()
@@ -147,7 +147,7 @@ fun LoginContent(
         when (authResult) {
             is AuthResult.Success -> {
                 val result = authResult as AuthResult.Success
-                onLogin(result.name, result.role)
+                onLogin(result.name, result.role, result.homeSection, result.subject)
             }
             is AuthResult.Error -> {
                 snackbarHostState.showSnackbar((authResult as AuthResult.Error).message)
@@ -390,18 +390,18 @@ fun LoginContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Don't have an account? ",
+                                text = "Don't know details? ",
                                 color = if (isDarkMode) Color.White.copy(alpha = 0.6f) else Color(0xFF666666),
                                 fontSize = 14.sp
                             )
                             TextButton(
                                 onClick = {
-                                    Toast.makeText(context, "Sign up feature coming soon", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "get details feature coming soon", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.padding(0.dp)
                             ) {
                                 Text(
-                                    text = "Sign Up",
+                                    text = "forget credintails",
                                     color = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.SemiBold
