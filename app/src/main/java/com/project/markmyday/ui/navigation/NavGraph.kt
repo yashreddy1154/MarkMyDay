@@ -33,6 +33,8 @@ sealed class Screen(val route: String) {
     object GlobalUpdates : Screen("global_updates")
     object Login : Screen("login")
     object Settings : Screen("settings")
+    object Terms : Screen("terms")
+    object About : Screen("about")
 }
 
 @Composable
@@ -242,8 +244,18 @@ fun AppNavigation(
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true
                     }
-                }
+                },
+                onNavigateToTerms = { navController.navigate(Screen.Terms.route) },
+                onNavigateToAbout = { navController.navigate(Screen.About.route) }
             )
+        }
+
+        composable(Screen.Terms.route) {
+            TermsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.About.route) {
+            AboutScreen(onBack = { navController.popBackStack() })
         }
     }
 }

@@ -29,9 +29,20 @@ import androidx.compose.ui.Alignment
 
 import androidx.activity.result.contract.ActivityResultContracts
 
-class MainActivity : ComponentActivity() {
+import com.project.markmyday.viewmodel.SettingsViewModel
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+
+import androidx.appcompat.app.AppCompatActivity
+
+val LocalSettingsViewModel = staticCompositionLocalOf<SettingsViewModel> {
+    error("No SettingsViewModel provided")
+}
+
+class MainActivity : AppCompatActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -56,39 +67,43 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val authState by authViewModel.authState.collectAsState()
+            val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
 
-            MarkMyDayTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    when (authState) {
-                        is AuthResult.Loading -> {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator()
+            CompositionLocalProvider(LocalSettingsViewModel provides settingsViewModel) {
+                MarkMyDayTheme(darkTheme = isDarkMode) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        when (authState) {
+                            is AuthResult.Loading -> {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    CircularProgressIndicator()
+                                }
                             }
-                        }
-                        is AuthResult.Success -> {
-                            val result = authState as AuthResult.Success
-                            val initialDashboardRoute = when (result.role.lowercase()) {
-                                "principal", "headmaster", "admin" -> "admin_dashboard/${result.name}/${result.role}"
-                                "teacher" -> "teacher_dashboard/${result.name}/${result.role}/${result.homeSection ?: "N/A"}/${result.subject ?: "N/A"}"
-                                "student" -> "student_dashboard/${result.name}/${result.role}"
-                                else -> "student_dashboard/${result.name}/${result.role}"
+                            is AuthResult.Success -> {
+                                val result = authState as AuthResult.Success
+                                val initialDashboardRoute = when (result.role.lowercase()) {
+                                    "principal", "headmaster", "admin" -> "admin_dashboard/${result.name}/${result.role}"
+                                    "teacher" -> "teacher_dashboard/${result.name}/${result.role}/${result.homeSection ?: "N/A"}/${result.subject ?: "N/A"}"
+                                    "student" -> "student_dashboard/${result.name}/${result.role}"
+                                    else -> "student_dashboard/${result.name}/${result.role}"
+                                }
+                                AppNavigation(
+                                    startDestination = initialDashboardRoute,
+                                    initialDashboardRoute = initialDashboardRoute
+                                )
                             }
-                            AppNavigation(
-                                startDestination = initialDashboardRoute,
-                                initialDashboardRoute = initialDashboardRoute
-                            )
-                        }
-                        else -> {
-                            AppNavigation()
+                            else -> {
+                                AppNavigation()
+                            }
                         }
                     }
                 }
             }
         }
-        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("FCM", "Fetching FCM registration token failed", task.exception)
                 return@addOnCompleteListener
@@ -100,6 +115,5 @@ class MainActivity : ComponentActivity() {
             // Log the token so you can copy it from Logcat
             Log.d("FCM", "FCM registration token: $token")
         }
-
     }
 }

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">MarkMyDay</string>
+    <string name="settings">సెట్టింగులు</string>
+    <string name="profile_details">ప్రొఫైల్ వివరాలు</string>
+    <string name="preferences">ప్రాధాన్యతలు</string>
+    <string name="language">భాష</string>
+    <string name="dark_mode">డార్క్ మోడ్</string>
+    <string name="notifications">నోటిఫికేషన్లు</string>
+    <string name="more">మరిన్ని</string>
+    <string name="terms_and_policies">నిబంధనలు మరియు విధానాలు</string>
+    <string name="about_app">యాప్ గురించి</string>
+    <string name="app_creators">యాప్ సృష్టికర్తలు</string>
+    <string name="logout">లాగ్ అవుట్</string>
+    <string name="name_label">పేరు: %1$s</string>
+    <string name="role_label">పాత్ర: %1$s</string>
+    <string name="android_dev">ఆండ్రాయిడ్ దేవ్</string>
+    <string name="error_profile">లోపం: %1$s</string>
+    <string name="back">వెనుకకు</string>
+</resources>
