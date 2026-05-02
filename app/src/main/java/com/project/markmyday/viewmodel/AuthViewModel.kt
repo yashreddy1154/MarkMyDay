@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.markmyday.subscribeUserToTopics
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -72,6 +73,8 @@ class AuthViewModel : ViewModel() {
                 val role = document.getString("role") ?: "unknown"
                 val homeSection = document.getString("homeSection")
                 val subject = document.getString("subject")
+
+                subscribeUserToTopics(role)
 
                 _authState.value = AuthResult.Success(name, role, homeSection, subject)
             } else {

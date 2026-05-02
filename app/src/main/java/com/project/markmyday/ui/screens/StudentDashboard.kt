@@ -34,6 +34,11 @@ import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.R
 
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.markmyday.viewmodel.NotificationViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentDashboard(
@@ -43,6 +48,13 @@ fun StudentDashboard(
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
 ) {
+    val notificationViewModel: NotificationViewModel = viewModel()
+    val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
+
+    LaunchedEffect(userRole) {
+        notificationViewModel.fetchNotifications(userRole)
+    }
+
     var currentSubScreen by remember { mutableStateOf("home") }
 
     // Handle back button to go back to home if we are in a sub-screen
@@ -58,7 +70,7 @@ fun StudentDashboard(
                     icon = Icons.Default.Face,
                     title = "My School Life",
                     onNotificationClick = onNotificationClick,
-                    notificationCount = 12
+                    notificationCount = if (hasUnread) 1 else 0
                 )
                 "attendance" -> TopAppBar(
                     title = { Text("My Attendance", fontWeight = FontWeight.Bold) },

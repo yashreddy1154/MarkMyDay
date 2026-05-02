@@ -26,6 +26,12 @@ import com.project.markmyday.ui.models.TimetableEntry
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import androidx.compose.ui.tooling.preview.Preview
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.markmyday.viewmodel.NotificationViewModel
+
 @Composable
 fun TeacherDashboard(
     userName: String = "Dr. Anuj Sharma",
@@ -36,6 +42,13 @@ fun TeacherDashboard(
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
 ) {
+    val notificationViewModel: NotificationViewModel = viewModel()
+    val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
+
+    LaunchedEffect(userRole) {
+        notificationViewModel.fetchNotifications(userRole)
+    }
+
     val teacherTiles = listOf(
         DashboardTile("attendance", "Mark Attendance", Icons.Default.Checklist, badgeText = "80%"),
         DashboardTile("assignments", "Assignments", Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
@@ -61,7 +74,7 @@ fun TeacherDashboard(
                 icon = Icons.Default.CastForEducation,
                 title = "Teacher Hub",
                 onNotificationClick = onNotificationClick,
-                notificationCount = 8
+                notificationCount = if (hasUnread) 1 else 0
             )
         },
         bottomBar = {

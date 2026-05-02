@@ -20,12 +20,13 @@ sealed class Screen(val route: String) {
     object StudentDashboard : Screen("student_dashboard/{name}/{role}")
     object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}/{section}/{subject}")
     object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
-    object Notifications : Screen("notifications")
+    object Notifications : Screen("notifications/{role}")
     object Admissions : Screen("admissions")
     object AddStaff : Screen("add_staff")
     object AddStudent : Screen("add_student")
     object StaffManagement : Screen("staff_management")
     object StudentManagement : Screen("student_management")
+    object AdminCreateNotification : Screen("admin_create_notification")
     
     // Bottom Bar Screens
     object Happenings : Screen("happenings")
@@ -92,12 +93,12 @@ fun AppNavigation(
             StudentDashboard(
                 userName = name,
                 userRole = role,
-                onNotificationClick = { navController.navigate(Screen.Notifications.route) },
+                onNotificationClick = { navController.navigate("notifications/$role") },
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "results" -> navController.navigate(Screen.Reports.route)
-                        "notifications" -> navController.navigate(Screen.Notifications.route)
+                        "notifications" -> navController.navigate("notifications/$role")
                         "settings" -> navController.navigate(Screen.Settings.route)
                     }
                 },
@@ -124,7 +125,7 @@ fun AppNavigation(
                 userRole = role,
                 homeSection = section,
                 subject = subject,
-                onNotificationClick = { navController.navigate(Screen.Notifications.route) },
+                onNotificationClick = { navController.navigate("notifications/$role") },
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
@@ -149,10 +150,11 @@ fun AppNavigation(
             AdminDashboard(
                 userName = name,
                 userRole = role,
-                onNotificationClick = { navController.navigate(Screen.Notifications.route) },
+                onNotificationClick = { navController.navigate("notifications/$role") },
                 onTileClick = { id -> 
                     when (id) {
                         "admissions" -> navController.navigate(Screen.Admissions.route)
+                        "notices" -> navController.navigate(Screen.AdminCreateNotification.route)
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "reports" -> navController.navigate(Screen.Reports.route)
                         "add_staff" -> navController.navigate(Screen.AddStaff.route)
@@ -218,8 +220,16 @@ fun AppNavigation(
             )
         }
 
-        composable(Screen.Notifications.route) {
-            NotificationScreen(onBackClick = { navController.popBackStack() })
+        composable(
+            Screen.Notifications.route,
+            arguments = listOf(navArgument("role") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val role = backStackEntry.arguments?.getString("role") ?: "Student"
+            NotificationScreen(role = role, onBackClick = { navController.popBackStack() })
+        }
+
+        composable(Screen.AdminCreateNotification.route) {
+            AdminCreateNotificationScreen(onBack = { navController.popBackStack() })
         }
 
         // New Bottom Bar Routes

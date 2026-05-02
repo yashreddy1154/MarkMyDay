@@ -11,6 +11,8 @@ import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.markmyday.viewmodel.NotificationViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +37,13 @@ fun AdminDashboard(
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
 ) {
+    val notificationViewModel: NotificationViewModel = viewModel()
+    val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
+
+    LaunchedEffect(userRole) {
+        notificationViewModel.fetchNotifications(userRole)
+    }
+
     var searchQuery by remember { mutableStateOf("") }
 
     val adminTiles = listOf(
@@ -57,7 +66,7 @@ fun AdminDashboard(
                 icon = Icons.Default.AutoGraph,
                 title = "MarkMyDay",
                 onNotificationClick = onNotificationClick,
-                notificationCount = 6
+                notificationCount = if (hasUnread) 1 else 0
             )
         },
         bottomBar = {

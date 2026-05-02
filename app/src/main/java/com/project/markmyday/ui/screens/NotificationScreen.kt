@@ -13,28 +13,34 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// Removed: import com.project.markmyday.ui.theme.OrangeGradientStart
-
-data class NotificationItem(
-    val id: Int,
-    val title: String,
-    val description: String,
-    val time: String,
-    val isRead: Boolean = false
-)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.markmyday.viewmodel.Notification
+import com.project.markmyday.viewmodel.NotificationViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(onBackClick: () -> Unit) {
-    val notifications = listOf(
-        NotificationItem(1, "Timetable Updated", "The timetable for Semester 2 has been updated.", "2 mins ago"),
-        NotificationItem(2, "Fee Payment", "Last date for fee payment is May 31st.", "1 hour ago"),
-        NotificationItem(3, "Exam Results", "Your results for Mid-term exams are out.", "5 hours ago", true),
-        NotificationItem(4, "New Assignment", "New assignment posted in Mathematics.", "Yesterday", true)
-    )
+fun NotificationScreen(role: String, onBackClick: () -> Unit) {
+    val viewModel: NotificationViewModel = viewModel()
+    val notifications by viewModel.notifications.collectAsState()
+
+    LaunchedEffect(role) {
+        viewModel.fetchNotifications(role)
+    }
+
+    LaunchedEffect(notifications) {
+        if (notifications.isNotEmpty()) {
+            viewModel.markAsRead()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -48,25 +54,34 @@ fun NotificationScreen(onBackClick: () -> Unit) {
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier.padding(padding).fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(notifications) { notification ->
-                NotificationCard(notification)
+        if (notifications.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Text("No notifications yet", style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.padding(padding).fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(notifications) { notification ->
+                    NotificationCard(notification)
+                }
             }
         }
     }
 }
 
 @Composable
-fun NotificationCard(notification: NotificationItem) {
+fun NotificationCard(notification: Notification) {
+    val date = notification.timestamp?.toDate() ?: Date()
+    val timeString = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(date)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (notification.isRead) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -85,25 +100,22 @@ fun NotificationCard(notification: NotificationItem) {
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = notification.title,
-                    fontWeight = if (notification.isRead) FontWeight.Medium else FontWeight.Bold,
-                    fontSize = 16.sp
+                    text = if (notification.targetAudience == "teachers") "Teacher Notice" else "General Notice",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = notification.description,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2
+                    text = notification.message,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = notification.time,
+                    text = timeString,
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-            if (!notification.isRead) {
-                Box(modifier = Modifier.size(8.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
             }
         }
     }
