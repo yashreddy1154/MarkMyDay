@@ -210,11 +210,12 @@ fun TimetableCard(entry: TimetableEntry) {
 @Composable
 fun DashboardTileGrid(tiles: List<DashboardTile>, onTileClick: (DashboardTile) -> Unit) {
     Column(modifier = Modifier.padding(16.dp)) {
+        val gridHeight = if (tiles.size > 8) 600.dp else 500.dp
         LazyVerticalGrid(
             columns = GridCells.Fixed(2), // 2 columns for better visibility as per UI ideas
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.height(500.dp),
+            modifier = Modifier.height(gridHeight),
             userScrollEnabled = false
         ) {
             items(tiles) { tile ->

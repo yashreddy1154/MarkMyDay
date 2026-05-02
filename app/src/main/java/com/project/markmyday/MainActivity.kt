@@ -18,9 +18,20 @@ import com.project.markmyday.ui.navigation.AppNavigation
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.project.markmyday.viewmodel.AuthViewModel
+import com.project.markmyday.viewmodel.AuthResult
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+
 import androidx.activity.result.contract.ActivityResultContracts
 
 class MainActivity : ComponentActivity() {
+
+    private val authViewModel: AuthViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -36,17 +47,44 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Check for existing session
+        authViewModel.checkSession()
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         setContent {
+            val authState by authViewModel.authState.collectAsState()
+
             MarkMyDayTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavigation()
+                    when (authState) {
+                        is AuthResult.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        is AuthResult.Success -> {
+                            val result = authState as AuthResult.Success
+                            val initialDashboardRoute = when (result.role.lowercase()) {
+                                "principal", "headmaster", "admin" -> "admin_dashboard/${result.name}/${result.role}"
+                                "teacher" -> "teacher_dashboard/${result.name}/${result.role}/${result.homeSection ?: "N/A"}/${result.subject ?: "N/A"}"
+                                "student" -> "student_dashboard/${result.name}/${result.role}"
+                                else -> "student_dashboard/${result.name}/${result.role}"
+                            }
+                            AppNavigation(
+                                startDestination = initialDashboardRoute,
+                                initialDashboardRoute = initialDashboardRoute
+                            )
+                        }
+                        else -> {
+                            AppNavigation()
+                        }
+                    }
                 }
             }
         }

@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.ui.screens.*
 import com.project.markmyday.ui.auth.AuthenticationScreen
 import com.project.markmyday.viewmodel.TeacherViewModel
+import com.project.markmyday.viewmodel.StudentViewModel
 
 sealed class Screen(val route: String) {
     object Authentication : Screen("auth")
@@ -22,6 +23,7 @@ sealed class Screen(val route: String) {
     object Notifications : Screen("notifications")
     object Admissions : Screen("admissions")
     object AddStaff : Screen("add_staff")
+    object AddStudent : Screen("add_student")
     object StaffManagement : Screen("staff_management")
     
     // Bottom Bar Screens
@@ -30,15 +32,19 @@ sealed class Screen(val route: String) {
     object Reports : Screen("marks")
     object GlobalUpdates : Screen("global_updates")
     object Login : Screen("login")
+    object Settings : Screen("settings")
 }
 
 @Composable
-fun AppNavigation(startDestination: String = Screen.Authentication.route) {
+fun AppNavigation(
+    startDestination: String = Screen.Authentication.route,
+    initialDashboardRoute: String = Screen.StudentDashboard.route
+) {
     val navController = rememberNavController()
     
     // Track the last dashboard route to know where "Home" should go
     // Use rememberSaveable to survive configuration changes
-    var lastDashboardRoute by rememberSaveable { mutableStateOf(Screen.StudentDashboard.route) }
+    var lastDashboardRoute by rememberSaveable { mutableStateOf(initialDashboardRoute) }
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Authentication.route) {
@@ -89,6 +95,7 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "results" -> navController.navigate(Screen.Reports.route)
                         "notifications" -> navController.navigate(Screen.Notifications.route)
+                        "settings" -> navController.navigate(Screen.Settings.route)
                     }
                 },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
@@ -118,6 +125,7 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
+                        "settings" -> navController.navigate(Screen.Settings.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -145,7 +153,9 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "reports" -> navController.navigate(Screen.Reports.route)
                         "add_staff" -> navController.navigate(Screen.AddStaff.route)
+                        "add_student" -> navController.navigate(Screen.AddStudent.route)
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
+                        "settings" -> navController.navigate(Screen.Settings.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -163,9 +173,22 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
             )
         }
 
+        composable(Screen.AddStudent.route) {
+            val studentViewModel: StudentViewModel = viewModel()
+            AddStudentScreen(
+                onBack = { navController.popBackStack() },
+                onSubmit = { formState ->
+                    studentViewModel.registerStudent(formState)
+                }
+            )
+        }
+
         composable(Screen.StaffManagement.route) {
+            val teacherViewModel: TeacherViewModel = viewModel()
+            val teachers by teacherViewModel.allTeachers.collectAsState()
+            
             StaffManagementScreen(
-                teachers = emptyList(), // Should be from ViewModel
+                teachers = teachers,
                 onEditTeacher = { /* Handle edit */ },
                 onDeleteTeacher = { /* Handle delete */ },
                 onBack = { navController.popBackStack() }
@@ -208,6 +231,18 @@ fun AppNavigation(startDestination: String = Screen.Authentication.route) {
         composable(Screen.GlobalUpdates.route) {
             GlobalUpdateScreen(
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Settings.route) {
+            com.project.markmyday.settings.SettingsScreen(
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    navController.navigate(Screen.Authentication.route) {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }

@@ -41,12 +41,13 @@ fun AdminDashboard(
         DashboardTile("notices", "Send Notices", Icons.Default.Campaign),
         DashboardTile("staff_management", "Staff List", Icons.Default.Badge),
         DashboardTile("add_staff", "Add Staff", Icons.Default.PersonAdd),
+        DashboardTile("add_student", "Add Student", Icons.Default.PersonAddAlt1),
         DashboardTile("timetable", "Timetables", Icons.AutoMirrored.Filled.EventNote),
         DashboardTile("students", "Students", Icons.Default.People),
         DashboardTile("admissions", "New  Admission", Icons.Default.School),
         DashboardTile("updates", "Global Updates", Icons.Default.Update),
-        DashboardTile("reports", "Reports", Icons.Default.Assessment),
         DashboardTile("settings", "Settings", Icons.Default.Settings),
+        DashboardTile("reports", "Reports", Icons.Default.Assessment)
     )
 
     Scaffold(

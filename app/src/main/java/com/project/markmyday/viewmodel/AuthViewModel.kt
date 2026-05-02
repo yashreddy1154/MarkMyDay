@@ -39,26 +39,46 @@ class AuthViewModel : ViewModel() {
                 val uid = authResult.user?.uid
 
                 if (uid != null) {
-                    // 2. Fetch user document from Firestore
-                    val document = firestore.collection("users").document(uid).get().await()
-                    
-                    if (document.exists()) {
-                        // 3. Extract name, role, and teacher specific fields
-                        val name = document.getString("name") ?: "User"
-                        val role = document.getString("role") ?: "unknown"
-                        val homeSection = document.getString("homeSection")
-                        val subject = document.getString("subject")
-                        
-                        _authState.value = AuthResult.Success(name, role, homeSection, subject)
-                    } else {
-                        _authState.value = AuthResult.Error("User document not found in Firestore.")
-                    }
+                    fetchUserAndSetState(uid)
                 } else {
                     _authState.value = AuthResult.Error("Failed to get User ID after sign-in.")
                 }
             } catch (e: Exception) {
                 _authState.value = AuthResult.Error(e.localizedMessage ?: "An unknown error occurred")
             }
+        }
+    }
+
+    fun checkSession() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            viewModelScope.launch {
+                _authState.value = AuthResult.Loading
+                fetchUserAndSetState(currentUser.uid)
+            }
+        } else {
+            _authState.value = AuthResult.Idle
+        }
+    }
+
+    private suspend fun fetchUserAndSetState(uid: String) {
+        try {
+            // 2. Fetch user document from Firestore
+            val document = firestore.collection("users").document(uid).get().await()
+
+            if (document.exists()) {
+                // 3. Extract name, role, and teacher specific fields
+                val name = document.getString("name") ?: "User"
+                val role = document.getString("role") ?: "unknown"
+                val homeSection = document.getString("homeSection")
+                val subject = document.getString("subject")
+
+                _authState.value = AuthResult.Success(name, role, homeSection, subject)
+            } else {
+                _authState.value = AuthResult.Error("User document not found in Firestore.")
+            }
+        } catch (e: Exception) {
+            _authState.value = AuthResult.Error(e.localizedMessage ?: "An unknown error occurred")
         }
     }
 }
