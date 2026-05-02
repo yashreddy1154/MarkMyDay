@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -97,9 +98,9 @@ fun PreLoginContent(onStart: () -> Unit) {
                 ),
                 textAlign = TextAlign.Center
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "Let's Start Your Learning Adventure",
                 style = MaterialTheme.typography.titleMedium.copy(
@@ -120,7 +121,7 @@ fun PreLoginContent(onStart: () -> Unit) {
             ) {
                 Text("Start Learning", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -156,19 +157,31 @@ fun LoginContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background Image with better dark mode handling
         Image(
             painter = painterResource(id = R.drawable.loginscreenbackground),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            alpha = if (isDarkMode) 0.5f else 1f
+            alpha = if (isDarkMode) 0.6f else 1f
         )
-        
+
+        // Enhanced dark mode overlay with gradient for better visual appeal
         if (isDarkMode) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.7f),
+                                Color(0xFF1A1A2E).copy(alpha = 0.85f),
+                                Color.Black.copy(alpha = 0.8f)
+                            ),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY
+                        )
+                    )
             )
         }
 
@@ -181,8 +194,8 @@ fun LoginContent(
                         IconButton(onClick = onBack) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back", 
-                                tint = if (isDarkMode) Color.White else Color.Black
+                                contentDescription = "Back",
+                                tint = if (isDarkMode) Color.White else Color(0xFF1A1A2E)
                             )
                         }
                     },
@@ -201,30 +214,48 @@ fun LoginContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
-                    shape = RoundedCornerShape(28.dp),
+                    shape = RoundedCornerShape(32.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isDarkMode) 
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.85f) 
-                            else Color.White.copy(alpha = 0.9f)
+                        containerColor = if (isDarkMode)
+                            Color(0xFF1E1E2E).copy(alpha = 0.92f)
+                        else Color.White.copy(alpha = 0.92f)
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = if (isDarkMode) 0.dp else 8.dp),
+                    border = if (isDarkMode)
+                        androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.12f))
+                    else null
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 32.dp),
+                            .padding(horizontal = 24.dp, vertical = 36.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        // Animated welcome text with gradient
+                        val gradientColors = if (isDarkMode)
+                            listOf(Color(0xFF9D4EDD), Color(0xFFFF6B6B))
+                        else listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.7f))
+
                         Text(
-                            text = "Login",
+                            text = "Welcome Back!",
                             style = MaterialTheme.typography.displaySmall.copy(
                                 fontWeight = FontWeight.ExtraBold,
-                                color = if (isDarkMode) Color.White else Color.Black
+                                fontSize = 32.sp
+                            ),
+                            color = if (isDarkMode) Color.White else Color(0xFF1A1A2E)
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Sign in to continue your journey",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = if (isDarkMode) Color.White.copy(alpha = 0.7f) else Color(0xFF666666)
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(40.dp))
 
                         // Email TextField with auto-complete
                         OutlinedTextField(
@@ -242,14 +273,19 @@ fun LoginContent(
                             singleLine = true,
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (isDarkMode) MaterialTheme.colorScheme.primary else Color.Black,
-                                unfocusedBorderColor = if (isDarkMode) Color.White.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.5f),
-                                focusedLabelColor = if (isDarkMode) MaterialTheme.colorScheme.primary else Color.Black,
-                                cursorColor = if (isDarkMode) Color.White else Color.Black
+                                focusedTextColor = if (isDarkMode) Color.White else Color(0xFF1A1A2E),
+                                unfocusedTextColor = if (isDarkMode) Color.White.copy(alpha = 0.8f) else Color(0xFF1A1A2E),
+                                focusedBorderColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = if (isDarkMode) Color.White.copy(alpha = 0.3f) else Color.Gray.copy(alpha = 0.5f),
+                                focusedLabelColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = if (isDarkMode) Color.White.copy(alpha = 0.6f) else Color.Gray,
+                                cursorColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         // Password TextField with Animated Eye Icon
                         OutlinedTextField(
@@ -273,22 +309,44 @@ fun LoginContent(
                                         label = "EyeIconAnimation"
                                     ) { targetIcon ->
                                         Icon(
-                                            imageVector = targetIcon, 
-                                            contentDescription = null, 
-                                            tint = if (isDarkMode) Color.White else Color.Black
+                                            imageVector = targetIcon,
+                                            contentDescription = null,
+                                            tint = if (isDarkMode) Color.White.copy(alpha = 0.7f) else Color(0xFF666666)
                                         )
                                     }
                                 }
                             },
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = if (isDarkMode) MaterialTheme.colorScheme.primary else Color.Black,
-                                unfocusedBorderColor = if (isDarkMode) Color.White.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.5f),
-                                focusedLabelColor = if (isDarkMode) MaterialTheme.colorScheme.primary else Color.Black,
-                                cursorColor = if (isDarkMode) Color.White else Color.Black
+                                focusedTextColor = if (isDarkMode) Color.White else Color(0xFF1A1A2E),
+                                unfocusedTextColor = if (isDarkMode) Color.White.copy(alpha = 0.8f) else Color(0xFF1A1A2E),
+                                focusedBorderColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = if (isDarkMode) Color.White.copy(alpha = 0.3f) else Color.Gray.copy(alpha = 0.5f),
+                                focusedLabelColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = if (isDarkMode) Color.White.copy(alpha = 0.6f) else Color.Gray,
+                                cursorColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
                             )
                         )
 
-                        Spacer(modifier = Modifier.height(40.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Forgot Password link
+                        TextButton(
+                            onClick = {
+                                // Handle forgot password
+                                Toast.makeText(context, "Forgot password feature coming soon", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.align(Alignment.End)
+                        ) {
+                            Text(
+                                text = "Forgot Password?",
+                                color = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                fontSize = 14.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(28.dp))
 
                         Button(
                             onClick = {
@@ -303,22 +361,50 @@ fun LoginContent(
                                 .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isDarkMode) MaterialTheme.colorScheme.primary else Color.Black
+                                containerColor = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary
                             ),
                             enabled = authResult !is AuthResult.Loading
                         ) {
-                            if (authResult is AuthResult.Loading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = Color.White,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                if (authResult is AuthResult.Loading) {
+                                    LinearProgressIndicator(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.6f)
+                                            .height(3.dp),
+                                        color = if (isDarkMode) Color.White else Color.White,
+                                        trackColor = if (isDarkMode) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.3f)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text("Logging you in...", color = Color.White, fontSize = 16.sp)
+                                } else {
+                                    Text("Login", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Sign up suggestion
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Don't have an account? ",
+                                color = if (isDarkMode) Color.White.copy(alpha = 0.6f) else Color(0xFF666666),
+                                fontSize = 14.sp
+                            )
+                            TextButton(
+                                onClick = {
+                                    Toast.makeText(context, "Sign up feature coming soon", Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier.padding(0.dp)
+                            ) {
                                 Text(
-                                    "Login", 
-                                    color = Color.White, 
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                                    text = "Sign Up",
+                                    color = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold
                                 )
                             }
                         }
