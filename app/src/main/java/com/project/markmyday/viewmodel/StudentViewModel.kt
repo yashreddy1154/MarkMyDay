@@ -3,6 +3,7 @@ package com.project.markmyday.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.markmyday.data.model.Student
@@ -31,9 +32,21 @@ sealed class StudentRegistrationState {
  */
 class StudentViewModel(
     private val repository: StudentRepository = StudentRepository(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : ViewModel() {
+
+    // Using a secondary FirebaseApp instance to prevent auto-login of newly created users
+    private val auth: FirebaseAuth by lazy {
+        val defaultApp = FirebaseApp.getInstance()
+        val options = defaultApp.options
+        val context = defaultApp.applicationContext
+        val secondaryApp = try {
+            FirebaseApp.getInstance("Secondary")
+        } catch (e: Exception) {
+            FirebaseApp.initializeApp(context, options, "Secondary")
+        }
+        FirebaseAuth.getInstance(secondaryApp)
+    }
 
     private val _registrationState = MutableStateFlow<StudentRegistrationState>(StudentRegistrationState.Idle)
     val registrationState: StateFlow<StudentRegistrationState> = _registrationState.asStateFlow()
@@ -49,6 +62,33 @@ class StudentViewModel(
         )
 
     private val TAG = "StudentViewModel"
+
+    /**
+     * Resets the registration state to Idle.
+     */
+    fun resetRegistrationState() {
+        _registrationState.value = StudentRegistrationState.Idle
+    }
+
+    fun deleteStudent(studentId: String) {
+        viewModelScope.launch {
+            try {
+                repository.deleteStudent(studentId)
+            } catch (e: Exception) {
+                _registrationState.value = StudentRegistrationState.Error(e.localizedMessage ?: "Delete failed")
+            }
+        }
+    }
+
+    fun updateStudent(student: Student) {
+        viewModelScope.launch {
+            try {
+                repository.updateStudent(student)
+            } catch (e: Exception) {
+                _registrationState.value = StudentRegistrationState.Error(e.localizedMessage ?: "Update failed")
+            }
+        }
+    }
 
     /**
      * Registers a new student by creating credentials in Firebase Auth 
@@ -78,6 +118,7 @@ class StudentViewModel(
 
                 // 3. Prepare Student object for Firestore 'students' collection
                 val student = Student(
+                    uid = uid,
                     studentId = studentId,
                     name = formState.name,
                     age = formState.age.toIntOrNull() ?: 0,
@@ -86,6 +127,7 @@ class StudentViewModel(
                     phone = formState.phone,
                     studentClass = formState.studentClass,
                     section = formState.section,
+                    classSection = "${formState.studentClass} ${formState.section}",
                     email = email
                 )
 
@@ -100,7 +142,10 @@ class StudentViewModel(
                     "email" to email,
                     "studentId" to studentId,
                     "studentClass" to formState.studentClass,
-                    "section" to formState.section
+                    "section" to formState.section,
+                    "class_section" to "${formState.studentClass} ${formState.section}",
+                    "parentName" to formState.parentName,
+                    "phone" to formState.phone
                 )
                 firestore.collection("users").document(uid).set(userMap).await()
 

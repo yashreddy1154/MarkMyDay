@@ -30,11 +30,10 @@ fun StudentManagementScreen(
     onBack: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
 
     val filteredStudents = remember(searchQuery, students) {
-        if (searchQuery.isEmpty()) {
-            students
+        if (searchQuery.isBlank()) {
+            emptyList()
         } else {
             students.filter {
                 it.name.contains(searchQuery, ignoreCase = true) ||
@@ -43,15 +42,89 @@ fun StudentManagementScreen(
         }
     }
 
+    var studentToEdit by remember { mutableStateOf<Student?>(null) }
+    var studentToDelete by remember { mutableStateOf<Student?>(null) }
+
+    if (studentToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { studentToDelete = null },
+            title = { Text("Delete Student") },
+            text = { Text("Are you sure you want to delete ${studentToDelete?.name}?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        studentToDelete?.let { onDeleteStudent(it) }
+                        studentToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { studentToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (studentToEdit != null) {
+        var editState by remember { 
+            mutableStateOf(
+                AddStudentFormState(
+                    name = studentToEdit?.name ?: "",
+                    age = studentToEdit?.age?.toString() ?: "",
+                    dob = studentToEdit?.dob ?: "",
+                    parentName = studentToEdit?.parentName ?: "",
+                    phone = studentToEdit?.phone ?: "",
+                    studentClass = studentToEdit?.studentClass ?: "",
+                    section = studentToEdit?.section ?: "",
+                    email = studentToEdit?.email ?: ""
+                )
+            )
+        }
+
+        ModalBottomSheet(
+            onDismissRequest = { studentToEdit = null },
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            modifier = Modifier.fillMaxHeight(0.9f)
+        ) {
+            AddStudentContent(
+                title = "Edit Student Details",
+                state = editState,
+                onStateChange = { editState = it },
+                onBack = { studentToEdit = null },
+                onSubmit = {
+                    studentToEdit?.let { original ->
+                        onEditStudent(
+                            original.copy(
+                                name = editState.name,
+                                age = editState.age.toIntOrNull() ?: 0,
+                                dob = editState.dob,
+                                parentName = editState.parentName,
+                                phone = editState.phone,
+                                studentClass = editState.studentClass,
+                                section = editState.section,
+                                email = editState.email
+                            )
+                        )
+                    }
+                    studentToEdit = null
+                }
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
-            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
-                    onSearch = { active = false },
-                    active = active,
-                    onActiveChange = { active = it },
+                    onSearch = { },
+                    active = false,
+                    onActiveChange = { },
                     placeholder = { Text("Search by Name or ID") },
                     leadingIcon = {
                         IconButton(onClick = onBack) {
@@ -59,32 +132,45 @@ fun StudentManagementScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    // Suggestions could go here
-                }
+                ) { }
             }
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Text(
-                    text = "Student List (${filteredStudents.size})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+        if (searchQuery.isNotBlank()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Text(
+                        text = "Student List (${filteredStudents.size})",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                items(filteredStudents, key = { it.studentId }) { student ->
+                    StudentListItem(
+                        student = student,
+                        onEdit = { studentToEdit = student },
+                        onDelete = { studentToDelete = student }
+                    )
+                }
             }
-            items(filteredStudents, key = { it.studentId }) { student ->
-                StudentListItem(
-                    student = student,
-                    onEdit = { onEditStudent(student) },
-                    onDelete = { onDeleteStudent(student) }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Search for students to view details",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

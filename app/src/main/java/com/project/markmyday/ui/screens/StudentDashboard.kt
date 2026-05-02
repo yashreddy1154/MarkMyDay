@@ -99,8 +99,8 @@ fun StudentDashboard(
                         }
                     }
                 )
-                "attendance" -> AttendanceScreenContent()
-                "leave" -> LeaveScreenContent(onApply = { currentSubScreen = "home" })
+                "attendance" -> StudentAttendanceDashboardScreen(onBack = { currentSubScreen = "home" })
+                "leave" -> LeaveScreen(onBack = { currentSubScreen = "home" })
             }
         }
     }

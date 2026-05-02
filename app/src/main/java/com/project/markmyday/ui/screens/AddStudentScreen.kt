@@ -24,26 +24,69 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.ui.utils.calculateAgeFromDateOfBirth
 import com.project.markmyday.ui.utils.formatDateForDisplay
+import com.project.markmyday.viewmodel.StudentRegistrationState
+import com.project.markmyday.viewmodel.StudentViewModel
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStudentScreen(
     onBack: () -> Unit,
-    onSubmit: (AddStudentFormState) -> Unit
+    onSubmit: (AddStudentFormState) -> Unit,
+    viewModel: StudentViewModel = viewModel()
 ) {
     var state by remember { mutableStateOf(AddStudentFormState()) }
+    val registrationState by viewModel.registrationState.collectAsState()
+    val context = LocalContext.current
 
-    AddStudentContent(
-        state = state,
-        onStateChange = { state = it },
-        onBack = onBack,
-        onSubmit = { onSubmit(state) }
-    )
+    LaunchedEffect(registrationState) {
+        if (registrationState is StudentRegistrationState.Success) {
+            Toast.makeText(context, "Student added successfully!", Toast.LENGTH_LONG).show()
+            // Reset form state and viewmodel state to allow adding another student
+            state = AddStudentFormState()
+            viewModel.resetRegistrationState()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AddStudentContent(
+            title = "Add New Student",
+            state = state,
+            onStateChange = { state = it },
+            onBack = onBack,
+            onSubmit = { onSubmit(state) }
+        )
+
+        if (registrationState is StudentRegistrationState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        }
+
+        if (registrationState is StudentRegistrationState.Error) {
+            val errorMessage = (registrationState as StudentRegistrationState.Error).message
+            AlertDialog(
+                onDismissRequest = { /* Handle error dismissal if needed */ },
+                title = { Text("Registration Error") },
+                text = { Text(errorMessage) },
+                confirmButton = {
+                    TextButton(onClick = { /* Reset state if needed */ }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+    }
 }
 
 data class AddStudentFormState(
@@ -60,6 +103,7 @@ data class AddStudentFormState(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStudentContent(
+    title: String,
     state: AddStudentFormState,
     onStateChange: (AddStudentFormState) -> Unit,
     onBack: () -> Unit,
@@ -127,7 +171,7 @@ fun AddStudentContent(
                 TopAppBar(
                     title = {
                         Text(
-                            "Add New Student",
+                            title,
                             fontWeight = FontWeight.Bold,
                             color = Color.Blue
                         )

@@ -2,6 +2,7 @@ package com.project.markmyday.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.project.markmyday.data.model.Teacher
 import com.project.markmyday.data.repository.TeacherRepository
@@ -24,9 +25,21 @@ sealed class TeacherRegistrationState {
 
 class TeacherViewModel(
     private val repository: TeacherRepository = TeacherRepository(),
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : ViewModel() {
+
+    // Using a secondary FirebaseApp instance to prevent auto-login of newly created users
+    private val auth: FirebaseAuth by lazy {
+        val defaultApp = FirebaseApp.getInstance()
+        val options = defaultApp.options
+        val context = defaultApp.applicationContext
+        val secondaryApp = try {
+            FirebaseApp.getInstance("Secondary")
+        } catch (e: Exception) {
+            FirebaseApp.initializeApp(context, options, "Secondary")
+        }
+        FirebaseAuth.getInstance(secondaryApp)
+    }
 
     private val _registrationState = MutableStateFlow<TeacherRegistrationState>(TeacherRegistrationState.Idle)
     val registrationState: StateFlow<TeacherRegistrationState> = _registrationState.asStateFlow()
@@ -37,6 +50,32 @@ class TeacherViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    fun resetRegistrationState() {
+        _registrationState.value = TeacherRegistrationState.Idle
+    }
+
+    fun deleteTeacher(teacherId: String) {
+        viewModelScope.launch {
+            try {
+                repository.deleteTeacher(teacherId)
+                // Note: We might also want to delete from 'users' collection and Firebase Auth
+                // but that requires UID which is not currently in Teacher model.
+            } catch (e: Exception) {
+                _registrationState.value = TeacherRegistrationState.Error(e.localizedMessage ?: "Delete failed")
+            }
+        }
+    }
+
+    fun updateTeacher(teacher: Teacher) {
+        viewModelScope.launch {
+            try {
+                repository.updateTeacher(teacher)
+            } catch (e: Exception) {
+                _registrationState.value = TeacherRegistrationState.Error(e.localizedMessage ?: "Update failed")
+            }
+        }
+    }
 
     fun registerTeacher(formState: AddStaffFormState) {
         viewModelScope.launch {
@@ -79,8 +118,9 @@ class TeacherViewModel(
                     "role" to "teacher",
                     "email" to email,
                     "teacherId" to teacherId,
-                    "homeSection" to formState.homeSection,
-                    "subject" to formState.subject
+                    "home_section" to formState.homeSection,
+                    "subject" to formState.subject,
+                    "teaching_assignments" to formState.classesTaught
                 )
                 firestore.collection("users").document(uid).set(userMap).await()
 

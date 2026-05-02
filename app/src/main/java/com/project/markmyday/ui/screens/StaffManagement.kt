@@ -29,16 +29,88 @@ fun StaffManagementScreen(
     onBack: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var active by remember { mutableStateOf(false) }
 
     val filteredTeachers = remember(searchQuery, teachers) {
-        if (searchQuery.isEmpty()) {
-            teachers
+        if (searchQuery.isBlank()) {
+            emptyList()
         } else {
             teachers.filter {
                 it.name.contains(searchQuery, ignoreCase = true) ||
                 it.teacherId.contains(searchQuery, ignoreCase = true)
             }
+        }
+    }
+
+    var teacherToEdit by remember { mutableStateOf<Teacher?>(null) }
+    var teacherToDelete by remember { mutableStateOf<Teacher?>(null) }
+
+    if (teacherToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { teacherToDelete = null },
+            title = { Text("Delete Staff") },
+            text = { Text("Are you sure you want to delete ${teacherToDelete?.name}?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        teacherToDelete?.let { onDeleteTeacher(it) }
+                        teacherToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { teacherToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (teacherToEdit != null) {
+        var editState by remember { 
+            mutableStateOf(
+                AddStaffFormState(
+                    name = teacherToEdit?.name ?: "",
+                    age = teacherToEdit?.age?.toString() ?: "",
+                    dob = teacherToEdit?.dob ?: "",
+                    phone = teacherToEdit?.phone ?: "",
+                    email = teacherToEdit?.email ?: "",
+                    subject = teacherToEdit?.subject ?: "",
+                    homeSection = teacherToEdit?.homeSection ?: "",
+                    classesTaught = teacherToEdit?.classesTaught ?: emptyList()
+                )
+            )
+        }
+
+        ModalBottomSheet(
+            onDismissRequest = { teacherToEdit = null },
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            modifier = Modifier.fillMaxHeight(0.9f)
+        ) {
+            AddStaffContent(
+                title = "Edit Staff Details",
+                state = editState,
+                onStateChange = { editState = it },
+                onBack = { teacherToEdit = null },
+                onSubmit = {
+                    teacherToEdit?.let { original ->
+                        onEditTeacher(
+                            original.copy(
+                                name = editState.name,
+                                age = editState.age.toIntOrNull() ?: 0,
+                                dob = editState.dob,
+                                phone = editState.phone,
+                                subject = editState.subject,
+                                homeSection = editState.homeSection,
+                                classesTaught = editState.classesTaught
+                            )
+                        )
+                    }
+                    teacherToEdit = null
+                }
+            )
         }
     }
 
@@ -48,9 +120,9 @@ fun StaffManagementScreen(
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
-                    onSearch = { active = false },
-                    active = active,
-                    onActiveChange = { active = it },
+                    onSearch = { },
+                    active = false,
+                    onActiveChange = { },
                     placeholder = { Text("Search by Name or ID") },
                     leadingIcon = { 
                         IconButton(onClick = onBack) {
@@ -58,32 +130,45 @@ fun StaffManagementScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    // Search suggestions could go here
-                }
+                ) { }
             }
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Text(
-                    text = "Staff List (${filteredTeachers.size})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+        if (searchQuery.isNotBlank()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Text(
+                        text = "Staff List (${filteredTeachers.size})",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                items(filteredTeachers, key = { it.teacherId }) { teacher ->
+                    TeacherListItem(
+                        teacher = teacher,
+                        onEdit = { teacherToEdit = teacher },
+                        onDelete = { teacherToDelete = teacher }
+                    )
+                }
             }
-            items(filteredTeachers, key = { it.teacherId }) { teacher ->
-                TeacherListItem(
-                    teacher = teacher,
-                    onEdit = { onEditTeacher(teacher) },
-                    onDelete = { onDeleteTeacher(teacher) }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Search for staff members to view details",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

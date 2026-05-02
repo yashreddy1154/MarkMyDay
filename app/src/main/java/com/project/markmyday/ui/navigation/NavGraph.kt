@@ -25,6 +25,7 @@ sealed class Screen(val route: String) {
     object AddStaff : Screen("add_staff")
     object AddStudent : Screen("add_student")
     object StaffManagement : Screen("staff_management")
+    object StudentManagement : Screen("student_management")
     
     // Bottom Bar Screens
     object Happenings : Screen("happenings")
@@ -155,6 +156,7 @@ fun AppNavigation(
                         "add_staff" -> navController.navigate(Screen.AddStaff.route)
                         "add_student" -> navController.navigate(Screen.AddStudent.route)
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
+                        "students" -> navController.navigate(Screen.StudentManagement.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
                         // Add more routing as screens are implemented
                     }
@@ -189,8 +191,20 @@ fun AppNavigation(
             
             StaffManagementScreen(
                 teachers = teachers,
-                onEditTeacher = { /* Handle edit */ },
-                onDeleteTeacher = { /* Handle delete */ },
+                onEditTeacher = { teacherViewModel.updateTeacher(it) },
+                onDeleteTeacher = { teacherViewModel.deleteTeacher(it.teacherId) },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.StudentManagement.route) {
+            val studentViewModel: StudentViewModel = viewModel()
+            val students by studentViewModel.allStudents.collectAsState()
+            
+            StudentManagementScreen(
+                students = students,
+                onEditStudent = { studentViewModel.updateStudent(it) },
+                onDeleteStudent = { studentViewModel.deleteStudent(it.studentId) },
                 onBack = { navController.popBackStack() }
             )
         }

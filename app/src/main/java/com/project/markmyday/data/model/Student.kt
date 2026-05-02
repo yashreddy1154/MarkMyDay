@@ -14,6 +14,7 @@ package com.project.markmyday.data.model
  * @property email Email address for the student or parent.
  */
 data class Student(
+    val uid: String = "",
     val studentId: String = "",
     val name: String = "",
     val age: Int = 0,
@@ -22,5 +23,6 @@ data class Student(
     val phone: String = "",
     val studentClass: String = "",
     val section: String = "",
+    val classSection: String = "",
     val email: String = ""
 )

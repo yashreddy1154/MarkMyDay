@@ -1,125 +1,190 @@
 package com.project.markmyday.ui.screens
 
-import androidx.compose.foundation.background
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.project.markmyday.ui.theme.MarkMyDayTheme
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.markmyday.data.model.Student
+import com.project.markmyday.viewmodel.AttendanceSubmissionState
+import com.project.markmyday.viewmodel.AttendanceViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AttendanceScreen(onBack: () -> Unit) {
+fun AttendanceScreen(
+    onBack: () -> Unit,
+    viewModel: AttendanceViewModel = viewModel()
+) {
+    val assignedClasses by viewModel.assignedClasses.collectAsState()
+    val studentsByClass by viewModel.studentsByClass.collectAsState()
+    val submissionState by viewModel.submissionState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val context = LocalContext.current
+
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val selectedClass = if (assignedClasses.isNotEmpty() && selectedTabIndex < assignedClasses.size) {
+        assignedClasses[selectedTabIndex]
+    } else ""
+    val studentsInSelectedClass = studentsByClass[selectedClass] ?: emptyList()
+
+    LaunchedEffect(submissionState) {
+        when (submissionState) {
+            is AttendanceSubmissionState.Success -> {
+                Toast.makeText(context, "Attendance submitted successfully!", Toast.LENGTH_SHORT).show()
+                viewModel.resetSubmissionState()
+            }
+            is AttendanceSubmissionState.Error -> {
+                Toast.makeText(context, (submissionState as AttendanceSubmissionState.Error).message, Toast.LENGTH_LONG).show()
+                viewModel.resetSubmissionState()
+            }
+            else -> {}
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Attendance", fontWeight = FontWeight.Bold) },
+                title = { Text("Mark Attendance", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (selectedClass.isNotEmpty()) {
+                Surface(
+                    tonalElevation = 4.dp,
+                    shadowElevation = 8.dp
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = { viewModel.submitAttendance(selectedClass) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            enabled = submissionState !is AttendanceSubmissionState.Loading
+                        ) {
+                            if (submissionState is AttendanceSubmissionState.Loading) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            } else {
+                                Text("Submit Attendance", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
         }
     ) { padding ->
-        AttendanceScreenContent(modifier = Modifier.padding(padding))
-    }
-}
+        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (assignedClasses.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No classes assigned to you.")
+                }
+            } else {
+                ScrollableTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    edgePadding = 16.dp,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    assignedClasses.forEachIndexed { index, className ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index },
+                            text = { Text(className) }
+                        )
+                    }
+                }
 
-@Composable
-fun AttendanceScreenContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Overall percentage card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Overall Attendance", color = Color.White.copy(alpha = 0.8f))
-                Text("85%", fontSize = 48.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
-                Text("You're doing great!", color = Color.White.copy(alpha = 0.9f))
+                if (studentsInSelectedClass.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No students found for $selectedClass.")
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(studentsInSelectedClass, key = { it.uid }) { student ->
+                            StudentAttendanceRow(
+                                student = student,
+                                isPresent = viewModel.attendanceStates[student.uid] ?: true,
+                                onToggle = { viewModel.toggleAttendance(student.uid, it) }
+                            )
+                        }
+                    }
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        Text("Subject-wise Details", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        AttendanceItem("Mathematics", "22/25", 88)
-        AttendanceItem("Physics", "18/25", 72)
-        AttendanceItem("English", "24/25", 96)
-        AttendanceItem("Telugu", "20/25", 80)
     }
 }
 
 @Composable
-fun AttendanceItem(subject: String, ratio: String, percentage: Int) {
-    Card(
-        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp)
+fun StudentAttendanceRow(
+    student: Student,
+    isPresent: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        if (percentage >= 75) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
-                        RoundedCornerShape(12.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (percentage >= 75) Icons.Default.CheckCircle else Icons.Default.Cancel,
-                    contentDescription = null,
-                    tint = if (percentage >= 75) Color(0xFF4CAF50) else Color(0xFFF44336)
+            Column {
+                Text(
+                    text = student.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "ID: ${student.studentId}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(subject, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(ratio, color = Color.Gray, fontSize = 14.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = if (isPresent) "Present" else "Absent",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isPresent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Switch(
+                    checked = isPresent,
+                    onCheckedChange = onToggle
+                )
             }
-            Text(
-                "$percentage%",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 18.sp,
-                color = if (percentage >= 75) Color(0xFF4CAF50) else Color(0xFFF44336)
-            )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AttendanceScreenPreview() {
-    MarkMyDayTheme {
-        AttendanceScreen(onBack = {})
     }
 }

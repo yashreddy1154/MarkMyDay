@@ -64,17 +64,18 @@ fun AddStaffScreen(
     val registrationState by viewModel.registrationState.collectAsState()
     val context = LocalContext.current
 
-    // Show success Toast but do NOT navigate back
+    // Show success Toast and reset form
     LaunchedEffect(registrationState) {
         if (registrationState is TeacherRegistrationState.Success) {
             Toast.makeText(context, "Staff member added successfully!", Toast.LENGTH_LONG).show()
-            // Optional: reset form to allow adding another staff without leaving the screen
-            // state = AddStaffFormState()
+            state = AddStaffFormState()
+            viewModel.resetRegistrationState()
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AddStaffContent(
+            title = "Add New Staff",
             state = state,
             onStateChange = { state = it },
             onBack = onBack,
@@ -124,6 +125,7 @@ data class AddStaffFormState(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AddStaffContent(
+    title: String,
     state: AddStaffFormState,
     onStateChange: (AddStaffFormState) -> Unit,
     onBack: () -> Unit,
@@ -213,7 +215,7 @@ fun AddStaffContent(
                 TopAppBar(
                     title = {
                         Text(
-                            "Add New Staff",
+                            title,
                             fontWeight = FontWeight.Bold,
                             color = Color.Blue
                         )
