@@ -56,6 +56,7 @@ fun TeacherDashboard(
         DashboardTile("leave", "Leave Request", Icons.Default.EventBusy),
         DashboardTile("exams", "Manage Exams", Icons.Default.Quiz, badgeCount = 2),
         DashboardTile("updates", "Global Updates", Icons.Default.Update),
+        DashboardTile("notifications", "Notices", Icons.Default.Notifications, badgeCount = if (hasUnread) 1 else 0),
         DashboardTile("admissions", "New  Admission", Icons.Default.School),
         DashboardTile("messages", "Messages", Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", "Settings", Icons.Default.Settings)

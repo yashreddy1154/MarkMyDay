@@ -51,7 +51,11 @@ class AttendanceViewModel(
             _isLoading.value = true
             try {
                 val teacherDoc = firestore.collection("users").document(uid).get().await()
-                val assignments = teacherDoc.get("teaching_assignments") as? List<String> ?: emptyList()
+                val rawAssignments = teacherDoc.get("teaching_assignments")
+                val assignments = when (rawAssignments) {
+                    is List<*> -> rawAssignments.filterIsInstance<String>()
+                    else -> emptyList()
+                }
                 val subject = teacherDoc.getString("subject") ?: ""
                 val teacherId = teacherDoc.getString("teacherId") ?: ""
 

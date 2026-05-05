@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.markmyday.viewmodel.Notification
+import com.project.markmyday.data.model.NotificationData
 import com.project.markmyday.viewmodel.NotificationViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -73,8 +73,8 @@ fun NotificationScreen(role: String, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun NotificationCard(notification: Notification) {
-    val date = notification.timestamp?.toDate() ?: Date()
+fun NotificationCard(notification: NotificationData) {
+    val date = Date(notification.timestamp)
     val timeString = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(date)
 
     Card(
@@ -99,11 +99,27 @@ fun NotificationCard(notification: Notification) {
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = if (notification.audience == "teachers") "Teacher Notice" else "General Notice",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "By ${notification.author}",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
                 Text(
-                    text = if (notification.targetAudience == "teachers") "Teacher Notice" else "General Notice",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    text = notification.heading,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = notification.message,

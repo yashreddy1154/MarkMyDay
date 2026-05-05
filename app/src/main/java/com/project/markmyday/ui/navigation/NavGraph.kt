@@ -130,6 +130,7 @@ fun AppNavigation(
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
+                        "notifications" -> navController.navigate("notifications/$role")
                         // Add more routing as screens are implemented
                     }
                 },

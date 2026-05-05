@@ -1,13 +1,11 @@
 package com.project.markmyday.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
+import com.project.markmyday.data.model.NotificationData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 sealed class NotificationUiState {
     object Idle : NotificationUiState()
@@ -17,10 +15,17 @@ sealed class NotificationUiState {
 }
 
 class AdminNotificationViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
+    // Reference to Realtime Database
+    private val database = FirebaseDatabase.getInstance().getReference("notifications")
+
+    private val _heading = MutableStateFlow("")
+    val heading = _heading.asStateFlow()
 
     private val _message = MutableStateFlow("")
     val message = _message.asStateFlow()
+
+    private val _author = MutableStateFlow("")
+    val author = _author.asStateFlow()
 
     private val _targetAudience = MutableStateFlow("all")
     val targetAudience = _targetAudience.asStateFlow()
@@ -28,8 +33,16 @@ class AdminNotificationViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<NotificationUiState>(NotificationUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
-    fun onMessageChange(newMessage: String) {
-        _message.value = newMessage
+    fun onHeadingChange(newValue: String) {
+        _heading.value = newValue
+    }
+
+    fun onMessageChange(newValue: String) {
+        _message.value = newValue
+    }
+
+    fun onAuthorChange(newValue: String) {
+        _author.value = newValue
     }
 
     fun onTargetAudienceChange(newTarget: String) {
@@ -37,29 +50,55 @@ class AdminNotificationViewModel : ViewModel() {
     }
 
     fun sendNotification() {
+        val currentHeading = _heading.value
         val currentMessage = _message.value
+        val currentAuthor = _author.value
         val currentAudience = _targetAudience.value
 
-        if (currentMessage.isBlank()) {
-            _uiState.value = NotificationUiState.Error("Message cannot be empty")
+        if (currentHeading.isBlank() || currentMessage.isBlank() || currentAuthor.isBlank()) {
+            _uiState.value = NotificationUiState.Error("All fields are required")
             return
         }
 
-        viewModelScope.launch {
-            _uiState.value = NotificationUiState.Loading
-            try {
-                val notificationData = hashMapOf(
-                    "message" to currentMessage,
-                    "target_audience" to currentAudience,
-                    "timestamp" to FieldValue.serverTimestamp()
-                )
-                firestore.collection("notifications").add(notificationData).await()
+        // 5. Debug Log: Start
+        Log.d("AdminNotificationVM", "Attempting to send notification: $currentHeading")
+        
+        _uiState.value = NotificationUiState.Loading
+
+        // 3. Generate ID using push()
+        val notificationId = database.push().key
+        if (notificationId == null) {
+            Log.e("AdminNotificationVM", "Failed to generate Firebase push key")
+            _uiState.value = NotificationUiState.Error("Database error: Could not generate ID")
+            return
+        }
+
+        val notification = NotificationData(
+            id = notificationId,
+            heading = currentHeading,
+            message = currentMessage,
+            author = currentAuthor,
+            audience = currentAudience,
+            timestamp = System.currentTimeMillis()
+        )
+
+        // 1. Use Listeners (NOT .await())
+        database.child(notificationId).setValue(notification)
+            .addOnSuccessListener {
+                // 5. Debug Log: Success
+                Log.d("AdminNotificationVM", "Notification successfully saved! ID: $notificationId")
+                
+                // Reset input fields after success
+                _heading.value = ""
                 _message.value = ""
+                _author.value = ""
                 _uiState.value = NotificationUiState.Success
-            } catch (e: Exception) {
+            }
+            .addOnFailureListener { e ->
+                // 5. Debug Log: Error
+                Log.e("AdminNotificationVM", "Failed to save notification", e)
                 _uiState.value = NotificationUiState.Error(e.localizedMessage ?: "Unknown error occurred")
             }
-        }
     }
 
     fun resetUiState() {

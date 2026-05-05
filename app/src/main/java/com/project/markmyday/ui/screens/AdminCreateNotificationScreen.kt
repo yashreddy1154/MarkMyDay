@@ -1,8 +1,10 @@
 package com.project.markmyday.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -23,17 +25,20 @@ fun AdminCreateNotificationScreen(
     onBack: () -> Unit
 ) {
     val viewModel: AdminNotificationViewModel = viewModel()
+    val heading by viewModel.heading.collectAsState()
     val message by viewModel.message.collectAsState()
+    val author by viewModel.author.collectAsState()
     val targetAudience by viewModel.targetAudience.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val audiences = listOf("all", "teachers")
 
+    // Handle UI state changes for snackbar
     LaunchedEffect(uiState) {
         when (uiState) {
             is NotificationUiState.Success -> {
-                snackbarHostState.showSnackbar("Notification created successfully!")
+                snackbarHostState.showSnackbar("Notification sent successfully!")
                 viewModel.resetUiState()
             }
             is NotificationUiState.Error -> {
@@ -61,7 +66,8 @@ fun AdminCreateNotificationScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
@@ -70,6 +76,27 @@ fun AdminCreateNotificationScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            // Heading Field
+            OutlinedTextField(
+                value = heading,
+                onValueChange = { viewModel.onHeadingChange(it) },
+                label = { Text("Notification Heading") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                placeholder = { Text("Enter a catchy title...") }
+            )
+
+            // Author Field
+            OutlinedTextField(
+                value = author,
+                onValueChange = { viewModel.onAuthorChange(it) },
+                label = { Text("Author / Department") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                placeholder = { Text("e.g. Administration, Principal...") }
+            )
+
+            // Message Field
             OutlinedTextField(
                 value = message,
                 onValueChange = { viewModel.onMessageChange(it) },
@@ -102,7 +129,7 @@ fun AdminCreateNotificationScreen(
                     ) {
                         RadioButton(
                             selected = (text == targetAudience),
-                            onClick = null // null recommended for accessibility with selectable modifier
+                            onClick = null
                         )
                         Text(
                             text = text.replaceFirstChar { it.uppercase() },
@@ -113,8 +140,9 @@ fun AdminCreateNotificationScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(24.dp))
 
+            // 4. Button Fix (Loading indicator + Disabled state)
             Button(
                 onClick = { viewModel.sendNotification() },
                 modifier = Modifier
