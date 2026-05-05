@@ -38,10 +38,17 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 }
 
 dependencies {
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.glide)
+    implementation(libs.swiperefreshlayout)
+    implementation(libs.recyclerview)
+    implementation(libs.cardview)
     implementation(libs.androidx.compose.remote.creation.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -55,6 +62,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.appcompat)
+    implementation(libs.constraintlayout)
+    implementation(libs.material)
     
     // Firebase BoM
     implementation(platform(libs.firebase.bom))

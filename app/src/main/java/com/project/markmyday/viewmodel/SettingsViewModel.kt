@@ -84,12 +84,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun setLanguage(languageCode: String) {
+        if (_currentLanguage.value == languageCode) return
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
         AppCompatDelegate.setApplicationLocales(appLocale)
         _currentLanguage.value = languageCode
     }
 
     fun toggleDarkMode(enabled: Boolean) {
+        if (_isDarkMode.value == enabled) return
         _isDarkMode.value = enabled
         prefs.edit().putBoolean("dark_mode", enabled).apply()
         AppCompatDelegate.setDefaultNightMode(

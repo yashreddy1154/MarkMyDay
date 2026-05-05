@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.project.markmyday.R
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,10 +36,10 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Student Admissions", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.student_admissions), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -60,7 +62,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "New Admission Form 📝",
+                            text = stringResource(R.string.new_admission_form),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
@@ -71,7 +73,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                         OutlinedTextField(
                             value = name,
                             onValueChange = { name = it },
-                            label = { Text("Student Name") },
+                            label = { Text(stringResource(R.string.student_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -82,7 +84,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                             OutlinedTextField(
                                 value = age,
                                 onValueChange = { age = it },
-                                label = { Text("Age") },
+                                label = { Text(stringResource(R.string.age)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
                             )
@@ -90,7 +92,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                             OutlinedTextField(
                                 value = className,
                                 onValueChange = { className = it },
-                                label = { Text("Class") },
+                                label = { Text(stringResource(R.string.class_label)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp)
                             )
@@ -101,7 +103,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                         OutlinedTextField(
                             value = parentName,
                             onValueChange = { parentName = it },
-                            label = { Text("Parent Name") },
+                            label = { Text(stringResource(R.string.parent_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -111,7 +113,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                         OutlinedTextField(
                             value = phone,
                             onValueChange = { phone = it },
-                            label = { Text("Phone Number") },
+                            label = { Text(stringResource(R.string.phone_number)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -141,7 +143,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                         ) {
-                            Text("Submit Admission")
+                            Text(stringResource(R.string.submit_admission))
                         }
                     }
                 }
@@ -149,7 +151,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
 
             item {
                 Text(
-                    "Recent Admissions", 
+                    stringResource(R.string.recent_admissions), 
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
@@ -160,7 +162,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp)) {
                         Text(
-                            "No admissions added yet.", 
+                            stringResource(R.string.no_admissions_yet), 
                             color = Color.Gray,
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -197,11 +199,11 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(text = item["name"] ?: "", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            Text(text = "Class: ${item["class"]}", color = Color.Gray, fontSize = 13.sp)
+                            Text(text = stringResource(R.string.class_prefix, item["class"] ?: ""), color = Color.Gray, fontSize = 13.sp)
                         }
                         Column(horizontalAlignment = androidx.compose.ui.Alignment.End) {
                             Text(text = item["phone"] ?: "", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                            Text(text = "By: ${item["role"]}", fontSize = 10.sp, color = Color.LightGray)
+                            Text(text = stringResource(R.string.by_prefix, item["role"] ?: ""), fontSize = 10.sp, color = Color.LightGray)
                         }
                     }
                 }

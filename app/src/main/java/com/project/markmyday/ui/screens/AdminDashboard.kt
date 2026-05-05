@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.project.markmyday.ui.components.*
 import com.project.markmyday.ui.models.DashboardTile
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,16 +48,16 @@ fun AdminDashboard(
     var searchQuery by remember { mutableStateOf("") }
 
     val adminTiles = listOf(
-        DashboardTile("notices", "Send Notices", Icons.Default.Campaign),
-        DashboardTile("staff_management", "Staff List", Icons.Default.Badge),
-        DashboardTile("add_staff", "Add Staff", Icons.Default.PersonAdd),
-        DashboardTile("add_student", "Add Student", Icons.Default.PersonAddAlt1),
-        DashboardTile("timetable", "Timetables", Icons.AutoMirrored.Filled.EventNote),
-        DashboardTile("students", "Students", Icons.Default.People),
-        DashboardTile("admissions", "New  Admission", Icons.Default.School),
-        DashboardTile("updates", "Global Updates", Icons.Default.Update),
-        DashboardTile("settings", "Settings", Icons.Default.Settings),
-        DashboardTile("reports", "Reports", Icons.Default.Assessment)
+        DashboardTile("notices", stringResource(R.string.tile_notices), Icons.Default.Campaign),
+        DashboardTile("staff_management", stringResource(R.string.tile_staff_list), Icons.Default.Badge),
+        DashboardTile("add_staff", stringResource(R.string.tile_add_staff), Icons.Default.PersonAdd),
+        DashboardTile("add_student", stringResource(R.string.tile_add_student), Icons.Default.PersonAddAlt1),
+        DashboardTile("timetable", stringResource(R.string.tile_timetables), Icons.AutoMirrored.Filled.EventNote),
+        DashboardTile("students", stringResource(R.string.tile_students), Icons.Default.People),
+        DashboardTile("admissions", stringResource(R.string.tile_new_admission), Icons.Default.School),
+        DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
+        DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings),
+        DashboardTile("reports", stringResource(R.string.nav_reports), Icons.Default.Assessment)
     )
 
     Scaffold(
@@ -64,7 +65,7 @@ fun AdminDashboard(
         topBar = {
             DashboardTopBar(
                 icon = Icons.Default.AutoGraph,
-                title = "MarkMyDay",
+                title = stringResource(R.string.app_name),
                 onNotificationClick = onNotificationClick,
                 notificationCount = if (hasUnread) 1 else 0
             )
@@ -146,17 +147,17 @@ fun AdminDashboard(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "Manage Your School 🏫",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                "Everything you need in one place.",
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 13.sp
-                            )
+                        Text(
+                            stringResource(R.string.manage_your_school),
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            stringResource(R.string.everything_in_one_place),
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp
+                        )
                         }
                         Icon(
                             Icons.Default.Celebration,
@@ -171,7 +172,7 @@ fun AdminDashboard(
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "Dashboard Overview",
+                text = stringResource(R.string.dashboard_overview),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -194,7 +195,7 @@ fun AdminDashboard(
                     Icon(Icons.Default.Favorite, contentDescription = null, tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "Made for bright futures",
+                        stringResource(R.string.made_for_futures),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -35,6 +35,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 
 import androidx.appcompat.app.AppCompatActivity
 
+import androidx.appcompat.app.AppCompatDelegate
+
 val LocalSettingsViewModel = staticCompositionLocalOf<SettingsViewModel> {
     error("No SettingsViewModel provided")
 }

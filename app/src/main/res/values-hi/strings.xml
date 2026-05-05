@@ -16,4 +16,196 @@
     <string name="android_dev">एंड्रॉइड डेवलपर</string>
     <string name="error_profile">त्रुटि: %1$s</string>
     <string name="back">पीछे</string>
+    <string name="no_title">कोई शीर्षक नहीं</string>
+    <string name="no_description">कोई विवरण नहीं</string>
+
+
+    <!-- Dashboard Strings -->
+    <string name="hello">नमस्ते 👋,</string>
+    <string name="my_school_life">मेरा स्कूली जीवन</string>
+    <string name="teacher_hub">शिक्षक केंद्र</string>
+    <string name="admin_hub">व्यवस्थापक केंद्र</string>
+    <string name="school_schedule">स्कूल का समय</string>
+    <string name="view_all">सभी देखें</string>
+    <string name="my_dashboard">मेरा डैशबोर्ड</string>
+    <string name="faculty_portal">संकाय पोर्टल</string>
+    <string name="search_anything">कुछ भी खोजें...</string>
+    <string name="keep_learning">सीखते रहें! 🚀</string>
+    <string name="assignments_due">आपके पास जल्द ही 3 असाइनमेंट होने वाले हैं।</string>
+    <string name="class_in_session">कक्षा चल रही है 👩‍🏫</string>
+    <string name="next_class_starts">आपकी अगली कक्षा 15 मिनट में शुरू होगी।</string>
+
+    <!-- Tile Labels -->
+    <string name="tile_attendance">उपस्थिति</string>
+    <string name="tile_assignments">असाइनमेंट</string>
+    <string name="tile_results">मेरे परिणाम</string>
+    <string name="tile_leave">छुट्टी के लिए आवेदन</string>
+    <string name="tile_updates">वैश्विक अपडेट</string>
+    <string name="tile_exams">आगामी परीक्षाएं</string>
+    <string name="tile_fees">शुल्क विवरण</string>
+    <string name="tile_mark_attendance">उपस्थिति दर्ज करें</string>
+    <string name="tile_post_results">परिणाम घोषित करें</string>
+    <string name="tile_leave_request">छुट्टी का अनुरोध</string>
+    <string name="tile_manage_exams">परीक्षा प्रबंधन</string>
+    <string name="tile_notices">सूचनाएं</string>
+    <string name="tile_new_admission">नया प्रवेश</string>
+    <string name="tile_messages">संदेश</string>
+    <string name="tile_admissions">प्रवेश</string>
+    <string name="tile_staff_management">कर्मचारी प्रबंधन</string>
+    <string name="tile_student_management">छात्र प्रबंधन</string>
+    <string name="tile_add_staff">कर्मचारी जोड़ें</string>
+    <string name="tile_add_student">छात्र जोड़ें</string>
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">होम</string>
+    <string name="nav_notices">सूचनाएं</string>
+    <string name="nav_learning">सीखना</string>
+    <string name="nav_reports">रिपोर्ट</string>
+    <string name="manage_your_school">अपने स्कूल का प्रबंधन करें 🏫</string>
+    <string name="everything_in_one_place">सब कुछ एक ही जगह पर।</string>
+    <string name="dashboard_overview">डैशबोर्ड अवलोकन</string>
+    <string name="made_for_futures">उज्ज्वल भविष्य के लिए बनाया गया</string>
+    <string name="tile_staff_list">कर्मचारी सूची</string>
+    <string name="tile_timetables">समय सारणी</string>
+    <string name="tile_students">छात्र</string>
+
+    <!-- Admissions Screen -->
+    <string name="student_admissions">छात्र प्रवेश</string>
+    <string name="new_admission_form">नया प्रवेश फॉर्म 📝</string>
+    <string name="student_name">छात्र का नाम</string>
+    <string name="age">आयु</string>
+    <string name="class_label">कक्षा</string>
+    <string name="parent_name">अभिभावक का नाम</string>
+    <string name="phone_number">फ़ोन नंबर</string>
+    <string name="submit_admission">प्रवेश जमा करें</string>
+    <string name="recent_admissions">हाल के प्रवेश</string>
+    <string name="no_admissions_yet">अभी तक कोई प्रवेश नहीं जोड़ा गया है।</string>
+    <string name="class_prefix">कक्षा: %1$s</string>
+    <string name="by_prefix">द्वारा: %1$s</string>
+
+    <!-- Happenings Screen -->
+    <string name="happenings_title">सूचनाएं और कार्यक्रम</string>
+    <string name="latest_updates">नवीनतम स्कूल अपडेट 📢</string>
+    <string name="no_notices">आज के लिए कोई नई सूचना नहीं है।</string>
+
+    <!-- Learning Screen -->
+    <string name="learning_center">सीखने का केंद्र</string>
+    <string name="my_courses">मेरे पाठ्यक्रम 📚</string>
+    <string name="study_material_empty">आपकी अध्ययन सामग्री यहाँ दिखाई देगी।</string>
+
+    <!-- Reports Screen -->
+    <string name="performance_reports">प्रदर्शन रिपोर्ट</string>
+    <string name="academic_progress">शैक्षणिक प्रगति 📊</string>
+    <string name="report_cards_status">परीक्षा के बाद रिपोर्ट कार्ड उपलब्ध होंगे।</string>
+
+    <!-- Terms Screen -->
+    <string name="privacy_policy">गोपनीयता नीति</string>
+    <string name="privacy_content">हम आपकी गोपनीयता का सम्मान करते हैं। आपका सारा डेटा हमारे स्कूल प्रबंधन प्रणाली में सुरक्षित रूप से संग्रहीत है।</string>
+    <string name="terms_of_service">सेवा की शर्तें</string>
+    <string name="terms_content">MarkMyDay का उपयोग करके, आप हमारे संस्थान की आचार संहिता का पालन करने के लिए सहमत हैं।</string>
+
+    <!-- About Screen -->
+    <string name="app_version">संस्करण %1$s</string>
+    <string name="about_content">MarkMyDay एक व्यापक स्कूल प्रबंधन प्रणाली है जिसे प्रशासकों, शिक्षकों और छात्रों के बीच संचार को सुव्यवस्थित करने के लिए डिज़ाइन किया गया है।</string>
+
+    <!-- Authentication Screen -->
+    <string name="learning_adventure">आइए अपना सीखने का साहसिक कार्य शुरू करें</string>
+    <string name="start_learning">सीखना शुरू करें</string>
+    <string name="welcome_back">स्वागत है!</string>
+    <string name="sign_in_continue">अपनी यात्रा जारी रखने के लिए साइन इन करें</string>
+    <string name="email">ईमेल</string>
+    <string name="password">पासवर्ड</string>
+    <string name="forgot_password">पासवर्ड भूल गए?</string>
+    <string name="login_button">लॉगिन</string>
+    <string name="logging_in">आपको लॉगिन किया जा रहा है...</string>
+    <string name="dont_know_details">विवरण नहीं पता? </string>
+    <string name="forget_credentials">क्रेडेंशियल भूल गए</string>
+    <string name="error_empty_fields">कृपया ईमेल और पासवर्ड दर्ज करें</string>
+    <string name="feature_coming_soon">सुविधा जल्द ही आ रही है</string>
+
+    <!-- Add Staff Screen -->
+    <string name="staff_added_success">कर्मचारी सफलतापूर्वक जोड़ा गया!</string>
+    <string name="add_new_staff">नया कर्मचारी जोड़ें</string>
+    <string name="error_title">त्रुटि</string>
+    <string name="ok">ठीक है</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="age_limit_error">आयु 100 वर्ष या उससे कम होनी चाहिए। कृपया एक वैध तिथि चुनें।</string>
+    <string name="teacher_registration">शिक्षक पंजीकरण</string>
+    <string name="fields_completed">%1$d / %2$d आवश्यक फ़ील्ड पूरे हुए</string>
+    <string name="full_name">पूरा नाम</string>
+    <string name="age_auto">आयु (स्वचालित)</string>
+    <string name="date_of_birth">जन्म तिथि</string>
+    <string name="pick_date">तारीख चुनें</string>
+    <string name="email_address">ईमेल पता</string>
+    <string name="primary_subject">प्राथमिक विषय</string>
+    <string name="home_section">होम सेक्शन</string>
+    <string name="classes_taught">पढ़ाए जाने वाले विषय</string>
+    <string name="submit">जमा करें</string>
+    <string name="class_format">कक्षा %1$d</string>
+
+    <!-- Add Student Screen -->
+    <string name="student_added_success">छात्र सफलतापूर्वक जोड़ा गया!</string>
+    <string name="add_new_student">नया छात्र जोड़ें</string>
+    <string name="registration_error">पंजीकरण त्रुटि</string>
+    <string name="student_registration">छात्र पंजीकरण</string>
+    <string name="dob_label">जन्म तिथि (ddmmyyyy)</string>
+    <string name="email_optional">ईमेल (वैकल्पिक)</string>
+    <string name="select_class">कक्षा चुनें</string>
+    <string name="select_section">सेक्शन चुनें</string>
+    <string name="error_enter_student_name">कृपया छात्र का नाम दर्ज करें</string>
+    <string name="error_select_class">कृपया कक्षा चुनें</string>
+    <string name="error_select_dob">कृपया जन्म तिथि चुनें</string>
+    <string name="error_registration_failed">पंजीकरण विफल रहा</string>
+    <string name="error_invalid_dob_format">अमान्य जन्म तिथि प्रारूप। 8 अंकों (ddMMyyyy) की अपेक्षा थी।</string>
+    <string name="error_login_failed">लॉगिन विफल रहा। कृपया अपने क्रेडेंशियल की जांच करें।</string>
+    <string name="error_user_not_found">उपयोगकर्ता प्रोफ़ाइल नहीं मिली।</string>
+    <string name="error_unknown">एक अज्ञात त्रुटि हुई</string>
+
+
+    <!-- Staff Management Screen -->
+    <string name="delete_staff">कर्मचारी को हटाएं</string>
+    <string name="delete_confirmation">क्या आप वाकई %1$s को हटाना चाहते हैं?</string>
+    <string name="delete">हटाएं</string>
+    <string name="edit_staff_details">कर्मचारी विवरण संपादित करें</string>
+    <string name="search_placeholder">नाम या आईडी द्वारा खोजें</string>
+    <string name="staff_list_count">कर्मचारी सूची (%1$d)</string>
+    <string name="search_instruction">विवरण देखने के लिए कर्मचारियों की खोज करें</string>
+    <string name="id_label">आईडी: %1$s</string>
+    <string name="edit">संपादित करें</string>
+
+    <!-- Attendance Screen -->
+    <string name="attendance_success">उपस्थिति सफलतापूर्वक जमा की गई!</string>
+    <string name="submit_attendance">उपस्थिति जमा करें</string>
+    <string name="no_classes_assigned">आपको कोई कक्षा आवंटित नहीं की गई है।</string>
+    <string name="no_students_found">%1$s के लिए कोई छात्र नहीं मिला।</string>
+    <string name="present">उपस्थित</string>
+    <string name="absent">अनुपस्थित</string>
+
+    <!-- Global Updates Screen -->
+    <string name="title_global_updates">वैश्विक अपडेट</string>
+    <string name="hot_news">ताज़ा खबर</string>
+    <string name="more_updates">अधिक अपडेट 📰</string>
+
+    <!-- Role Selector Screen -->
+    <string name="app_tagline">आपका स्कूल, सरलता से प्रबंधित</string>
+    <string name="continue_as">के रूप में जारी रखें</string>
+    <string name="role_student">छात्र</string>
+    <string name="student_desc">उपस्थिति, अंक और बहुत कुछ देखें</string>
+    <string name="role_teacher">शिक्षक</string>
+    <string name="teacher_desc">कक्षाओं और असाइनमेंट का प्रबंधन करें</string>
+    <string name="role_admin">प्रशासक</string>
+    <string name="admin_desc">पूर्ण स्कूल हब प्रबंधन</string>
+    <!-- Global Updates Screen Dummy Data -->
+    <string name="dummy_news_title_1">नई शिक्षा नीति की घोषणा</string>
+    <string name="dummy_news_desc_1">भारत ने स्कूलों के लिए नए डिजिटल लर्निंग सुधार पेश किए...</string>
+    <string name="dummy_news_title_2">स्कूलों में एआई</string>
+    <string name="dummy_news_desc_2">स्कूल शुरुआती ग्रेड के लिए विषय के रूप में एआई पेश कर रहे हैं...</string>
+    <string name="dummy_news_title_3">परीक्षा पैटर्न बदला गया</string>
+    <string name="dummy_news_desc_3">सीबीएसई ने 2026 शैक्षणिक वर्ष के लिए परीक्षा पैटर्न अपडेट किया...</string>
+    <string name="dummy_news_title_4">डिजिटल लाइब्रेरी एक्सेस</string>
+    <string name="dummy_news_desc_4">छात्रों को राष्ट्रीय डिजिटल लाइब्रेरी तक मुफ्त पहुंच मिलेगी...</string>
+    <string name="dummy_news_title_5">गर्मी की छुट्टी 2024</string>
+    <string name="dummy_news_desc_5">आगामी गर्मियों की छुट्टियों के लिए आधिकारिक कार्यक्रम जारी।</string>
+    <string name="dummy_news_title_6">स्पोर्ट्स मीट 2024</string>
+    <string name="dummy_news_desc_6">अगले महीने से वार्षिक अंतर-स्कूल खेल प्रतियोगिता शुरू होगी।</string>
 </resources>

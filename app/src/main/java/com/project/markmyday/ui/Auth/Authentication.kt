@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
 import com.project.markmyday.R
 import com.project.markmyday.viewmodel.AuthResult
 import com.project.markmyday.viewmodel.AuthViewModel
@@ -90,7 +91,7 @@ fun PreLoginContent(onStart: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Mark My Day",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.displayMedium.copy(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
@@ -102,7 +103,7 @@ fun PreLoginContent(onStart: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Let's Start Your Learning Adventure",
+                text = stringResource(R.string.learning_adventure),
                 style = MaterialTheme.typography.titleMedium.copy(
                     color = Color.White.copy(alpha = 0.8f)
                 ),
@@ -119,7 +120,7 @@ fun PreLoginContent(onStart: () -> Unit) {
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Start Learning", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.start_learning), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -150,7 +151,14 @@ fun LoginContent(
                 onLogin(result.name, result.role, result.homeSection, result.subject)
             }
             is AuthResult.Error -> {
-                snackbarHostState.showSnackbar((authResult as AuthResult.Error).message)
+                val errorKey = (authResult as AuthResult.Error).message
+                val displayMessage = when(errorKey) {
+                    "error_login_failed" -> context.getString(R.string.error_login_failed)
+                    "error_user_not_found" -> context.getString(R.string.error_user_not_found)
+                    "error_unknown" -> context.getString(R.string.error_unknown)
+                    else -> errorKey
+                }
+                snackbarHostState.showSnackbar(displayMessage)
             }
             else -> {}
         }
@@ -194,7 +202,7 @@ fun LoginContent(
                         IconButton(onClick = onBack) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                                 tint = if (isDarkMode) Color.White else Color(0xFF1A1A2E)
                             )
                         }
@@ -238,7 +246,7 @@ fun LoginContent(
                         else listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.7f))
 
                         Text(
-                            text = "Welcome Back!",
+                            text = stringResource(R.string.welcome_back),
                             style = MaterialTheme.typography.displaySmall.copy(
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 32.sp
@@ -249,7 +257,7 @@ fun LoginContent(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Sign in to continue your journey",
+                            text = stringResource(R.string.sign_in_continue),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = if (isDarkMode) Color.White.copy(alpha = 0.7f) else Color(0xFF666666)
                             )
@@ -267,7 +275,7 @@ fun LoginContent(
                                     newValue
                                 }
                             },
-                            label = { Text("Email") },
+                            label = { Text(stringResource(R.string.email)) },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             singleLine = true,
@@ -291,7 +299,7 @@ fun LoginContent(
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it },
-                            label = { Text("Password") },
+                            label = { Text(stringResource(R.string.password)) },
                             modifier = Modifier.fillMaxWidth(),
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -335,12 +343,12 @@ fun LoginContent(
                         TextButton(
                             onClick = {
                                 // Handle forgot password
-                                Toast.makeText(context, "Forgot password feature coming soon", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.feature_coming_soon), Toast.LENGTH_SHORT).show()
                             },
                             modifier = Modifier.align(Alignment.End)
                         ) {
                             Text(
-                                text = "Forgot Password?",
+                                text = stringResource(R.string.forgot_password),
                                 color = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
                                 fontSize = 14.sp
                             )
@@ -353,7 +361,7 @@ fun LoginContent(
                                 if (email.isNotEmpty() && password.isNotEmpty()) {
                                     viewModel.loginUser(email, password)
                                 } else {
-                                    Toast.makeText(context, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show()
                                 }
                             },
                             modifier = Modifier
@@ -375,9 +383,9 @@ fun LoginContent(
                                         trackColor = if (isDarkMode) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.3f)
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    Text("Logging you in...", color = Color.White, fontSize = 16.sp)
+                                    Text(stringResource(R.string.logging_in), color = Color.White, fontSize = 16.sp)
                                 } else {
-                                    Text("Login", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                    Text(stringResource(R.string.login_button), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                                 }
                             }
                         }
@@ -390,18 +398,18 @@ fun LoginContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Don't know details? ",
+                                text = stringResource(R.string.dont_know_details),
                                 color = if (isDarkMode) Color.White.copy(alpha = 0.6f) else Color(0xFF666666),
                                 fontSize = 14.sp
                             )
                             TextButton(
                                 onClick = {
-                                    Toast.makeText(context, "get details feature coming soon", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.feature_coming_soon), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.padding(0.dp)
                             ) {
                                 Text(
-                                    text = "forget credintails",
+                                    text = stringResource(R.string.forget_credentials),
                                     color = if (isDarkMode) Color(0xFF9D4EDD) else MaterialTheme.colorScheme.primary,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.SemiBold

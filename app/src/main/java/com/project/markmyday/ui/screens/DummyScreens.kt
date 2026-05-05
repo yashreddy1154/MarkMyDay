@@ -22,45 +22,45 @@ import com.project.markmyday.ui.components.DashboardTopBar
 @Composable
 fun HappeningsScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Unit) {
     DummyBaseScreen(
-        title = "Notices & Events",
+        title = stringResource(R.string.happenings_title),
         icon = Icons.Default.Campaign,
         currentRoute = "happenings",
         onNotificationClick = onNotificationClick,
         onNavigate = onNavigate
     ) {
-        Text("Latest School Updates 📢", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.latest_updates), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        Text("No new notices for today.", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+        Text(stringResource(R.string.no_notices), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
     }
 }
 
 @Composable
 fun LearningScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Unit) {
     DummyBaseScreen(
-        title = "Learning Center",
+        title = stringResource(R.string.learning_center),
         icon = Icons.Default.School,
         currentRoute = "SKP",
         onNotificationClick = onNotificationClick,
         onNavigate = onNavigate
     ) {
-        Text("My Courses 📚", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.my_courses), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Your study material will appear here.", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+        Text(stringResource(R.string.study_material_empty), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
     }
 }
 
 @Composable
 fun ReportsScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Unit) {
     DummyBaseScreen(
-        title = "Performance Reports",
+        title = stringResource(R.string.performance_reports),
         icon = Icons.Default.Assessment,
         currentRoute = "marks",
         onNotificationClick = onNotificationClick,
         onNavigate = onNavigate
     ) {
-        Text("Academic Progress 📊", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.academic_progress), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Report cards will be available after exams.", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+        Text(stringResource(R.string.report_cards_status), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
     }
 }
 
@@ -85,13 +85,13 @@ fun TermsScreen(onBack: () -> Unit) {
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
-            Text("Privacy Policy", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.privacy_policy), style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(16.dp))
-            Text("We respect your privacy. All your data is stored securely in our school management system.")
+            Text(stringResource(R.string.privacy_content))
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Terms of Service", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.terms_of_service), style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(16.dp))
-            Text("By using MarkMyDay, you agree to follow the code of conduct of our institution.")
+            Text(stringResource(R.string.terms_content))
         }
     }
 }
@@ -120,11 +120,11 @@ fun AboutScreen(onBack: () -> Unit) {
         ) {
             Icon(Icons.Default.School, contentDescription = null, modifier = Modifier.size(100.dp), tint = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(24.dp))
-            Text("MarkMyDay", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text("Version 1.0.0", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.app_version, "1.0.0"), style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                "MarkMyDay is a comprehensive school management system designed to streamline communication between administrators, teachers, and students.",
+                stringResource(R.string.about_content),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }

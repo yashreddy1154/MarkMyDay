@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.project.markmyday.R
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,7 +42,7 @@ fun AttendanceScreen(
     LaunchedEffect(submissionState) {
         when (submissionState) {
             is AttendanceSubmissionState.Success -> {
-                Toast.makeText(context, "Attendance submitted successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.attendance_success), Toast.LENGTH_SHORT).show()
                 viewModel.resetSubmissionState()
             }
             is AttendanceSubmissionState.Error -> {
@@ -54,10 +56,10 @@ fun AttendanceScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mark Attendance", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.tile_mark_attendance), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -88,7 +90,7 @@ fun AttendanceScreen(
                                     modifier = Modifier.size(24.dp)
                                 )
                             } else {
-                                Text("Submit Attendance", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.submit_attendance), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -103,7 +105,7 @@ fun AttendanceScreen(
                 }
             } else if (assignedClasses.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No classes assigned to you.")
+                    Text(stringResource(R.string.no_classes_assigned))
                 }
             } else {
                 ScrollableTabRow(
@@ -123,7 +125,7 @@ fun AttendanceScreen(
 
                 if (studentsInSelectedClass.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No students found for $selectedClass.")
+                        Text(stringResource(R.string.no_students_found, selectedClass))
                     }
                 } else {
                     LazyColumn(
@@ -175,7 +177,7 @@ fun StudentAttendanceRow(
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = if (isPresent) "Present" else "Absent",
+                    text = if (isPresent) stringResource(R.string.present) else stringResource(R.string.absent),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (isPresent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(end = 8.dp)

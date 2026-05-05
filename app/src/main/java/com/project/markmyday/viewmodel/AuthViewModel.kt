@@ -42,10 +42,10 @@ class AuthViewModel : ViewModel() {
                 if (uid != null) {
                     fetchUserAndSetState(uid)
                 } else {
-                    _authState.value = AuthResult.Error("Failed to get User ID after sign-in.")
+                    _authState.value = AuthResult.Error("error_login_failed")
                 }
             } catch (e: Exception) {
-                _authState.value = AuthResult.Error(e.localizedMessage ?: "An unknown error occurred")
+                _authState.value = AuthResult.Error(e.localizedMessage ?: "error_unknown")
             }
         }
     }
@@ -78,10 +78,10 @@ class AuthViewModel : ViewModel() {
 
                 _authState.value = AuthResult.Success(name, role, homeSection, subject)
             } else {
-                _authState.value = AuthResult.Error("User document not found in Firestore.")
+                _authState.value = AuthResult.Error("error_user_not_found")
             }
         } catch (e: Exception) {
-            _authState.value = AuthResult.Error(e.localizedMessage ?: "An unknown error occurred")
+            _authState.value = AuthResult.Error(e.localizedMessage ?: "error_unknown")
         }
     }
 }

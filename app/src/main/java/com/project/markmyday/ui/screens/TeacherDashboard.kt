@@ -20,7 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.project.markmyday.ui.components.*
+import com.project.markmyday.R
 import com.project.markmyday.ui.models.DashboardTile
 import com.project.markmyday.ui.models.TimetableEntry
 import com.project.markmyday.ui.theme.MarkMyDayTheme
@@ -50,16 +52,16 @@ fun TeacherDashboard(
     }
 
     val teacherTiles = listOf(
-        DashboardTile("attendance", "Mark Attendance", Icons.Default.Checklist, badgeText = "80%"),
-        DashboardTile("assignments", "Assignments", Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
-        DashboardTile("results", "Post Results", Icons.Default.Description),
-        DashboardTile("leave", "Leave Request", Icons.Default.EventBusy),
-        DashboardTile("exams", "Manage Exams", Icons.Default.Quiz, badgeCount = 2),
-        DashboardTile("updates", "Global Updates", Icons.Default.Update),
-        DashboardTile("notifications", "Notices", Icons.Default.Notifications, badgeCount = if (hasUnread) 1 else 0),
-        DashboardTile("admissions", "New  Admission", Icons.Default.School),
-        DashboardTile("messages", "Messages", Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
-        DashboardTile("settings", "Settings", Icons.Default.Settings)
+        DashboardTile("attendance", stringResource(R.string.tile_mark_attendance), Icons.Default.Checklist, badgeText = "80%"),
+        DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
+        DashboardTile("results", stringResource(R.string.tile_post_results), Icons.Default.Description),
+        DashboardTile("leave", stringResource(R.string.tile_leave_request), Icons.Default.EventBusy),
+        DashboardTile("exams", stringResource(R.string.tile_manage_exams), Icons.Default.Quiz, badgeCount = 2),
+        DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
+        DashboardTile("notifications", stringResource(R.string.tile_notices), Icons.Default.Notifications, badgeCount = if (hasUnread) 1 else 0),
+        DashboardTile("admissions", stringResource(R.string.tile_new_admission), Icons.Default.School),
+        DashboardTile("messages", stringResource(R.string.tile_messages), Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
+        DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     )
 
     val timetable = listOf(
@@ -73,7 +75,7 @@ fun TeacherDashboard(
         topBar = {
             DashboardTopBar(
                 icon = Icons.Default.CastForEducation,
-                title = "Teacher Hub",
+                title = stringResource(R.string.teacher_hub),
                 onNotificationClick = onNotificationClick,
                 notificationCount = if (hasUnread) 1 else 0
             )
@@ -145,17 +147,17 @@ fun TeacherDashboard(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "Class In Session 👩‍🏫",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                "Your next class starts in 15 mins.",
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 13.sp
-                            )
+                        Text(
+                            stringResource(R.string.class_in_session),
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            stringResource(R.string.next_class_starts),
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp
+                        )
                         }
                         Icon(
                             Icons.Default.Timer,
@@ -174,7 +176,7 @@ fun TeacherDashboard(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Faculty Portal",
+                text = stringResource(R.string.faculty_portal),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp),

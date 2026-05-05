@@ -22,9 +22,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.project.markmyday.R
+import com.project.markmyday.ui.theme.BadgeRed
 import com.project.markmyday.ui.models.DashboardTile
 import com.project.markmyday.ui.models.TimetableEntry
-import com.project.markmyday.ui.theme.BadgeRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,12 +104,12 @@ fun WelcomeSection(
     subject: String? = null
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(
-            "Hello 👋,", 
-            fontSize = 16.sp, 
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-            fontWeight = FontWeight.Medium
-        )
+                Text(
+                    stringResource(id = R.string.hello), 
+                    fontSize = 16.sp, 
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    fontWeight = FontWeight.Medium
+                )
         Text(
             name, 
             fontSize = 28.sp, 
@@ -146,9 +148,9 @@ fun TimetableSection(entries: List<TimetableEntry>) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("School Schedule ", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.school_schedule), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             TextButton(onClick = { /* TODO */ }) {
-                Text("View All", color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+                Text(stringResource(id = R.string.view_all), color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -287,7 +289,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        placeholder = { Text("Search anything...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+        placeholder = { Text(stringResource(id = R.string.search_anything), color = MaterialTheme.colorScheme.onSurfaceVariant) },
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.primary) },
         shape = RoundedCornerShape(20.dp),
         singleLine = true,
@@ -311,10 +313,10 @@ fun DashboardBottomBar(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface)
     ) {
         val items = listOf(
-            Triple("dashboard", "Home", Icons.Default.Home),
-            Triple("happenings", "Notices", Icons.Default.Campaign),
-            Triple("SKP", "Learning", Icons.Default.School),
-            Triple("marks", "Reports", Icons.Default.Assessment)
+            Triple("dashboard", stringResource(id = R.string.nav_home), Icons.Default.Home),
+            Triple("happenings", stringResource(id = R.string.nav_notices), Icons.Default.Campaign),
+            Triple("SKP", stringResource(id = R.string.nav_learning), Icons.Default.School),
+            Triple("marks", stringResource(id = R.string.nav_reports), Icons.Default.Assessment)
         )
 
         items.forEach { (route, label, icon) ->

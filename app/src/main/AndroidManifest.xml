@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".MarkMyDayApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,6 +17,12 @@
         android:supportsRtl="true"
         android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.MarkMyDay">
+        <activity
+            android:name=".ui.screens.GlobalUpdatesActivity"
+            android:exported="false"
+            android:label="Global Updates"
+            android:theme="@style/Theme.MarkMyDay" />
+
         <activity
             android:name=".ui.screens.AddStaff"
             android:exported="false"

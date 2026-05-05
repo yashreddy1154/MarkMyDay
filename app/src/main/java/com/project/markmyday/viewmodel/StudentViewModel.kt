@@ -105,7 +105,7 @@ class StudentViewModel(
                 val password = formState.dob.filter { it.isDigit() }
 
                 if (password.length != 8) {
-                    throw Exception("Invalid DOB format for password. Expected 8 digits (ddMMyyyy).")
+                    throw Exception("error_invalid_dob_format")
                 }
 
                 Log.d(TAG, "Attempting to register student: $studentId with email: $email")
@@ -154,7 +154,7 @@ class StudentViewModel(
 
             } catch (e: Exception) {
                 Log.e("FirebaseError", "Error: ${e.message}", e)
-                _registrationState.value = StudentRegistrationState.Error(e.localizedMessage ?: "Registration failed")
+                _registrationState.value = StudentRegistrationState.Error(e.localizedMessage ?: "error_registration_failed")
             }
         }
     }

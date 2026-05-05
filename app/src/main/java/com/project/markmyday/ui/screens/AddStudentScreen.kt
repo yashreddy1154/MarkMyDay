@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
 import com.project.markmyday.R
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.ui.utils.calculateAgeFromDateOfBirth
@@ -43,10 +44,11 @@ fun AddStudentScreen(
     var state by remember { mutableStateOf(AddStudentFormState()) }
     val registrationState by viewModel.registrationState.collectAsState()
     val context = LocalContext.current
+    val studentAddedSuccess = stringResource(R.string.student_added_success)
 
     LaunchedEffect(registrationState) {
         if (registrationState is StudentRegistrationState.Success) {
-            Toast.makeText(context, "Student added successfully!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, studentAddedSuccess, Toast.LENGTH_LONG).show()
             // Reset form state and viewmodel state to allow adding another student
             state = AddStudentFormState()
             viewModel.resetRegistrationState()
@@ -55,7 +57,7 @@ fun AddStudentScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         AddStudentContent(
-            title = "Add New Student",
+            title = stringResource(R.string.add_new_student),
             state = state,
             onStateChange = { state = it },
             onBack = onBack,
@@ -74,14 +76,19 @@ fun AddStudentScreen(
         }
 
         if (registrationState is StudentRegistrationState.Error) {
-            val errorMessage = (registrationState as StudentRegistrationState.Error).message
+            val errorKey = (registrationState as StudentRegistrationState.Error).message
+            val displayMessage = when(errorKey) {
+                "error_invalid_dob_format" -> stringResource(R.string.error_invalid_dob_format)
+                "error_registration_failed" -> stringResource(R.string.error_registration_failed)
+                else -> errorKey
+            }
             AlertDialog(
                 onDismissRequest = { /* Handle error dismissal if needed */ },
-                title = { Text("Registration Error") },
-                text = { Text(errorMessage) },
+                title = { Text(stringResource(R.string.registration_error)) },
+                text = { Text(displayMessage) },
                 confirmButton = {
-                    TextButton(onClick = { /* Reset state if needed */ }) {
-                        Text("OK")
+                    TextButton(onClick = { viewModel.resetRegistrationState() }) {
+                        Text(stringResource(R.string.ok))
                     }
                 }
             )
@@ -110,8 +117,12 @@ fun AddStudentContent(
     onSubmit: () -> Unit
 ) {
     val context = LocalContext.current
-    val classes = (1..10).map { "Class $it" }
+    val classes = (1..10).map { stringResource(R.string.class_format, it) }
     val sections = listOf("A", "B", "C")
+    
+    val errorEnterStudentName = stringResource(R.string.error_enter_student_name)
+    val errorSelectClass = stringResource(R.string.error_select_class)
+    val errorSelectDob = stringResource(R.string.error_select_dob)
 
     // Date picker state
     var showDatePicker by remember { mutableStateOf(false) }
@@ -137,12 +148,12 @@ fun AddStudentContent(
                         showDatePicker = false
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -180,7 +191,7 @@ fun AddStudentContent(
                         IconButton(onClick = onBack) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                                 tint = Color.Black
                             )
                         }
@@ -213,7 +224,7 @@ fun AddStudentContent(
                             .verticalScroll(rememberScrollState())
                     ) {
                         Text(
-                            text = "Student Registration",
+                            text = stringResource(R.string.student_registration),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
@@ -225,7 +236,7 @@ fun AddStudentContent(
                         OutlinedTextField(
                             value = state.name,
                             onValueChange = { onStateChange(state.copy(name = it)) },
-                            label = { Text("Student Name") },
+                            label = { Text(stringResource(R.string.student_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -238,7 +249,7 @@ fun AddStudentContent(
                                 value = state.dob,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("DOB (ddmmyyyy)") },
+                                label = { Text(stringResource(R.string.dob_label)) },
                                 modifier = Modifier
                                     .weight(2f)
                                     .clickable { showDatePicker = true },
@@ -248,7 +259,7 @@ fun AddStudentContent(
                                     IconButton(onClick = { showDatePicker = true }) {
                                         Icon(
                                             imageVector = Icons.Default.DateRange,
-                                            contentDescription = "Pick date"
+                                            contentDescription = stringResource(R.string.pick_date)
                                         )
                                     }
                                 }
@@ -257,7 +268,7 @@ fun AddStudentContent(
                             OutlinedTextField(
                                 value = state.age,
                                 onValueChange = { onStateChange(state.copy(age = it)) },
-                                label = { Text("Age") },
+                                label = { Text(stringResource(R.string.age)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
@@ -272,7 +283,7 @@ fun AddStudentContent(
                         OutlinedTextField(
                             value = state.parentName,
                             onValueChange = { onStateChange(state.copy(parentName = it)) },
-                            label = { Text("Parent Name") },
+                            label = { Text(stringResource(R.string.parent_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -283,7 +294,7 @@ fun AddStudentContent(
                         OutlinedTextField(
                             value = state.phone,
                             onValueChange = { onStateChange(state.copy(phone = it)) },
-                            label = { Text("Phone Number") },
+                            label = { Text(stringResource(R.string.phone_number)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
@@ -297,7 +308,7 @@ fun AddStudentContent(
                         OutlinedTextField(
                             value = state.email,
                             onValueChange = { onStateChange(state.copy(email = it)) },
-                            label = { Text("Email (Optional)") },
+                            label = { Text(stringResource(R.string.email_optional)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -315,7 +326,7 @@ fun AddStudentContent(
                                 value = state.studentClass,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Select Class") },
+                                label = { Text(stringResource(R.string.select_class)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
@@ -325,11 +336,12 @@ fun AddStudentContent(
                                 expanded = classExpanded,
                                 onDismissRequest = { classExpanded = false }
                             ) {
-                                classes.forEach { className ->
+                                classes.forEachIndexed { index, className ->
+                                    val classValue = (index + 1).toString()
                                     DropdownMenuItem(
                                         text = { Text(className) },
                                         onClick = {
-                                            onStateChange(state.copy(studentClass = className))
+                                            onStateChange(state.copy(studentClass = classValue))
                                             classExpanded = false
                                         }
                                     )
@@ -350,7 +362,7 @@ fun AddStudentContent(
                                 value = state.section,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Select Section") },
+                                label = { Text(stringResource(R.string.select_section)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionExpanded) },
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
@@ -379,11 +391,11 @@ fun AddStudentContent(
                             onClick = {
                                 Log.d("AddStudent", "Submit clicked")
                                 if (state.name.isBlank()) {
-                                    Toast.makeText(context, "Please enter Student Name", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, errorEnterStudentName, Toast.LENGTH_SHORT).show()
                                 } else if (state.studentClass.isBlank()) {
-                                    Toast.makeText(context, "Please select a Class", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, errorSelectClass, Toast.LENGTH_SHORT).show()
                                 } else if (state.dob.isBlank()) {
-                                    Toast.makeText(context, "Please select Date of Birth", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, errorSelectDob, Toast.LENGTH_SHORT).show()
                                 } else {
                                     onSubmit()
                                 }
@@ -394,7 +406,7 @@ fun AddStudentContent(
                             shape = RoundedCornerShape(16.dp)
                         ) {
                             Text(
-                                "Submit",
+                                stringResource(R.string.submit),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )

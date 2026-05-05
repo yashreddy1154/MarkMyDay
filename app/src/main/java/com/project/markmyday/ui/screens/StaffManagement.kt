@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.project.markmyday.R
 import com.project.markmyday.data.model.Teacher
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,8 +49,8 @@ fun StaffManagementScreen(
     if (teacherToDelete != null) {
         AlertDialog(
             onDismissRequest = { teacherToDelete = null },
-            title = { Text("Delete Staff") },
-            text = { Text("Are you sure you want to delete ${teacherToDelete?.name}?") },
+            title = { Text(stringResource(R.string.delete_staff)) },
+            text = { Text(stringResource(R.string.delete_confirmation, teacherToDelete?.name ?: "")) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -57,12 +59,12 @@ fun StaffManagementScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { teacherToDelete = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -90,7 +92,7 @@ fun StaffManagementScreen(
             modifier = Modifier.fillMaxHeight(0.9f)
         ) {
             AddStaffContent(
-                title = "Edit Staff Details",
+                title = stringResource(R.string.edit_staff_details),
                 state = editState,
                 onStateChange = { editState = it },
                 onBack = { teacherToEdit = null },
@@ -123,10 +125,10 @@ fun StaffManagementScreen(
                     onSearch = { },
                     active = false,
                     onActiveChange = { },
-                    placeholder = { Text("Search by Name or ID") },
+                    placeholder = { Text(stringResource(R.string.search_placeholder)) },
                     leadingIcon = { 
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -144,7 +146,7 @@ fun StaffManagementScreen(
             ) {
                 item {
                     Text(
-                        text = "Staff List (${filteredTeachers.size})",
+                        text = stringResource(R.string.staff_list_count, filteredTeachers.size),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -166,7 +168,7 @@ fun StaffManagementScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Search for staff members to view details",
+                    text = stringResource(R.string.search_instruction),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -202,7 +204,7 @@ fun TeacherListItem(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "ID: ${teacher.teacherId}",
+                    text = stringResource(R.string.id_label, teacher.teacherId),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -224,14 +226,14 @@ fun TeacherListItem(
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit",
+                        contentDescription = stringResource(R.string.edit),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
+                        contentDescription = stringResource(R.string.delete),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }

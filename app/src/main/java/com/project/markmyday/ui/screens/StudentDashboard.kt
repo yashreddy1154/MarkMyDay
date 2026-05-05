@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.project.markmyday.ui.components.*
 import com.project.markmyday.ui.models.DashboardTile
 import com.project.markmyday.ui.models.TimetableEntry
@@ -68,23 +69,23 @@ fun StudentDashboard(
             when (currentSubScreen) {
                 "home" -> DashboardTopBar(
                     icon = Icons.Default.Face,
-                    title = "My School Life",
+                    title = stringResource(R.string.my_school_life),
                     onNotificationClick = onNotificationClick,
                     notificationCount = if (hasUnread) 1 else 0
                 )
                 "attendance" -> TopAppBar(
-                    title = { Text("My Attendance", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.tile_attendance), fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { currentSubScreen = "home" }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                         }
                     }
                 )
                 "leave" -> TopAppBar(
-                    title = { Text("Apply Leave", fontWeight = FontWeight.Bold) },
+                    title = { Text(stringResource(R.string.tile_leave), fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { currentSubScreen = "home" }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                         }
                     }
                 )
@@ -125,14 +126,14 @@ fun StudentDashboardHomeContent(
     onTileClick: (String) -> Unit
 ) {
     val studentTiles = listOf(
-        DashboardTile("attendance", "Attendance", Icons.Default.CalendarMonth, badgeText = "85%"),
-        DashboardTile("assignments", "Assignments", Icons.Default.Task, badgeCount = 3),
-        DashboardTile("results", "My Results", Icons.Default.Grade),
-        DashboardTile("leave", "Apply Leave", Icons.Default.HistoryEdu),
-        DashboardTile("updates", "Global Updates", Icons.Default.Update),
-        DashboardTile("exams", "Upcoming Exams", Icons.Default.History, badgeCount = 1),
-        DashboardTile("fees", "Fee Statement", Icons.Default.Payments),
-        DashboardTile("settings", "Settings", Icons.Default.Settings)
+        DashboardTile("attendance", stringResource(R.string.tile_attendance), Icons.Default.CalendarMonth, badgeText = "85%"),
+        DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.Default.Task, badgeCount = 3),
+        DashboardTile("results", stringResource(R.string.tile_results), Icons.Default.Grade),
+        DashboardTile("leave", stringResource(R.string.tile_leave), Icons.Default.HistoryEdu),
+        DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
+        DashboardTile("exams", stringResource(R.string.tile_exams), Icons.Default.History, badgeCount = 1),
+        DashboardTile("fees", stringResource(R.string.tile_fees), Icons.Default.Payments),
+        DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     )
 
     val timetable = listOf(
@@ -200,13 +201,13 @@ fun StudentDashboardHomeContent(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            "Keep Learning! 🚀",
+                            stringResource(R.string.keep_learning),
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            "You have 3 assignments due soon.",
+                            stringResource(R.string.assignments_due),
                             color = Color.White.copy(alpha = 0.8f),
                             fontSize = 13.sp
                         )
@@ -228,7 +229,7 @@ fun StudentDashboardHomeContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "My Dashboard",
+            text = stringResource(R.string.my_dashboard),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 16.dp),

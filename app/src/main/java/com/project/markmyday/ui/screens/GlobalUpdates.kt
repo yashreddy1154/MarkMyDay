@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,33 +39,33 @@ fun GlobalUpdateScreen(onBack: () -> Unit) {
     // Dummy data (later replace with API)
     val newsList = listOf(
         Triple(
-            "New Education Policy Announced",
-            "India introduces new digital learning reforms for schools...",
+            stringResource(R.string.dummy_news_title_1),
+            stringResource(R.string.dummy_news_desc_1),
             "https://images.unsplash.com/photo-1588072432836-e10032774350"
         ),
         Triple(
-            "AI in Schools",
-            "Schools are introducing AI as a subject for early grades...",
+            stringResource(R.string.dummy_news_title_2),
+            stringResource(R.string.dummy_news_desc_2),
             "https://images.unsplash.com/photo-1509062522246-3755977927d7"
         ),
         Triple(
-            "Exam Pattern Changed",
-            "CBSE updates exam pattern for 2026 academic year...",
+            stringResource(R.string.dummy_news_title_3),
+            stringResource(R.string.dummy_news_desc_3),
             "https://images.unsplash.com/photo-1584697964403-7c5b68c82a39"
         ),
         Triple(
-            "Digital Library Access",
-            "Students to get free access to national digital library...",
+            stringResource(R.string.dummy_news_title_4),
+            stringResource(R.string.dummy_news_desc_4),
             "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f"
         ),
         Triple(
-            "Summer Break 2024",
-            "Official schedule for upcoming summer holidays released.",
+            stringResource(R.string.dummy_news_title_5),
+            stringResource(R.string.dummy_news_desc_5),
             "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
         ),
         Triple(
-            "Sports Meet 2024",
-            "Annual inter-school sports competition begins next month.",
+            stringResource(R.string.dummy_news_title_6),
+            stringResource(R.string.dummy_news_desc_6),
             "https://images.unsplash.com/photo-1461896836934-8b8919a5fe6f"
         )
     )
@@ -72,10 +73,10 @@ fun GlobalUpdateScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Global Updates", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.title_global_updates), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -146,7 +147,7 @@ fun GlobalUpdateScreen(onBack: () -> Unit) {
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Text(
-                                        text = "HOT NEWS",
+                                        text = stringResource(R.string.hot_news),
                                         color = Color.White,
                                         style = MaterialTheme.typography.labelSmall,
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -167,7 +168,7 @@ fun GlobalUpdateScreen(onBack: () -> Unit) {
 
                 item {
                     Text(
-                        text = "More Updates 📰",
+                        text = stringResource(R.string.more_updates),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary

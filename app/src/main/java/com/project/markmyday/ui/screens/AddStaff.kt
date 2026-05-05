@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.markmyday.R
@@ -63,11 +64,12 @@ fun AddStaffScreen(
     var state by remember { mutableStateOf(AddStaffFormState()) }
     val registrationState by viewModel.registrationState.collectAsState()
     val context = LocalContext.current
+    val staffAddedSuccess = stringResource(R.string.staff_added_success)
 
     // Show success Toast and reset form
     LaunchedEffect(registrationState) {
         if (registrationState is TeacherRegistrationState.Success) {
-            Toast.makeText(context, "Staff member added successfully!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, staffAddedSuccess, Toast.LENGTH_LONG).show()
             state = AddStaffFormState()
             viewModel.resetRegistrationState()
         }
@@ -75,7 +77,7 @@ fun AddStaffScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         AddStaffContent(
-            title = "Add New Staff",
+            title = stringResource(R.string.add_new_staff),
             state = state,
             onStateChange = { state = it },
             onBack = onBack,
@@ -99,11 +101,11 @@ fun AddStaffScreen(
             val errorMessage = (registrationState as TeacherRegistrationState.Error).message
             AlertDialog(
                 onDismissRequest = { /* Keep showing until fixed */ },
-                title = { Text("Error") },
+                title = { Text(stringResource(R.string.error_title)) },
                 text = { Text(errorMessage) },
                 confirmButton = {
                     Button(onClick = { /* Optionally reset error state in ViewModel */ }) {
-                        Text("OK")
+                        Text(stringResource(R.string.ok))
                     }
                 }
             )
@@ -134,7 +136,8 @@ fun AddStaffContent(
     val context = LocalContext.current
     val subjects = listOf("Telugu", "Hindi", "English", "Maths", "Science", "Physics", "Biology", "Computers", "Social", "Games/PT")
     val sections = listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B", "7A", "7B", "8A", "8B", "9A", "9B", "10A", "10B")
-    val classes = (1..10).map { "Class $it" }
+    val classes = (1..10).map { stringResource(R.string.class_format, it) }
+    val ageLimitError = stringResource(R.string.age_limit_error)
 
     // Date picker state
     var showDatePicker by remember { mutableStateOf(false) }
@@ -161,7 +164,7 @@ fun AddStaffContent(
                             } else {
                                 Toast.makeText(
                                     context,
-                                    "Age must be 100 years or less. Please select a valid date.",
+                                    ageLimitError,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -169,12 +172,12 @@ fun AddStaffContent(
                         showDatePicker = false
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -224,7 +227,7 @@ fun AddStaffContent(
                         IconButton(onClick = onBack) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                                 tint = Color.Black
                             )
                         }
@@ -257,7 +260,7 @@ fun AddStaffContent(
                             .verticalScroll(rememberScrollState())
                     ) {
                         Text(
-                            text = "Teacher Registration",
+                            text = stringResource(R.string.teacher_registration),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
@@ -275,7 +278,7 @@ fun AddStaffContent(
                             trackColor = MaterialTheme.colorScheme.primaryContainer
                         )
                         Text(
-                            text = "$filledCount / ${requiredFields.size} required fields completed",
+                            text = stringResource(R.string.fields_completed, filledCount, requiredFields.size),
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(top = 4.dp)
                         )
@@ -286,7 +289,7 @@ fun AddStaffContent(
                         OutlinedTextField(
                             value = state.name,
                             onValueChange = { onStateChange(state.copy(name = it)) },
-                            label = { Text("Full Name") },
+                            label = { Text(stringResource(R.string.full_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -298,7 +301,7 @@ fun AddStaffContent(
                             OutlinedTextField(
                                 value = state.age,
                                 onValueChange = {},
-                                label = { Text("Age (auto)") },
+                                label = { Text(stringResource(R.string.age_auto)) },
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(12.dp),
                                 readOnly = true,
@@ -309,7 +312,7 @@ fun AddStaffContent(
                                 value = state.dob,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Date of Birth") },
+                                label = { Text(stringResource(R.string.date_of_birth)) },
                                 modifier = Modifier
                                     .weight(2f)
                                     .clickable { showDatePicker = true },
@@ -319,7 +322,7 @@ fun AddStaffContent(
                                     IconButton(onClick = { showDatePicker = true }) {
                                         Icon(
                                             imageVector = Icons.Default.DateRange,
-                                            contentDescription = "Pick date"
+                                            contentDescription = stringResource(R.string.pick_date)
                                         )
                                     }
                                 }
@@ -332,7 +335,7 @@ fun AddStaffContent(
                         OutlinedTextField(
                             value = state.phone,
                             onValueChange = { onStateChange(state.copy(phone = it)) },
-                            label = { Text("Phone Number") },
+                            label = { Text(stringResource(R.string.phone_number)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -343,7 +346,7 @@ fun AddStaffContent(
                         OutlinedTextField(
                             value = state.email,
                             onValueChange = { onStateChange(state.copy(email = it)) },
-                            label = { Text("Email Address") },
+                            label = { Text(stringResource(R.string.email_address)) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
                         )
@@ -361,7 +364,7 @@ fun AddStaffContent(
                                 value = state.subject,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Primary Subject") },
+                                label = { Text(stringResource(R.string.primary_subject)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectExpanded) },
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
@@ -396,7 +399,7 @@ fun AddStaffContent(
                                 value = state.homeSection,
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Home Section") },
+                                label = { Text(stringResource(R.string.home_section)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionExpanded) },
                                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
@@ -422,7 +425,7 @@ fun AddStaffContent(
 
                         // Classes Taught (multi-select chips)
                         Text(
-                            text = "Classes Taught",
+                            text = stringResource(R.string.classes_taught),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
@@ -434,14 +437,15 @@ fun AddStaffContent(
                                 .horizontalScroll(rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            classes.forEach { className ->
+                            classes.forEachIndexed { index, className ->
+                                val classValue = (index + 1).toString()
                                 FilterChip(
-                                    selected = state.classesTaught.contains(className),
+                                    selected = state.classesTaught.contains(classValue),
                                     onClick = {
-                                        val newList = if (state.classesTaught.contains(className)) {
-                                            state.classesTaught - className
+                                        val newList = if (state.classesTaught.contains(classValue)) {
+                                            state.classesTaught - classValue
                                         } else {
-                                            state.classesTaught + className
+                                            state.classesTaught + classValue
                                         }
                                         onStateChange(state.copy(classesTaught = newList))
                                     },
@@ -462,7 +466,7 @@ fun AddStaffContent(
                             enabled = filledCount == requiredFields.size
                         ) {
                             Text(
-                                "Submit",
+                                stringResource(R.string.submit),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )

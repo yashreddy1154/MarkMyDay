@@ -17,4 +17,197 @@
     <string name="android_dev">Android Dev</string>
     <string name="error_profile">Error: %1$s</string>
     <string name="back">Back</string>
+    <string name="news_image">News Image</string>
+    <string name="no_title">No Title</string>
+    <string name="no_description">No Description</string>
+
+
+    <!-- Dashboard Strings -->
+    <string name="hello">Hello 👋,</string>
+    <string name="my_school_life">My School Life</string>
+    <string name="teacher_hub">Teacher Hub</string>
+    <string name="admin_hub">Admin Hub</string>
+    <string name="school_schedule">School Schedule</string>
+    <string name="view_all">View All</string>
+    <string name="my_dashboard">My Dashboard</string>
+    <string name="faculty_portal">Faculty Portal</string>
+    <string name="search_anything">Search anything...</string>
+    <string name="keep_learning">Keep Learning! 🚀</string>
+    <string name="assignments_due">You have 3 assignments due soon.</string>
+    <string name="class_in_session">Class In Session 👩‍🏫</string>
+    <string name="next_class_starts">Your next class starts in 15 mins.</string>
+
+    <!-- Tile Labels -->
+    <string name="tile_attendance">Attendance</string>
+    <string name="tile_assignments">Assignments</string>
+    <string name="tile_results">My Results</string>
+    <string name="tile_leave">Apply Leave</string>
+    <string name="tile_updates">Global Updates</string>
+    <string name="tile_exams">Upcoming Exams</string>
+    <string name="tile_fees">Fee Statement</string>
+    <string name="tile_mark_attendance">Mark Attendance</string>
+    <string name="tile_post_results">Post Results</string>
+    <string name="tile_leave_request">Leave Request</string>
+    <string name="tile_manage_exams">Manage Exams</string>
+    <string name="tile_notices">Notices</string>
+    <string name="tile_new_admission">New Admission</string>
+    <string name="tile_messages">Messages</string>
+    <string name="tile_admissions">Admissions</string>
+    <string name="tile_staff_management">Staff Management</string>
+    <string name="tile_student_management">Student Management</string>
+    <string name="tile_add_staff">Add Staff</string>
+    <string name="tile_add_student">Add Student</string>
+
+    <!-- Navigation Labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_notices">Notices</string>
+    <string name="nav_learning">Learning</string>
+    <string name="nav_reports">Reports</string>
+    <string name="manage_your_school">Manage Your School 🏫</string>
+    <string name="everything_in_one_place">Everything you need in one place.</string>
+    <string name="dashboard_overview">Dashboard Overview</string>
+    <string name="made_for_futures">Made for bright futures</string>
+    <string name="tile_staff_list">Staff List</string>
+    <string name="tile_timetables">Timetables</string>
+    <string name="tile_students">Students</string>
+
+    <!-- Admissions Screen -->
+    <string name="student_admissions">Student Admissions</string>
+    <string name="new_admission_form">New Admission Form 📝</string>
+    <string name="student_name">Student Name</string>
+    <string name="age">Age</string>
+    <string name="class_label">Class</string>
+    <string name="parent_name">Parent Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="submit_admission">Submit Admission</string>
+    <string name="recent_admissions">Recent Admissions</string>
+    <string name="no_admissions_yet">No admissions added yet.</string>
+    <string name="class_prefix">Class: %1$s</string>
+    <string name="by_prefix">By: %1$s</string>
+
+    <!-- Happenings Screen -->
+    <string name="happenings_title">Notices &amp; Events</string>
+    <string name="latest_updates">Latest School Updates 📢</string>
+    <string name="no_notices">No new notices for today.</string>
+
+    <!-- Learning Screen -->
+    <string name="learning_center">Learning Center</string>
+    <string name="my_courses">My Courses 📚</string>
+    <string name="study_material_empty">Your study material will appear here.</string>
+
+    <!-- Reports Screen -->
+    <string name="performance_reports">Performance Reports</string>
+    <string name="academic_progress">Academic Progress 📊</string>
+    <string name="report_cards_status">Report cards will be available after exams.</string>
+
+    <!-- Terms Screen -->
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_content">We respect your privacy. All your data is stored securely in our school management system.</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="terms_content">By using MarkMyDay, you agree to follow the code of conduct of our institution.</string>
+
+    <!-- About Screen -->
+    <string name="app_version">Version %1$s</string>
+    <string name="about_content">MarkMyDay is a comprehensive school management system designed to streamline communication between administrators, teachers, and students.</string>
+
+    <!-- Authentication Screen -->
+    <string name="learning_adventure">Let\'s Start Your Learning Adventure</string>
+    <string name="start_learning">Start Learning</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="sign_in_continue">Sign in to continue your journey</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login_button">Login</string>
+    <string name="logging_in">Logging you in...</string>
+    <string name="dont_know_details">Don\'t know details? </string>
+    <string name="forget_credentials">forget credentials</string>
+    <string name="error_empty_fields">Please enter email and password</string>
+    <string name="feature_coming_soon">Feature coming soon</string>
+
+    <!-- Add Staff Screen -->
+    <string name="staff_added_success">Staff member added successfully!</string>
+    <string name="add_new_staff">Add New Staff</string>
+    <string name="error_title">Error</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="age_limit_error">Age must be 100 years or less. Please select a valid date.</string>
+    <string name="teacher_registration">Teacher Registration</string>
+    <string name="fields_completed">%1$d / %2$d required fields completed</string>
+    <string name="full_name">Full Name</string>
+    <string name="age_auto">Age (auto)</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="pick_date">Pick date</string>
+    <string name="email_address">Email Address</string>
+    <string name="primary_subject">Primary Subject</string>
+    <string name="home_section">Home Section</string>
+    <string name="classes_taught">Classes Taught</string>
+    <string name="submit">Submit</string>
+    <string name="class_format">Class %1$d</string>
+
+    <!-- Add Student Screen -->
+    <string name="student_added_success">Student added successfully!</string>
+    <string name="add_new_student">Add New Student</string>
+    <string name="registration_error">Registration Error</string>
+    <string name="student_registration">Student Registration</string>
+    <string name="dob_label">DOB (ddmmyyyy)</string>
+    <string name="email_optional">Email (Optional)</string>
+    <string name="select_class">Select Class</string>
+    <string name="select_section">Select Section</string>
+    <string name="error_enter_student_name">Please enter Student Name</string>
+    <string name="error_select_class">Please select a Class</string>
+    <string name="error_select_dob">Please select Date of Birth</string>
+    <string name="error_registration_failed">Registration failed</string>
+    <string name="error_invalid_dob_format">Invalid DOB format. Expected 8 digits (ddMMyyyy).</string>
+    <string name="error_login_failed">Login failed. Please check your credentials.</string>
+    <string name="error_user_not_found">User profile not found.</string>
+    <string name="error_unknown">An unknown error occurred</string>
+
+
+    <!-- Staff Management Screen -->
+    <string name="delete_staff">Delete Staff</string>
+    <string name="delete_confirmation">Are you sure you want to delete %1$s?</string>
+    <string name="delete">Delete</string>
+    <string name="edit_staff_details">Edit Staff Details</string>
+    <string name="search_placeholder">Search by Name or ID</string>
+    <string name="staff_list_count">Staff List (%1$d)</string>
+    <string name="search_instruction">Search for staff members to view details</string>
+    <string name="id_label">ID: %1$s</string>
+    <string name="edit">Edit</string>
+
+    <!-- Attendance Screen -->
+    <string name="attendance_success">Attendance submitted successfully!</string>
+    <string name="submit_attendance">Submit Attendance</string>
+    <string name="no_classes_assigned">No classes assigned to you.</string>
+    <string name="no_students_found">No students found for %1$s.</string>
+    <string name="present">Present</string>
+    <string name="absent">Absent</string>
+
+    <!-- Global Updates Screen -->
+    <string name="title_global_updates">Global Updates</string>
+    <string name="hot_news">HOT NEWS</string>
+    <string name="more_updates">More Updates 📰</string>
+
+    <!-- Role Selector Screen -->
+    <string name="app_tagline">Your School, Managed Simply</string>
+    <string name="continue_as">Continue as</string>
+    <string name="role_student">Student</string>
+    <string name="student_desc">View attendance, marks &amp; more</string>
+    <string name="role_teacher">Teacher</string>
+    <string name="teacher_desc">Manage classes &amp; assignments</string>
+    <string name="role_admin">Administrator</string>
+    <string name="admin_desc">Full school hub management</string>
+    <!-- Global Updates Screen Dummy Data -->
+    <string name="dummy_news_title_1">New Education Policy Announced</string>
+    <string name="dummy_news_desc_1">India introduces new digital learning reforms for schools...</string>
+    <string name="dummy_news_title_2">AI in Schools</string>
+    <string name="dummy_news_desc_2">Schools are introducing AI as a subject for early grades...</string>
+    <string name="dummy_news_title_3">Exam Pattern Changed</string>
+    <string name="dummy_news_desc_3">CBSE updates exam pattern for 2026 academic year...</string>
+    <string name="dummy_news_title_4">Digital Library Access</string>
+    <string name="dummy_news_desc_4">Students to get free access to national digital library...</string>
+    <string name="dummy_news_title_5">Summer Break 2024</string>
+    <string name="dummy_news_desc_5">Official schedule for upcoming summer holidays released.</string>
+    <string name="dummy_news_title_6">Sports Meet 2024</string>
+    <string name="dummy_news_desc_6">Annual inter-school sports competition begins next month.</string>
 </resources>

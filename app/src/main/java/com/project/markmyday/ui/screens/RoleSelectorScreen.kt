@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,13 +74,13 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                "MarkMyDay",
+                stringResource(R.string.app_name),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                "Your School, Managed Simply",
+                stringResource(R.string.app_tagline),
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
             )
@@ -87,7 +88,7 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
             Spacer(modifier = Modifier.height(60.dp))
             
             Text(
-                "Continue as",
+                stringResource(R.string.continue_as),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -97,8 +98,8 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
             Spacer(modifier = Modifier.height(20.dp))
 
             RoleCard(
-                title = "Student",
-                subtitle = "View attendance, marks & more",
+                title = stringResource(R.string.role_student),
+                subtitle = stringResource(R.string.student_desc),
                 icon = Icons.Default.School,
                 onClick = { onRoleSelected("student") }
             )
@@ -106,8 +107,8 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             
             RoleCard(
-                title = "Teacher",
-                subtitle = "Manage classes & assignments",
+                title = stringResource(R.string.role_teacher),
+                subtitle = stringResource(R.string.teacher_desc),
                 icon = Icons.Default.Person,
                 onClick = { onRoleSelected("teacher") }
             )
@@ -115,8 +116,8 @@ fun RoleSelectorScreen(onRoleSelected: (String) -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             
             RoleCard(
-                title = "Administrator",
-                subtitle = "Full school hub management",
+                title = stringResource(R.string.role_admin),
+                subtitle = stringResource(R.string.admin_desc),
                 icon = Icons.Default.Badge,
                 onClick = { onRoleSelected("admin") }
             )
