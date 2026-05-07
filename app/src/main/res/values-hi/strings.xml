@@ -188,7 +188,11 @@
     <string name="delete">हटाएं</string>
     <string name="edit_staff_details">कर्मचारी विवरण संपादित करें</string>
     <string name="search_placeholder">नाम या आईडी द्वारा खोजें</string>
-    <string name="staff_list_count">कर्मचारी सूची (%1$d)</string>
+    <string name="staff_list_title">शिक्षकों की सूची</string>
+    <string name="category_label">श्रेणी: %1$s</string>
+    <string name="name_simple">नाम</string>
+    <string name="subject_simple">विषय</string>
+    <string name="category_simple">श्रेणी</string>
     <string name="search_instruction">विवरण देखने के लिए कर्मचारियों की खोज करें</string>
     <string name="id_label">आईडी: %1$s</string>
     <string name="edit">संपादित करें</string>

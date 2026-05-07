@@ -188,7 +188,11 @@
     <string name="delete">Delete</string>
     <string name="edit_staff_details">Edit Staff Details</string>
     <string name="search_placeholder">Search by Name or ID</string>
-    <string name="staff_list_count">Staff List (%1$d)</string>
+    <string name="staff_list_title">Teachers List</string>
+    <string name="category_label">Category: %1$s</string>
+    <string name="name_simple">Name</string>
+    <string name="subject_simple">Subject</string>
+    <string name="category_simple">Category</string>
     <string name="search_instruction">Search for staff members to view details</string>
     <string name="id_label">ID: %1$s</string>
     <string name="edit">Edit</string>

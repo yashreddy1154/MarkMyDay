@@ -1,19 +1,24 @@
 package com.project.markmyday.ui.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
@@ -21,6 +26,7 @@ import com.project.markmyday.R
 import com.project.markmyday.data.model.Teacher
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import androidx.compose.ui.tooling.preview.Preview
+import com.project.markmyday.viewmodel.TeacherRegistrationState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,11 +40,12 @@ fun StaffManagementScreen(
 
     val filteredTeachers = remember(searchQuery, teachers) {
         if (searchQuery.isBlank()) {
-            emptyList()
+            teachers
         } else {
             teachers.filter {
                 it.name.contains(searchQuery, ignoreCase = true) ||
-                it.teacherId.contains(searchQuery, ignoreCase = true)
+                it.teacherId.contains(searchQuery, ignoreCase = true) ||
+                it.subject.contains(searchQuery, ignoreCase = true)
             }
         }
     }
@@ -77,11 +84,12 @@ fun StaffManagementScreen(
                     name = teacherToEdit?.name ?: "",
                     age = teacherToEdit?.age?.toString() ?: "",
                     dob = teacherToEdit?.dob ?: "",
+                    gender = teacherToEdit?.gender ?: "",
                     phone = teacherToEdit?.phone ?: "",
                     email = teacherToEdit?.email ?: "",
                     subject = teacherToEdit?.subject ?: "",
                     homeSection = teacherToEdit?.homeSection ?: "",
-                    classesTaught = teacherToEdit?.classesTaught ?: emptyList()
+                    classesTaughtCategories = teacherToEdit?.classesTaughtCategories ?: emptyList()
                 )
             )
         }
@@ -103,10 +111,11 @@ fun StaffManagementScreen(
                                 name = editState.name,
                                 age = editState.age.toIntOrNull() ?: 0,
                                 dob = editState.dob,
+                                gender = editState.gender,
                                 phone = editState.phone,
                                 subject = editState.subject,
                                 homeSection = editState.homeSection,
-                                classesTaught = editState.classesTaught
+                                classesTaughtCategories = editState.classesTaughtCategories
                             )
                         )
                     }
@@ -118,7 +127,32 @@ fun StaffManagementScreen(
 
     Scaffold(
         topBar = {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.staff_list_title),
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent
+                    )
+                )
+                
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
@@ -126,52 +160,46 @@ fun StaffManagementScreen(
                     active = false,
                     onActiveChange = { },
                     placeholder = { Text(stringResource(R.string.search_placeholder)) },
-                    leadingIcon = { 
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) { }
+                
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     ) { padding ->
-        if (searchQuery.isNotBlank()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                item {
-                    Text(
-                        text = stringResource(R.string.staff_list_count, filteredTeachers.size),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-                items(filteredTeachers, key = { it.teacherId }) { teacher ->
-                    TeacherListItem(
-                        teacher = teacher,
-                        onEdit = { teacherToEdit = teacher },
-                        onDelete = { teacherToDelete = teacher }
-                    )
-                }
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.search_instruction),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(filteredTeachers, key = { it.teacherId }) { teacher ->
+                TeacherListItem(
+                    teacher = teacher,
+                    onEdit = { teacherToEdit = teacher },
+                    onDelete = { teacherToDelete = teacher }
                 )
+            }
+            
+            if (filteredTeachers.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillParentMaxSize()
+                            .padding(bottom = 100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_students_found, searchQuery),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
     }
@@ -183,61 +211,196 @@ fun TeacherListItem(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val initials = teacher.name.split(" ").mapNotNull { it.firstOrNull() }.joinToString("").take(2).uppercase()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(2.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(20.dp)
+                .fillMaxWidth()
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = teacher.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = stringResource(R.string.id_label, teacher.teacherId),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(8.dp)
+            // Header: Avatar, Name, and Actions
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Circular Avatar with Initials
+                Box(
+                    modifier = Modifier
+                        .size(52.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = teacher.subject,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        style = MaterialTheme.typography.labelSmall,
+                        text = initials,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = teacher.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = teacher.subject,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Row {
+                    IconButton(
+                        onClick = onEdit,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
 
-            Row {
-                IconButton(onClick = onEdit) {
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Info Section: ID and Category Tags
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                InfoTag(
+                    icon = Icons.Default.Badge,
+                    text = teacher.teacherId,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+                
+                teacher.classesTaughtCategories.forEach { category ->
+                    val color = when (category.lowercase()) {
+                        "primary" -> Color(0xFF4CAF50).copy(alpha = 0.15f)
+                        "secondary" -> Color(0xFF2196F3).copy(alpha = 0.15f)
+                        "high school" -> Color(0xFFFF9800).copy(alpha = 0.15f)
+                        else -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
+                    }
+                    val textColor = when (category.lowercase()) {
+                        "primary" -> Color(0xFF2E7D32)
+                        "secondary" -> Color(0xFF1565C0)
+                        "high school" -> Color(0xFFEF6C00)
+                        else -> MaterialTheme.colorScheme.onSecondaryContainer
+                    }
+
+                    Surface(
+                        color = color,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = category,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Footer: Contact and Personal Info
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.edit),
-                        tint = MaterialTheme.colorScheme.primary
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = teacher.phone,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.delete),
-                        tint = MaterialTheme.colorScheme.error
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${teacher.gender} • ${teacher.age} yrs",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun InfoTag(
+    icon: ImageVector,
+    text: String,
+    containerColor: Color
+) {
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

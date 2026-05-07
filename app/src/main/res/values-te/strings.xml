@@ -188,7 +188,11 @@
     <string name="delete">తొలగించండి</string>
     <string name="edit_staff_details">సిబ్బంది వివరాలను సవరించండి</string>
     <string name="search_placeholder">పేరు లేదా ID ద్వారా వెతకండి</string>
-    <string name="staff_list_count">సిబ్బంది జాబితా (%1$d)</string>
+    <string name="staff_list_title">ఉపాధ్యాయుల జాబితా</string>
+    <string name="category_label">వర్గం: %1$s</string>
+    <string name="name_simple">పేరు</string>
+    <string name="subject_simple">విషయం</string>
+    <string name="category_simple">వర్గం</string>
     <string name="search_instruction">వివరాలను చూడటానికి సిబ్బంది కోసం వెతకండి</string>
     <string name="id_label">ID: %1$s</string>
     <string name="edit">సవరించండి</string>
