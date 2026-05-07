@@ -26,7 +26,7 @@ fun HappeningsScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Un
         icon = Icons.Default.Campaign,
         currentRoute = "happenings",
         onNotificationClick = onNotificationClick,
-        onNavigate = onNavigate
+        onNavigate = onNavigate,
     ) {
         Text(stringResource(R.string.latest_updates), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
@@ -41,7 +41,7 @@ fun LearningScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Unit
         icon = Icons.Default.School,
         currentRoute = "SKP",
         onNotificationClick = onNotificationClick,
-        onNavigate = onNavigate
+        onNavigate = onNavigate,
     ) {
         Text(stringResource(R.string.my_courses), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
@@ -56,7 +56,7 @@ fun ReportsScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Unit)
         icon = Icons.Default.Assessment,
         currentRoute = "marks",
         onNotificationClick = onNotificationClick,
-        onNavigate = onNavigate
+        onNavigate = onNavigate,
     ) {
         Text(stringResource(R.string.academic_progress), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
@@ -96,41 +96,6 @@ fun TermsScreen(onBack: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AboutScreen(onBack: () -> Unit) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.about_app)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(Icons.Default.School, contentDescription = null, modifier = Modifier.size(100.dp), tint = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text(stringResource(R.string.app_version, "1.0.0"), style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                stringResource(R.string.about_content),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        }
-    }
-}
-
 @Composable
 fun DummyBaseScreen(
     title: String,
@@ -151,7 +116,7 @@ fun DummyBaseScreen(
         bottomBar = {
             DashboardBottomBar(
                 currentRoute = currentRoute,
-                onNavigate = onNavigate
+                onNavigate = onNavigate,
             )
         }
     ) { padding ->

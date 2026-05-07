@@ -31,10 +31,13 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthResult>(AuthResult.Idle)
     val authState: StateFlow<AuthResult> = _authState.asStateFlow()
 
-    fun loginUser(email: String, password: String) {
+    fun loginUser(emailOrId: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthResult.Loading
             try {
+                // Automatically append @gmail.com if it's just a user ID
+                val email = if (emailOrId.contains("@")) emailOrId else "$emailOrId@gmail.com"
+
                 // 1. Sign in with email and password
                 val authResult = auth.signInWithEmailAndPassword(email, password).await()
                 val uid = authResult.user?.uid

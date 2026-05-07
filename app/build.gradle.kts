@@ -65,6 +65,9 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.material)
     
+    // Google Play Services
+    implementation(libs.play.services.base)
+    
     // Firebase BoM
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

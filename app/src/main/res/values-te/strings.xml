@@ -113,6 +113,7 @@
     <string name="start_learning">నేర్చుకోవడం ప్రారంభించండి</string>
     <string name="welcome_back">తిరిగి స్వాగతం!</string>
     <string name="sign_in_continue">మీ ప్రయాణాన్ని కొనసాగించడానికి సైన్ ఇన్ చేయండి</string>
+    <string name="user_id">యూజర్ ఐడి</string>
     <string name="email">ఈమెయిల్</string>
     <string name="password">పాస్‌వర్డ్</string>
     <string name="forgot_password">పాస్‌వర్డ్ మర్చిపోయారా?</string>
@@ -120,7 +121,7 @@
     <string name="logging_in">మిమ్మల్ని లాగిన్ చేస్తున్నాము...</string>
     <string name="dont_know_details">వివరాలు తెలియవా? </string>
     <string name="forget_credentials">రుజువులను మర్చిపోయారా</string>
-    <string name="error_empty_fields">దయచేసి ఈమెయిల్ మరియు పాస్‌వర్డ్ నమోదు చేయండి</string>
+    <string name="error_empty_fields">దయచేసి యూజర్ ఐడి మరియు పాస్‌వర్డ్ నమోదు చేయండి</string>
     <string name="feature_coming_soon">ఫీచర్ త్వరలో వస్తుంది</string>
 
     <!-- Add Staff Screen -->

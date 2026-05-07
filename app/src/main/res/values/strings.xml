@@ -115,6 +115,7 @@
     <string name="start_learning">Start Learning</string>
     <string name="welcome_back">Welcome Back!</string>
     <string name="sign_in_continue">Sign in to continue your journey</string>
+    <string name="user_id">User ID</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="forgot_password">Forgot Password?</string>
@@ -122,7 +123,7 @@
     <string name="logging_in">Logging you in...</string>
     <string name="dont_know_details">Don\'t know details? </string>
     <string name="forget_credentials">forget credentials</string>
-    <string name="error_empty_fields">Please enter email and password</string>
+    <string name="error_empty_fields">Please enter User ID and password</string>
     <string name="feature_coming_soon">Feature coming soon</string>
 
     <!-- Add Staff Screen -->

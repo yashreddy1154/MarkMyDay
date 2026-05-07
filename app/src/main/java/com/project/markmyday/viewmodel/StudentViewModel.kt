@@ -101,7 +101,7 @@ class StudentViewModel(
             try {
                 // 1. Generate Credentials
                 val studentId = generateStudentId(formState.studentClass)
-                val email = "${studentId.lowercase()}@markmyday.com"
+                val email = "${studentId.lowercase()}@gmail.com"
                 val password = formState.dob.filter { it.isDigit() }
 
                 if (password.length != 8) {
@@ -164,10 +164,9 @@ class StudentViewModel(
      * Format: "S" + 4 random digits + "C" + ClassNumber (e.g., S4512C10).
      */
     fun generateStudentId(studentClass: String): String {
-        val randomDigits = (1000..9999).random()
-        val classNumber = studentClass.filter { it.isDigit() }
-        val id = "S${randomDigits}C$classNumber"
-        Log.d(TAG, "Generated Student ID: $id for class: $studentClass")
+        val randomDigits = (100000..999999).random()
+        val id = "S$randomDigits"
+        Log.d(TAG, "Generated Student ID: $id ")
         return id
     }
 }

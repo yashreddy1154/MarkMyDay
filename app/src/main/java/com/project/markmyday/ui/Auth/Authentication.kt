@@ -265,17 +265,11 @@ fun LoginContent(
 
                         Spacer(modifier = Modifier.height(40.dp))
 
-                        // Email TextField with auto-complete
+                        // User ID TextField
                         OutlinedTextField(
                             value = email,
-                            onValueChange = { newValue ->
-                                email = if (newValue.endsWith("@") && !newValue.contains("@gmail.com")) {
-                                    newValue + "gmail.com"
-                                } else {
-                                    newValue
-                                }
-                            },
-                            label = { Text(stringResource(R.string.email)) },
+                            onValueChange = { email = it },
+                            label = { Text(stringResource(R.string.user_id)) },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             singleLine = true,

@@ -113,6 +113,7 @@
     <string name="start_learning">सीखना शुरू करें</string>
     <string name="welcome_back">स्वागत है!</string>
     <string name="sign_in_continue">अपनी यात्रा जारी रखने के लिए साइन इन करें</string>
+    <string name="user_id">यूज़र आईडी</string>
     <string name="email">ईमेल</string>
     <string name="password">पासवर्ड</string>
     <string name="forgot_password">पासवर्ड भूल गए?</string>
@@ -120,7 +121,7 @@
     <string name="logging_in">आपको लॉगिन किया जा रहा है...</string>
     <string name="dont_know_details">विवरण नहीं पता? </string>
     <string name="forget_credentials">क्रेडेंशियल भूल गए</string>
-    <string name="error_empty_fields">कृपया ईमेल और पासवर्ड दर्ज करें</string>
+    <string name="error_empty_fields">कृपया यूज़र आईडी और पासवर्ड दर्ज करें</string>
     <string name="feature_coming_soon">सुविधा जल्द ही आ रही है</string>
 
     <!-- Add Staff Screen -->

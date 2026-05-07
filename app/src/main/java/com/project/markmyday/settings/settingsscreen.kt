@@ -1,11 +1,8 @@
 package com.project.markmyday.settings
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,23 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.lerp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
 import com.project.markmyday.viewmodel.SettingsUiState
 import com.project.markmyday.viewmodel.SettingsViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
-import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +36,7 @@ fun SettingsScreen(
     onBack: () -> Unit = {},
     onLogout: () -> Unit = {},
     onNavigateToTerms: () -> Unit = {},
-    onNavigateToAbout: () -> Unit = {}
+    onNavigateToAbout: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
@@ -81,6 +72,30 @@ fun SettingsScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ) {
+                Button(
+                    onClick = { viewModel.logout() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.logout), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
@@ -224,158 +239,11 @@ fun SettingsScreen(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            // 4. Creators Section
-            CreatorsSection()
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            // 5. Logout Button
-            Button(
-                onClick = { viewModel.logout() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                ),
-                shape = RoundedCornerShape(16.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.logout), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
-            }
             
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
-
-@Composable
-fun CreatorsSection() {
-    val creators = listOf(
-        Creator("Tarak", stringResource(R.string.android_dev), R.drawable.tarak),
-        Creator("Teja Reddy", stringResource(R.string.android_dev), R.drawable.teja),
-        Creator("Yash", stringResource(R.string.android_dev), R.drawable.yash)
-    )
-    val pagerState = rememberPagerState(pageCount = { creators.size })
-
-    // Auto-scroll logic
-    LaunchedEffect(creators) {
-        while (true) {
-            yield()
-            delay(3000)
-            val nextPage = (pagerState.currentPage + 1) % creators.size
-            pagerState.animateScrollToPage(nextPage)
-        }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.app_creators),
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier.align(Alignment.Start).padding(top = 24.dp, bottom = 24.dp)
-        )
-
-        HorizontalPager(
-            state = pagerState,
-            contentPadding = PaddingValues(horizontal = 60.dp),
-            modifier = Modifier.height(380.dp)
-        ) { page ->
-            val creator = creators[page]
-            
-            Card(
-                modifier = Modifier
-                    .graphicsLayer {
-                        val pageOffset = (
-                            (pagerState.currentPage - page) + pagerState
-                                .currentPageOffsetFraction
-                            ).absoluteValue
-                        
-                        // 3D rotation effect
-                        rotationY = lerp(
-                            start = 0f,
-                            stop = 40f,
-                            fraction = pageOffset.coerceIn(0f, 1f)
-                        ) * (if (pagerState.currentPage > page) 1f else -1f)
-
-                        // Scale effect
-                        val scale = lerp(
-                            start = 1f,
-                            stop = 0.85f,
-                            fraction = pageOffset.coerceIn(0f, 1f)
-                        )
-                        scaleX = scale
-                        scaleY = scale
-                        
-                        // Transparency effect
-                        alpha = lerp(
-                            start = 1f,
-                            stop = 0.5f,
-                            fraction = pageOffset.coerceIn(0f, 1f)
-                        )
-                    }
-                    .fillMaxWidth()
-                    .aspectRatio(0.8f),
-                shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = painterResource(id = creator.imageRes),
-                        contentDescription = creator.name,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    
-                    // Gradient overlay
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
-                                    startY = 300f
-                                )
-                            )
-                    )
-                    
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = creator.name,
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                        Text(
-                            text = creator.role,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-data class Creator(val name: String, val role: String, val imageRes: Int)
 
 @Composable
 fun ClickableSettingsItem(
