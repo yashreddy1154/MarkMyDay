@@ -15,14 +15,16 @@ package com.project.markmyday.data.model
  */
 data class Student(
     val uid: String = "",
-    val studentId: String = "",
+    val studentId: String = "", // Admission No.
     val name: String = "",
     val age: Int = 0,
     val dob: String = "",
-    val parentName: String = "",
-    val phone: String = "",
+    val gender: String = "",
+    val motherName: String = "",
+    val motherPhone: String = "",
+    val fatherName: String = "",
+    val fatherPhone: String = "",
     val studentClass: String = "",
-    val section: String = "",
-    val classSection: String = "",
+    val category: String = "", // Primary, Secondary, High School
     val email: String = ""
 )

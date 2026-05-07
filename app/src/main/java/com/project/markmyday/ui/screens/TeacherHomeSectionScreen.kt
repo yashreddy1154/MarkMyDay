@@ -108,7 +108,7 @@ fun StudentCard(student: Student) {
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.width(80.dp)
                 )
-                Text(text = student.parentName)
+                Text(text = student.motherName)
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -117,7 +117,7 @@ fun StudentCard(student: Student) {
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.width(80.dp)
                 )
-                Text(text = student.phone)
+                Text(text = student.motherPhone)
             }
         }
     }

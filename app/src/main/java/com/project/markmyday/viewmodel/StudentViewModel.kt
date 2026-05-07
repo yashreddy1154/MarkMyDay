@@ -23,7 +23,7 @@ import kotlinx.coroutines.tasks.await
 sealed class StudentRegistrationState {
     object Idle : StudentRegistrationState()
     object Loading : StudentRegistrationState()
-    object Success : StudentRegistrationState()
+    data class Success(val admissionNo: String) : StudentRegistrationState()
     data class Error(val message: String) : StudentRegistrationState()
 }
 
@@ -90,25 +90,21 @@ class StudentViewModel(
         }
     }
 
-    /**
-     * Registers a new student by creating credentials in Firebase Auth 
-     * and saving details in Firestore.
-     */
     fun registerStudent(formState: AddStudentFormState) {
         Log.d("AddStudent", "ViewModel function triggered")
         viewModelScope.launch {
             _registrationState.value = StudentRegistrationState.Loading
             try {
                 // 1. Generate Credentials
-                val studentId = generateStudentId(formState.studentClass)
-                val email = "${studentId.lowercase()}@gmail.com"
+                val admissionNo = generateUniqueAdmissionNo()
+                val email = "${admissionNo.lowercase()}@gmail.com"
                 val password = formState.dob.filter { it.isDigit() }
 
                 if (password.length != 8) {
                     throw Exception("error_invalid_dob_format")
                 }
 
-                Log.d(TAG, "Attempting to register student: $studentId with email: $email")
+                Log.d(TAG, "Attempting to register student: $admissionNo with email: $email")
 
                 // 2. Create User in Firebase Auth
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
@@ -116,18 +112,28 @@ class StudentViewModel(
 
                 Log.d(TAG, "Auth user created successfully with UID: $uid")
 
-                // 3. Prepare Student object for Firestore 'students' collection
+                // 3. Prepare Student object
+                val studentClassInt = formState.studentClass.toIntOrNull() ?: 0
+                val category = when (studentClassInt) {
+                    in 1..5 -> "Primary"
+                    in 6..7 -> "Secondary"
+                    in 8..10 -> "High School"
+                    else -> "Unknown"
+                }
+
                 val student = Student(
                     uid = uid,
-                    studentId = studentId,
+                    studentId = admissionNo,
                     name = formState.name,
                     age = formState.age.toIntOrNull() ?: 0,
                     dob = formState.dob,
-                    parentName = formState.parentName,
-                    phone = formState.phone,
+                    gender = formState.gender,
+                    motherName = formState.motherName,
+                    motherPhone = formState.motherPhone,
+                    fatherName = formState.fatherName,
+                    fatherPhone = formState.fatherPhone,
                     studentClass = formState.studentClass,
-                    section = formState.section,
-                    classSection = "${formState.studentClass} ${formState.section}",
+                    category = category,
                     email = email
                 )
 
@@ -140,33 +146,44 @@ class StudentViewModel(
                     "name" to formState.name,
                     "role" to "student",
                     "email" to email,
-                    "studentId" to studentId,
+                    "studentId" to admissionNo,
                     "studentClass" to formState.studentClass,
-                    "section" to formState.section,
-                    "class_section" to "${formState.studentClass} ${formState.section}",
-                    "parentName" to formState.parentName,
-                    "phone" to formState.phone
+                    "category" to category,
+                    "gender" to formState.gender,
+                    "motherName" to formState.motherName,
+                    "motherPhone" to formState.motherPhone,
+                    "fatherName" to formState.fatherName,
+                    "fatherPhone" to formState.fatherPhone
                 )
                 firestore.collection("users").document(uid).set(userMap).await()
 
-                Log.d(TAG, "Student data saved to Firestore successfully for ID: $studentId")
-                _registrationState.value = StudentRegistrationState.Success
+                Log.d(TAG, "Student data saved to Firestore successfully for ID: $admissionNo")
+                _registrationState.value = StudentRegistrationState.Success(admissionNo)
 
             } catch (e: Exception) {
-                Log.e("FirebaseError", "Error: ${e.message}", e)
+                Log.e(TAG, "Error: ${e.message}", e)
                 _registrationState.value = StudentRegistrationState.Error(e.localizedMessage ?: "error_registration_failed")
             }
         }
     }
 
-    /**
-     * Generates a unique Student ID.
-     * Format: "S" + 4 random digits + "C" + ClassNumber (e.g., S4512C10).
-     */
-    fun generateStudentId(studentClass: String): String {
-        val randomDigits = (100000..999999).random()
-        val id = "S$randomDigits"
-        Log.d(TAG, "Generated Student ID: $id ")
-        return id
+    private suspend fun generateUniqueAdmissionNo(): String {
+        var isUnique = false
+        var generatedId = ""
+        while (!isUnique) {
+            val randomNum = (100000..999999).random()
+            generatedId = randomNum.toString()
+            
+            // Check in 'students' collection
+            val doc = firestore.collection("students").document(generatedId).get().await()
+            if (!doc.exists()) {
+                isUnique = true
+            }
+        }
+        return generatedId
+    }
+
+    private fun generateStudentId(studentClass: String): String {
+        return "" // Deprecated by admissionNo logic
     }
 }

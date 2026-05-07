@@ -81,7 +81,10 @@
     <string name="parent_name">अभिभावक का नाम</string>
     <string name="phone_number">फ़ोन नंबर</string>
     <string name="submit_admission">प्रवेश जमा करें</string>
-    <string name="recent_admissions">हाल के प्रवेश</string>
+    <string name="students_list_title">छात्रों की सूची</string>
+    <string name="admission_no_label">प्रवेश संख्या: %1$s</string>
+    <string name="parent_label">अभिभावक: %1$s</string>
+    <string name="student_list_count">छात्र सूची (%1$d)</string>
     <string name="no_admissions_yet">अभी तक कोई प्रवेश नहीं जोड़ा गया है।</string>
     <string name="class_prefix">कक्षा: %1$s</string>
     <string name="by_prefix">द्वारा: %1$s</string>
@@ -164,13 +167,13 @@
     <string name="subject_japanese">जापानी</string>
 
     <!-- Add Student Screen -->
-    <string name="student_added_success">छात्र सफलतापूर्वक जोड़ा गया!</string>
-    <string name="add_new_student">नया छात्र जोड़ें</string>
+    <string name="student_added_success">छात्र को सफलतापूर्वक जोड़ा गया! प्रवेश संख्या: %1$s</string>
+    <string name="add_new_student">छात्र पंजीकरण</string>
     <string name="registration_error">पंजीकरण त्रुटि</string>
     <string name="student_registration">छात्र पंजीकरण</string>
-    <string name="dob_label">जन्म तिथि (ddmmyyyy)</string>
+    <string name="dob_label">जन्म तिथि</string>
     <string name="email_optional">ईमेल (वैकल्पिक)</string>
-    <string name="select_class">कक्षा चुनें</string>
+    <string name="select_class">कक्षा</string>
     <string name="select_section">सेक्शन चुनें</string>
     <string name="error_enter_student_name">कृपया छात्र का नाम दर्ज करें</string>
     <string name="error_select_class">कृपया कक्षा चुनें</string>
@@ -180,6 +183,12 @@
     <string name="error_login_failed">लॉगिन विफल रहा। कृपया अपने क्रेडेंशियल की जांच करें।</string>
     <string name="error_user_not_found">उपयोगकर्ता प्रोफ़ाइल नहीं मिली।</string>
     <string name="error_unknown">एक अज्ञात त्रुटि हुई</string>
+    <string name="mother_name">माता का नाम</string>
+    <string name="mother_phone">माता का फोन</string>
+    <string name="father_name">पिता का नाम</string>
+    <string name="father_phone">पिता का फोन</string>
+    <string name="error_parent_details">कम से कम एक अभिभावक का विवरण आवश्यक है</string>
+    <string name="adding_to_database">डेटाबेस में डेटा जोड़ा जा रहा है</string>
 
 
     <!-- Staff Management Screen -->

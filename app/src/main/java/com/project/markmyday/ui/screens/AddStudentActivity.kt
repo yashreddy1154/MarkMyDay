@@ -1,7 +1,7 @@
 package com.project.markmyday.ui.screens
 
+import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -85,13 +85,20 @@ fun AddStudentScreen(
     var state by remember { mutableStateOf(AddStudentFormState()) }
     val registrationState by viewModel.registrationState.collectAsState()
     val context = LocalContext.current
-    val studentAddedSuccess = stringResource(R.string.student_added_success)
 
+    // Show success Dialog and reset form
     LaunchedEffect(registrationState) {
         if (registrationState is StudentRegistrationState.Success) {
-            Toast.makeText(context, studentAddedSuccess, Toast.LENGTH_LONG).show()
-            state = AddStudentFormState()
-            viewModel.resetRegistrationState()
+            val admissionNo = (registrationState as StudentRegistrationState.Success).admissionNo
+            AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.student_registration))
+                .setMessage(context.getString(R.string.student_added_success, admissionNo))
+                .setPositiveButton(context.getString(R.string.ok)) { dialog, _ ->
+                    state = AddStudentFormState()
+                    viewModel.resetRegistrationState()
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
@@ -101,38 +108,9 @@ fun AddStudentScreen(
             state = state,
             onStateChange = { state = it },
             onBack = onBack,
-            onSubmit = { onSubmit(state) }
+            onSubmit = { onSubmit(state) },
+            registrationState = registrationState
         )
-
-        if (registrationState is StudentRegistrationState.Loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Color.White)
-            }
-        }
-
-        if (registrationState is StudentRegistrationState.Error) {
-            val errorKey = (registrationState as StudentRegistrationState.Error).message
-            val displayMessage = when(errorKey) {
-                "error_invalid_dob_format" -> stringResource(R.string.error_invalid_dob_format)
-                "error_registration_failed" -> stringResource(R.string.error_registration_failed)
-                else -> errorKey
-            }
-            AlertDialog(
-                onDismissRequest = { /* Handle error dismissal if needed */ },
-                title = { Text(stringResource(R.string.registration_error)) },
-                text = { Text(displayMessage) },
-                confirmButton = {
-                    TextButton(onClick = { viewModel.resetRegistrationState() }) {
-                        Text(stringResource(R.string.ok))
-                    }
-                }
-            )
-        }
     }
 }
 
@@ -140,10 +118,12 @@ data class AddStudentFormState(
     val name: String = "",
     val age: String = "",
     val dob: String = "",
-    val parentName: String = "",
-    val phone: String = "",
+    val gender: String = "",
+    val motherName: String = "",
+    val motherPhone: String = "",
+    val fatherName: String = "",
+    val fatherPhone: String = "",
     val studentClass: String = "",
-    val section: String = "",
     val email: String = ""
 )
 
@@ -154,15 +134,16 @@ fun AddStudentContent(
     state: AddStudentFormState,
     onStateChange: (AddStudentFormState) -> Unit,
     onBack: () -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: () -> Unit,
+    registrationState: StudentRegistrationState
 ) {
     val context = LocalContext.current
-    val classes = (1..10).map { stringResource(R.string.class_format, it) }
-    val sections = listOf("A", "B", "C")
+    val classes = (1..10).map { it.toString() }
     
     val errorEnterStudentName = stringResource(R.string.error_enter_student_name)
     val errorSelectClass = stringResource(R.string.error_select_class)
     val errorSelectDob = stringResource(R.string.error_select_dob)
+    val errorParentDetails = stringResource(R.string.error_parent_details)
 
     // Date picker state
     var showDatePicker by remember { mutableStateOf(false) }
@@ -201,260 +182,228 @@ fun AddStudentContent(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.staff),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+    // Form validation
+    val isFormValid = state.name.isNotBlank() && 
+                      state.dob.isNotBlank() && 
+                      state.studentClass.isNotBlank() &&
+                      ((state.motherName.isNotBlank() && state.motherPhone.isNotBlank()) || 
+                       (state.fatherName.isNotBlank() && state.fatherPhone.isNotBlank()))
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-        )
-
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            title,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Blue
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = Color.Black
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.White
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        title,
+                        fontWeight = FontWeight.Bold
                     )
-                )
-            }
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-            ) {
-                ElevatedCard(
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Full Name
+            OutlinedTextField(
+                value = state.name,
+                onValueChange = { onStateChange(state.copy(name = it)) },
+                label = { Text(stringResource(R.string.student_name)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // DOB + Gender
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = state.dob,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.dob_label)) },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .align(Alignment.BottomCenter),
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                    ),
-                    elevation = CardDefaults.elevatedCardElevation(8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(24.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Text(
-                            text = stringResource(R.string.student_registration),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Full Name
-                        OutlinedTextField(
-                            value = state.name,
-                            onValueChange = { onStateChange(state.copy(name = it)) },
-                            label = { Text(stringResource(R.string.student_name)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // DOB and Age
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            OutlinedTextField(
-                                value = state.dob,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.dob_label)) },
-                                modifier = Modifier
-                                    .weight(2f)
-                                    .clickable { showDatePicker = true },
-                                shape = RoundedCornerShape(12.dp),
-                                enabled = false,
-                                trailingIcon = {
-                                    IconButton(onClick = { showDatePicker = true }) {
-                                        Icon(
-                                            imageVector = Icons.Default.DateRange,
-                                            contentDescription = stringResource(R.string.pick_date)
-                                        )
-                                    }
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            OutlinedTextField(
-                                value = state.age,
-                                onValueChange = { onStateChange(state.copy(age = it)) },
-                                label = { Text(stringResource(R.string.age)) },
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
-                                )
+                        .weight(1.5f)
+                        .clickable { showDatePicker = true },
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = false,
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = stringResource(R.string.pick_date)
                             )
                         }
+                    }
+                )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-                        // Parent Name
-                        OutlinedTextField(
-                            value = state.parentName,
-                            onValueChange = { onStateChange(state.copy(parentName = it)) },
-                            label = { Text(stringResource(R.string.parent_name)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = stringResource(R.string.gender), style = MaterialTheme.typography.labelLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = state.gender == "Male",
+                            onClick = { onStateChange(state.copy(gender = "Male")) }
                         )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Phone Number
-                        OutlinedTextField(
-                            value = state.phone,
-                            onValueChange = { onStateChange(state.copy(phone = it)) },
-                            label = { Text(stringResource(R.string.phone_number)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
-                            )
+                        Text(text = stringResource(R.string.male), modifier = Modifier.clickable { onStateChange(state.copy(gender = "Male")) })
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = state.gender == "Female",
+                            onClick = { onStateChange(state.copy(gender = "Female")) }
                         )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Email (Optional based on requirements but good to have)
-                        OutlinedTextField(
-                            value = state.email,
-                            onValueChange = { onStateChange(state.copy(email = it)) },
-                            label = { Text(stringResource(R.string.email_optional)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Class Dropdown
-                        var classExpanded by remember { mutableStateOf(false) }
-                        ExposedDropdownMenuBox(
-                            expanded = classExpanded,
-                            onExpandedChange = { classExpanded = it },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedTextField(
-                                value = state.studentClass,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.select_class)) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            ExposedDropdownMenu(
-                                expanded = classExpanded,
-                                onDismissRequest = { classExpanded = false }
-                            ) {
-                                classes.forEachIndexed { index, className ->
-                                    val classValue = (index + 1).toString()
-                                    DropdownMenuItem(
-                                        text = { Text(className) },
-                                        onClick = {
-                                            onStateChange(state.copy(studentClass = classValue))
-                                            classExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Section Dropdown
-                        var sectionExpanded by remember { mutableStateOf(false) }
-                        ExposedDropdownMenuBox(
-                            expanded = sectionExpanded,
-                            onExpandedChange = { sectionExpanded = it },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedTextField(
-                                value = state.section,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.select_section)) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionExpanded) },
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            ExposedDropdownMenu(
-                                expanded = sectionExpanded,
-                                onDismissRequest = { sectionExpanded = false }
-                            ) {
-                                sections.forEach { sectionName ->
-                                    DropdownMenuItem(
-                                        text = { Text(sectionName) },
-                                        onClick = {
-                                            onStateChange(state.copy(section = sectionName))
-                                            sectionExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        // Submit Button
-                        Button(
-                            onClick = {
-                                Log.d("AddStudent", "Submit clicked")
-                                if (state.name.isBlank()) {
-                                    Toast.makeText(context, errorEnterStudentName, Toast.LENGTH_SHORT).show()
-                                } else if (state.studentClass.isBlank()) {
-                                    Toast.makeText(context, errorSelectClass, Toast.LENGTH_SHORT).show()
-                                } else if (state.dob.isBlank()) {
-                                    Toast.makeText(context, errorSelectDob, Toast.LENGTH_SHORT).show()
-                                } else {
-                                    onSubmit()
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Text(
-                                stringResource(R.string.submit),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(text = stringResource(R.string.female), modifier = Modifier.clickable { onStateChange(state.copy(gender = "Female")) })
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Mother details
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = state.motherName,
+                    onValueChange = { onStateChange(state.copy(motherName = it)) },
+                    label = { Text(stringResource(R.string.mother_name)) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                OutlinedTextField(
+                    value = state.motherPhone,
+                    onValueChange = { onStateChange(state.copy(motherPhone = it)) },
+                    label = { Text(stringResource(R.string.mother_phone)) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Father details
+            Row(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = state.fatherName,
+                    onValueChange = { onStateChange(state.copy(fatherName = it)) },
+                    label = { Text(stringResource(R.string.father_name)) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                OutlinedTextField(
+                    value = state.fatherPhone,
+                    onValueChange = { onStateChange(state.copy(fatherPhone = it)) },
+                    label = { Text(stringResource(R.string.father_phone)) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Class Dropdown
+            var classExpanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = classExpanded,
+                onExpandedChange = { classExpanded = it },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = state.studentClass,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.select_class)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                ExposedDropdownMenu(
+                    expanded = classExpanded,
+                    onDismissRequest = { classExpanded = false }
+                ) {
+                    classes.forEach { classValue ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.class_format, classValue.toInt())) },
+                            onClick = {
+                                onStateChange(state.copy(studentClass = classValue))
+                                classExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Submit Button
+            Button(
+                onClick = {
+                    if (isFormValid) {
+                        onSubmit()
+                    } else if (state.name.isBlank()) {
+                        Toast.makeText(context, errorEnterStudentName, Toast.LENGTH_SHORT).show()
+                    } else if (state.dob.isBlank()) {
+                        Toast.makeText(context, errorSelectDob, Toast.LENGTH_SHORT).show()
+                    } else if (state.studentClass.isBlank()) {
+                        Toast.makeText(context, errorSelectClass, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, errorParentDetails, Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
+                shape = RoundedCornerShape(16.dp),
+                enabled = registrationState !is StudentRegistrationState.Loading
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (registrationState is StudentRegistrationState.Loading) {
+                        Text(
+                            stringResource(R.string.adding_to_database),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(4.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            trackColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                        )
+                    } else {
+                        Text(
+                            stringResource(R.string.submit),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

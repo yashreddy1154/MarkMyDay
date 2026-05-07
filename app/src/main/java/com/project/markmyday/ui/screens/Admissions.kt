@@ -151,7 +151,7 @@ fun AdmissionsScreen(role: String, onBack: () -> Unit) {
 
             item {
                 Text(
-                    stringResource(R.string.recent_admissions), 
+                    "recent_admissions",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)

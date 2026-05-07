@@ -64,11 +64,7 @@ class TeacherHomeViewModel(
                                         uid = doc.getString("uid") ?: "",
                                         studentId = doc.getString("studentId") ?: "",
                                         name = doc.getString("name") ?: "",
-                                        parentName = doc.getString("parentName") ?: "",
-                                        phone = doc.getString("phone") ?: "",
                                         studentClass = doc.getString("studentClass") ?: "",
-                                        section = doc.getString("section") ?: "",
-                                        classSection = doc.getString("class_section") ?: "",
                                         email = doc.getString("email") ?: ""
                                     )
                                 }

@@ -81,7 +81,10 @@
     <string name="parent_name">Parent Name</string>
     <string name="phone_number">Phone Number</string>
     <string name="submit_admission">Submit Admission</string>
-    <string name="recent_admissions">Recent Admissions</string>
+    <string name="students_list_title">Students List</string>
+    <string name="admission_no_label">Admission No: %1$s</string>
+    <string name="parent_label">Parent: %1$s</string>
+    <string name="student_list_count">Student List (%1$d)</string>
     <string name="no_admissions_yet">No admissions added yet.</string>
     <string name="class_prefix">Class: %1$s</string>
     <string name="by_prefix">By: %1$s</string>
@@ -164,13 +167,13 @@
     <string name="subject_japanese">Japanese</string>
 
     <!-- Add Student Screen -->
-    <string name="student_added_success">Student added successfully!</string>
-    <string name="add_new_student">Add New Student</string>
+    <string name="student_added_success">Successfully added student! Admission No: %1$s</string>
+    <string name="add_new_student">Student Registration</string>
     <string name="registration_error">Registration Error</string>
     <string name="student_registration">Student Registration</string>
-    <string name="dob_label">DOB (ddmmyyyy)</string>
+    <string name="dob_label">DOB</string>
     <string name="email_optional">Email (Optional)</string>
-    <string name="select_class">Select Class</string>
+    <string name="select_class">Class</string>
     <string name="select_section">Select Section</string>
     <string name="error_enter_student_name">Please enter Student Name</string>
     <string name="error_select_class">Please select a Class</string>
@@ -180,6 +183,12 @@
     <string name="error_login_failed">Login failed. Please check your credentials.</string>
     <string name="error_user_not_found">User profile not found.</string>
     <string name="error_unknown">An unknown error occurred</string>
+    <string name="mother_name">Mother Name</string>
+    <string name="mother_phone">Mother Phone</string>
+    <string name="father_name">Father Name</string>
+    <string name="father_phone">Father Phone</string>
+    <string name="error_parent_details">At least one parent details are necessary</string>
+    <string name="adding_to_database">Adding Data to DataBase</string>
 
 
     <!-- Staff Management Screen -->

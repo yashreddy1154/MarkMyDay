@@ -81,7 +81,10 @@
     <string name="parent_name">తల్లిదండ్రుల పేరు</string>
     <string name="phone_number">ఫోన్ నంబర్</string>
     <string name="submit_admission">ప్రవేశాన్ని సమర్పించండి</string>
-    <string name="recent_admissions">ఇటీవలి ప్రవేశాలు</string>
+    <string name="students_list_title">విద్యార్థుల జాబితా</string>
+    <string name="admission_no_label">అడ్మిషన్ నంబర్: %1$s</string>
+    <string name="parent_label">తల్లిదండ్రులు: %1$s</string>
+    <string name="student_list_count">విద్యార్థుల జాబితా (%1$d)</string>
     <string name="no_admissions_yet">ఇంకా ప్రవేశాలు జోడించబడలేదు.</string>
     <string name="class_prefix">తరగతి: %1$s</string>
     <string name="by_prefix">ద్వారా: %1$s</string>
@@ -164,13 +167,13 @@
     <string name="subject_japanese">జపనీస్</string>
 
     <!-- Add Student Screen -->
-    <string name="student_added_success">విద్యార్థి విజయవంతంగా జోడించబడ్డారు!</string>
-    <string name="add_new_student">కొత్త విద్యార్థిని జోడించండి</string>
+    <string name="student_added_success">విద్యార్థి విజయవంతంగా జోడించబడ్డారు! అడ్మిషన్ నంబర్: %1$s</string>
+    <string name="add_new_student">విద్యార్థి నమోదు</string>
     <string name="registration_error">నమోదు లోపం</string>
     <string name="student_registration">విద్యార్థి నమోదు</string>
-    <string name="dob_label">పుట్టిన తేదీ (ddmmyyyy)</string>
+    <string name="dob_label">పుట్టిన తేదీ</string>
     <string name="email_optional">ఈమెయిల్ (ఐచ్ఛికం)</string>
-    <string name="select_class">తరగతిని ఎంచుకోండి</string>
+    <string name="select_class">తరగతి</string>
     <string name="select_section">విభాగాన్ని ఎంచుకోండి</string>
     <string name="error_enter_student_name">దయచేసి విద్యార్థి పేరును నమోదు చేయండి</string>
     <string name="error_select_class">దయచేసి తరగతిని ఎంచుకోండి</string>
@@ -180,6 +183,12 @@
     <string name="error_login_failed">లాగిన్ విఫలమైంది. దయచేసి మీ ఆధారాలను తనిఖీ చేయండి.</string>
     <string name="error_user_not_found">వినియోగదారు ప్రొఫైల్ కనుగొనబడలేదు.</string>
     <string name="error_unknown">తెలియని లోపం సంభవించింది</string>
+    <string name="mother_name">తల్లి పేరు</string>
+    <string name="mother_phone">తల్లి ఫోన్</string>
+    <string name="father_name">తండ్రి పేరు</string>
+    <string name="father_phone">తండ్రి ఫోన్</string>
+    <string name="error_parent_details">కనీసం ఒక తల్లిదండ్రుల వివరాలు అవసరం</string>
+    <string name="adding_to_database">డేటాబేస్ కు డేటాను జోడిస్తోంది</string>
 
 
     <!-- Staff Management Screen -->

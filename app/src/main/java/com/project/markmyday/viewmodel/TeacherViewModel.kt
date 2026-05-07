@@ -126,6 +126,7 @@ class TeacherViewModel(
 
                 _registrationState.value = TeacherRegistrationState.Success(teacherId)
             } catch (e: Exception) {
+                android.util.Log.e("TeacherViewModel", "Registration failed", e)
                 _registrationState.value = TeacherRegistrationState.Error(e.localizedMessage ?: "Registration failed")
             }
         }

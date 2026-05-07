@@ -91,11 +91,8 @@ class AttendanceViewModel(
                             studentId = doc.getString("studentId") ?: "",
                             name = doc.getString("name") ?: "",
                             studentClass = doc.getString("studentClass") ?: "",
-                            section = doc.getString("section") ?: "",
-                            classSection = doc.getString("class_section") ?: ""
                         )
                     }
-                    _studentsByClass.value = students.groupBy { it.classSection }
                     
                     // Initialize attendance states for all students as true (Present)
                     students.forEach { student ->
