@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">MarkMyDay</string>
+    <string name="title_activity_add_staff">సిబ్బందిని జోడించండి</string>
+    <string name="title_activity_add_student">విద్యార్థిని జోడించండి</string>
     <string name="settings">సెట్టింగులు</string>
     <string name="profile_details">ప్రొఫైల్ వివరాలు</string>
     <string name="preferences">ప్రాధాన్యతలు</string>
@@ -16,6 +18,7 @@
     <string name="android_dev">ఆండ్రాయిడ్ దేవ్</string>
     <string name="error_profile">లోపం: %1$s</string>
     <string name="back">వెనుకకు</string>
+    <string name="news_image">వార్తా చిత్రం</string>
     <string name="no_title">శీర్షిక లేదు</string>
     <string name="no_description">వివరణ లేదు</string>
 

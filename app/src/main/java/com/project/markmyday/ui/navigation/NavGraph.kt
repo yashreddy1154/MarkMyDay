@@ -10,7 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.ui.screens.*
-import com.project.markmyday.ui.auth.AuthenticationScreen
+import com.project.markmyday.ui.Auth.AuthenticationScreen
 import com.project.markmyday.viewmodel.TeacherViewModel
 import com.project.markmyday.viewmodel.StudentViewModel
 
@@ -22,8 +22,6 @@ sealed class Screen(val route: String) {
     object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
     object Notifications : Screen("notifications/{role}")
     object Admissions : Screen("admissions")
-    object AddStaff : Screen("add_staff")
-    object AddStudent : Screen("add_student")
     object StaffManagement : Screen("staff_management")
     object StudentManagement : Screen("student_management")
     object AdminCreateNotification : Screen("admin_create_notification")
@@ -147,6 +145,7 @@ fun AppNavigation(
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: "Admin"
             val role = backStackEntry.arguments?.getString("role") ?: "Administrator"
+            val context = androidx.compose.ui.platform.LocalContext.current
 
             AdminDashboard(
                 userName = name,
@@ -158,8 +157,12 @@ fun AppNavigation(
                         "notices" -> navController.navigate(Screen.AdminCreateNotification.route)
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "reports" -> navController.navigate(Screen.Reports.route)
-                        "add_staff" -> navController.navigate(Screen.AddStaff.route)
-                        "add_student" -> navController.navigate(Screen.AddStudent.route)
+                        "add_staff" -> {
+                            context.startActivity(android.content.Intent(context, AddStaffActivity::class.java))
+                        }
+                        "add_student" -> {
+                            context.startActivity(android.content.Intent(context, AddStudentActivity::class.java))
+                        }
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
                         "students" -> navController.navigate(Screen.StudentManagement.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
@@ -170,26 +173,6 @@ fun AppNavigation(
             )
         }
         
-        composable(Screen.AddStaff.route) {
-            val teacherViewModel: TeacherViewModel = viewModel()
-            AddStaffScreen(
-                onBack = { navController.popBackStack() },
-                onSubmit = { formState ->
-                    teacherViewModel.registerTeacher(formState)
-                }
-            )
-        }
-
-        composable(Screen.AddStudent.route) {
-            val studentViewModel: StudentViewModel = viewModel()
-            AddStudentScreen(
-                onBack = { navController.popBackStack() },
-                onSubmit = { formState ->
-                    studentViewModel.registerStudent(formState)
-                }
-            )
-        }
-
         composable(Screen.StaffManagement.route) {
             val teacherViewModel: TeacherViewModel = viewModel()
             val teachers by teacherViewModel.allTeachers.collectAsState()

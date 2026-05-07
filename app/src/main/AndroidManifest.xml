@@ -28,9 +28,15 @@
             android:theme="@style/Theme.MarkMyDay" />
 
         <activity
-            android:name=".ui.screens.AddStaff"
+            android:name=".ui.screens.AddStaffActivity"
             android:exported="false"
             android:label="@string/title_activity_add_staff"
+            android:theme="@style/Theme.MarkMyDay" />
+
+        <activity
+            android:name=".ui.screens.AddStudentActivity"
+            android:exported="false"
+            android:label="@string/title_activity_add_student"
             android:theme="@style/Theme.MarkMyDay" />
 
         <service

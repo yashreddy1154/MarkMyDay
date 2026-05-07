@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">MarkMyDay</string>
+    <string name="title_activity_add_staff">शिक्षक जोड़ें</string>
+    <string name="title_activity_add_student">छात्र जोड़ें</string>
     <string name="settings">सेटिंग्स</string>
     <string name="profile_details">प्रोफ़ाइल विवरण</string>
     <string name="preferences">प्राथमिकताएं</string>
@@ -16,6 +18,7 @@
     <string name="android_dev">एंड्रॉइड डेवलपर</string>
     <string name="error_profile">त्रुटि: %1$s</string>
     <string name="back">पीछे</string>
+    <string name="news_image">समाचार चित्र</string>
     <string name="no_title">कोई शीर्षक नहीं</string>
     <string name="no_description">कोई विवरण नहीं</string>
 

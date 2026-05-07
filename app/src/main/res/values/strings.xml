@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MarkMyDay</string>
-    <string name="title_activity_add_staff">AddStaff</string>
+    <string name="title_activity_add_staff">Add Staff</string>
+    <string name="title_activity_add_student">Add Student</string>
     <string name="settings">Settings</string>
     <string name="profile_details">Profile Details</string>
     <string name="preferences">Preferences</string>

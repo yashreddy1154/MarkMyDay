@@ -1,8 +1,9 @@
-package com.project.markmyday.ui.auth
+package com.project.markmyday.ui.Auth
 
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -17,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -230,7 +230,7 @@ fun LoginContent(
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = if (isDarkMode) 0.dp else 8.dp),
                     border = if (isDarkMode)
-                        androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.12f))
+                        BorderStroke(1.dp, Color.White.copy(alpha = 0.12f))
                     else null
                 ) {
                     Column(
