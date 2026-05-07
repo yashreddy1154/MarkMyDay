@@ -268,7 +268,7 @@ fun LoginContent(
                         // User ID TextField
                         OutlinedTextField(
                             value = email,
-                            onValueChange = { email = it },
+                            onValueChange = { email = it.lowercase() },
                             label = { Text(stringResource(R.string.user_id)) },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),

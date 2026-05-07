@@ -1,5 +1,6 @@
 package com.project.markmyday.ui.screens
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -73,8 +74,6 @@ class AddStaffActivity : AppCompatActivity() {
     }
 }
 
-// --- Combined UI Components from AddStaff.kt ---
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStaffScreen(
@@ -85,14 +84,20 @@ fun AddStaffScreen(
     var state by remember { mutableStateOf(AddStaffFormState()) }
     val registrationState by viewModel.registrationState.collectAsState()
     val context = LocalContext.current
-    val staffAddedSuccess = stringResource(R.string.staff_added_success)
 
-    // Show success Toast and reset form
+    // Show success Dialog and reset form
     LaunchedEffect(registrationState) {
         if (registrationState is TeacherRegistrationState.Success) {
-            Toast.makeText(context, staffAddedSuccess, Toast.LENGTH_LONG).show()
-            state = AddStaffFormState()
-            viewModel.resetRegistrationState()
+            val teacherId = (registrationState as TeacherRegistrationState.Success).teacherId
+            AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.teacher_registration))
+                .setMessage(context.getString(R.string.staff_added_success, teacherId))
+                .setPositiveButton(context.getString(R.string.ok)) { dialog, _ ->
+                    state = AddStaffFormState()
+                    viewModel.resetRegistrationState()
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
@@ -110,10 +115,18 @@ fun AddStaffScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
+                    .background(Color.Black.copy(alpha = 0.7f)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color.White)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = stringResource(R.string.adding_data_to_db),
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    CircularProgressIndicator(color = Color.White)
+                }
             }
         }
 
@@ -138,11 +151,13 @@ data class AddStaffFormState(
     val name: String = "",
     val age: String = "",
     val dob: String = "",
+    val gender: String = "",
     val phone: String = "",
     val email: String = "",
     val subject: String = "",
     val homeSection: String = "",
-    val classesTaught: List<String> = emptyList()
+    val classesTaught: List<String> = emptyList(),
+    val classesTaughtCategories: List<String> = emptyList()
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -155,9 +170,22 @@ fun AddStaffContent(
     onSubmit: () -> Unit
 ) {
     val context = LocalContext.current
-    val subjects = listOf("Telugu", "Hindi", "English", "Maths", "Science", "Physics", "Biology", "Computers", "Social", "Games/PT")
-    val sections = listOf("1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B", "7A", "7B", "8A", "8B", "9A", "9B", "10A", "10B")
-    val classes = (1..10).map { stringResource(R.string.class_format, it) }
+    val subjects = listOf(
+        stringResource(R.string.subject_telugu),
+        stringResource(R.string.subject_hindi),
+        stringResource(R.string.subject_english),
+        stringResource(R.string.subject_math),
+        stringResource(R.string.subject_science),
+        stringResource(R.string.subject_social),
+        stringResource(R.string.subject_physics),
+        stringResource(R.string.subject_biology),
+        stringResource(R.string.subject_japanese)
+    )
+    val categories = listOf(
+        stringResource(R.string.primary),
+        stringResource(R.string.secondary),
+        stringResource(R.string.high_school)
+    )
     val ageLimitError = stringResource(R.string.age_limit_error)
 
     // Date picker state
@@ -209,293 +237,188 @@ fun AddStaffContent(
     // Form completion progress (7 mandatory fields)
     val requiredFields = listOf(
         state.name.isNotBlank(),
-        state.age.isNotBlank(),
+        state.dob.isNotBlank(),
+        state.gender.isNotBlank(),
         state.phone.isNotBlank(),
-        state.email.isNotBlank(),
         state.subject.isNotBlank(),
-        state.homeSection.isNotBlank(),
-        state.classesTaught.isNotEmpty()
+        state.classesTaughtCategories.isNotEmpty()
     )
     val filledCount = requiredFields.count { it }
-    val progress = if (requiredFields.isEmpty()) 0f else filledCount.toFloat() / requiredFields.size
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.staff),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-        )
-
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            title,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Blue
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = Color.Black
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.White
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        title,
+                        fontWeight = FontWeight.Bold
                     )
-                )
-            }
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-            ) {
-                ElevatedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .align(Alignment.BottomCenter),
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    colors = CardDefaults.elevatedCardColors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                    ),
-                    elevation = CardDefaults.elevatedCardElevation(8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(24.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
-                        Text(
-                            text = stringResource(R.string.teacher_registration),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
                         )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Progress bar
-                        LinearProgressIndicator(
-                            progress = { progress },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primaryContainer
-                        )
-                        Text(
-                            text = stringResource(R.string.fields_completed, filledCount, requiredFields.size),
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Full Name
-                        OutlinedTextField(
-                            value = state.name,
-                            onValueChange = { onStateChange(state.copy(name = it)) },
-                            label = { Text(stringResource(R.string.full_name)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Age (auto, read-only) + DOB (clickable)
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            OutlinedTextField(
-                                value = state.age,
-                                onValueChange = {},
-                                label = { Text(stringResource(R.string.age_auto)) },
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                readOnly = true,
-                                enabled = false
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            OutlinedTextField(
-                                value = state.dob,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.date_of_birth)) },
-                                modifier = Modifier
-                                    .weight(2f)
-                                    .clickable { showDatePicker = true },
-                                shape = RoundedCornerShape(12.dp),
-                                enabled = false,
-                                trailingIcon = {
-                                    IconButton(onClick = { showDatePicker = true }) {
-                                        Icon(
-                                            imageVector = Icons.Default.DateRange,
-                                            contentDescription = stringResource(R.string.pick_date)
-                                        )
-                                    }
-                                }
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Phone Number
-                        OutlinedTextField(
-                            value = state.phone,
-                            onValueChange = { onStateChange(state.copy(phone = it)) },
-                            label = { Text(stringResource(R.string.phone_number)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Email Address
-                        OutlinedTextField(
-                            value = state.email,
-                            onValueChange = { onStateChange(state.copy(email = it)) },
-                            label = { Text(stringResource(R.string.email_address)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Primary Subject dropdown
-                        var subjectExpanded by remember { mutableStateOf(false) }
-                        ExposedDropdownMenuBox(
-                            expanded = subjectExpanded,
-                            onExpandedChange = { subjectExpanded = it },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedTextField(
-                                value = state.subject,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.primary_subject)) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectExpanded) },
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            ExposedDropdownMenu(
-                                expanded = subjectExpanded,
-                                onDismissRequest = { subjectExpanded = false }
-                            ) {
-                                subjects.forEach { subject ->
-                                    DropdownMenuItem(
-                                        text = { Text(subject) },
-                                        onClick = {
-                                            onStateChange(state.copy(subject = subject))
-                                            subjectExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Home Section dropdown
-                        var sectionExpanded by remember { mutableStateOf(false) }
-                        ExposedDropdownMenuBox(
-                            expanded = sectionExpanded,
-                            onExpandedChange = { sectionExpanded = it },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedTextField(
-                                value = state.homeSection,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.home_section)) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sectionExpanded) },
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            ExposedDropdownMenu(
-                                expanded = sectionExpanded,
-                                onDismissRequest = { sectionExpanded = false }
-                            ) {
-                                sections.forEach { section ->
-                                    DropdownMenuItem(
-                                        text = { Text(section) },
-                                        onClick = {
-                                            onStateChange(state.copy(homeSection = section))
-                                            sectionExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Classes Taught (multi-select chips)
-                        Text(
-                            text = stringResource(R.string.classes_taught),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            classes.forEachIndexed { index, className ->
-                                val classValue = (index + 1).toString()
-                                FilterChip(
-                                    selected = state.classesTaught.contains(classValue),
-                                    onClick = {
-                                        val newList = if (state.classesTaught.contains(classValue)) {
-                                            state.classesTaught - classValue
-                                        } else {
-                                            state.classesTaught + classValue
-                                        }
-                                        onStateChange(state.copy(classesTaught = newList))
-                                    },
-                                    label = { Text(className) }
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        // Submit button (enabled only when all mandatory fields are filled)
-                        Button(
-                            onClick = onSubmit,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            enabled = filledCount == requiredFields.size
-                        ) {
-                            Text(
-                                stringResource(R.string.submit),
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Full Name
+            OutlinedTextField(
+                value = state.name,
+                onValueChange = { onStateChange(state.copy(name = it)) },
+                label = { Text(stringResource(R.string.full_name)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // DOB + Gender side by side (approx)
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = state.dob,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.date_of_birth)) },
+                    modifier = Modifier
+                        .weight(1.5f)
+                        .clickable { showDatePicker = true },
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = false,
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = stringResource(R.string.pick_date)
+                            )
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = stringResource(R.string.gender), style = MaterialTheme.typography.labelLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = state.gender == "Male",
+                            onClick = { onStateChange(state.copy(gender = "Male")) }
+                        )
+                        Text(text = stringResource(R.string.male), modifier = Modifier.clickable { onStateChange(state.copy(gender = "Male")) })
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = state.gender == "Female",
+                            onClick = { onStateChange(state.copy(gender = "Female")) }
+                        )
+                        Text(text = stringResource(R.string.female), modifier = Modifier.clickable { onStateChange(state.copy(gender = "Female")) })
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Phone Number
+            OutlinedTextField(
+                value = state.phone,
+                onValueChange = { onStateChange(state.copy(phone = it)) },
+                label = { Text(stringResource(R.string.phone_number)) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Primary Subject dropdown
+            var subjectExpanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = subjectExpanded,
+                onExpandedChange = { subjectExpanded = it },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = state.subject,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.primary_subject)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectExpanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    modifier = Modifier
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                ExposedDropdownMenu(
+                    expanded = subjectExpanded,
+                    onDismissRequest = { subjectExpanded = false }
+                ) {
+                    subjects.forEach { subject ->
+                        DropdownMenuItem(
+                            text = { Text(subject) },
+                            onClick = {
+                                onStateChange(state.copy(subject = subject))
+                                subjectExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Classes Taught categories
+            Text(
+                text = stringResource(R.string.classes_taught),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                categories.forEach { category ->
+                    FilterChip(
+                        selected = state.classesTaughtCategories.contains(category),
+                        onClick = {
+                            val newList = if (state.classesTaughtCategories.contains(category)) {
+                                state.classesTaughtCategories - category
+                            } else {
+                                state.classesTaughtCategories + category
+                            }
+                            onStateChange(state.copy(classesTaughtCategories = newList))
+                        },
+                        label = { Text(category) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Submit button
+            Button(
+                onClick = onSubmit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                enabled = filledCount == requiredFields.size
+            ) {
+                Text(
+                    stringResource(R.string.submit),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

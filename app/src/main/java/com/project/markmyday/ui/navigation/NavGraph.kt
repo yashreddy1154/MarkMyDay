@@ -52,14 +52,18 @@ fun AppNavigation(
         composable(Screen.Authentication.route) {
             AuthenticationScreen(onLoginSuccess = { name, role, section, subject ->
                 // Routing logic based on user role
-                val baseRoute = when (role.lowercase()) {
-                    "principal", "headmaster", "admin" -> "admin_dashboard/$name/$role"
-                    "teacher" -> "teacher_dashboard/$name/$role/${section ?: "N/A"}/${subject ?: "N/A"}"
-                    "student" -> "student_dashboard/$name/$role"
-                    else -> "student_dashboard/$name/$role" // Default fallback
+                val encodedName = java.net.URLEncoder.encode(name, "UTF-8")
+                val encodedRole = java.net.URLEncoder.encode(role, "UTF-8")
+                val encodedSection = java.net.URLEncoder.encode(section ?: "N/A", "UTF-8")
+                val encodedSubject = java.net.URLEncoder.encode(subject ?: "N/A", "UTF-8")
+
+                val destination = when (role.lowercase()) {
+                    "principal", "headmaster", "admin" -> "admin_dashboard/$encodedName/$encodedRole"
+                    "teacher" -> "teacher_dashboard/$encodedName/$encodedRole/$encodedSection/$encodedSubject"
+                    "student" -> "student_dashboard/$encodedName/$encodedRole"
+                    else -> "student_dashboard/$encodedName/$encodedRole" // Default fallback
                 }
 
-                val destination = baseRoute
                 lastDashboardRoute = destination
 
                 navController.navigate(destination) {

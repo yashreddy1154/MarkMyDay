@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 sealed class TeacherRegistrationState {
     object Idle : TeacherRegistrationState()
     object Loading : TeacherRegistrationState()
-    object Success : TeacherRegistrationState()
+    data class Success(val teacherId: String) : TeacherRegistrationState()
     data class Error(val message: String) : TeacherRegistrationState()
 }
 
@@ -81,8 +81,7 @@ class TeacherViewModel(
         viewModelScope.launch {
             _registrationState.value = TeacherRegistrationState.Loading
             try {
-                val subjectCode = getSubjectCode(formState.subject)
-                val teacherId = generateTeacherId(subjectCode)
+                val teacherId = generateUniqueTeacherId()
                 val email = generateEmail(teacherId)
                 val password = formState.dob.filter { it.isDigit() } // Ensure password is digits only (ddmmyyyy)
 
@@ -101,9 +100,10 @@ class TeacherViewModel(
                     name = formState.name,
                     age = formState.age.toIntOrNull() ?: 0,
                     dob = formState.dob,
+                    gender = formState.gender,
                     subject = formState.subject,
                     homeSection = formState.homeSection,
-                    classesTaught = formState.classesTaught,
+                    classesTaughtCategories = formState.classesTaughtCategories,
                     phone = formState.phone,
                     email = email
                 )
@@ -124,36 +124,31 @@ class TeacherViewModel(
                 )
                 firestore.collection("users").document(uid).set(userMap).await()
 
-                _registrationState.value = TeacherRegistrationState.Success
+                _registrationState.value = TeacherRegistrationState.Success(teacherId)
             } catch (e: Exception) {
                 _registrationState.value = TeacherRegistrationState.Error(e.localizedMessage ?: "Registration failed")
             }
         }
     }
 
-    private fun generateTeacherId(subjectCode: String): String {
-        // Requirements: "T1261" + SubjectCode
-        return "T1261$subjectCode"
+    private suspend fun generateUniqueTeacherId(): String {
+        var isUnique = false
+        var generatedId = ""
+        while (!isUnique) {
+            val randomNum = (1000..9999).random()
+            generatedId = "T$randomNum"
+            
+            // Check in 'teachers' collection
+            val doc = firestore.collection("teachers").document(generatedId).get().await()
+            if (!doc.exists()) {
+                isUnique = true
+            }
+        }
+        return generatedId
     }
 
     private fun generateEmail(teacherId: String): String {
-        // Requirements: teacherId + "@gmail.com"
+        // Requirements: teacherId + "@gmail.com" (lowercase t)
         return "${teacherId.lowercase()}@gmail.com"
-    }
-
-    private fun getSubjectCode(subjectName: String): String {
-        return when (subjectName) {
-            "Telugu" -> "TEL"
-            "Hindi" -> "HIN"
-            "English" -> "ENG"
-            "Maths" -> "MAT"
-            "Science" -> "SCI"
-            "Physics" -> "PHY"
-            "Biology" -> "BIO"
-            "Computers" -> "COM"
-            "Social" -> "SOC"
-            "Games/PT" -> "GPT"
-            else -> "GEN" // General/Unknown
-        }
     }
 }

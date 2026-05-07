@@ -128,8 +128,8 @@
     <string name="feature_coming_soon">सुविधा जल्द ही आ रही है</string>
 
     <!-- Add Staff Screen -->
-    <string name="staff_added_success">कर्मचारी सफलतापूर्वक जोड़ा गया!</string>
-    <string name="add_new_staff">नया कर्मचारी जोड़ें</string>
+    <string name="staff_added_success">उपयोगकर्ता आईडी के साथ शिक्षक जोड़ा गया: %1$s</string>
+    <string name="add_new_staff">शिक्षक पंजीकरण</string>
     <string name="error_title">त्रुटि</string>
     <string name="ok">ठीक है</string>
     <string name="cancel">रद्द करें</string>
@@ -141,11 +141,27 @@
     <string name="date_of_birth">जन्म तिथि</string>
     <string name="pick_date">तारीख चुनें</string>
     <string name="email_address">ईमेल पता</string>
-    <string name="primary_subject">प्राथमिक विषय</string>
+    <string name="primary_subject">मुख्य विषय</string>
     <string name="home_section">होम सेक्शन</string>
     <string name="classes_taught">पढ़ाए जाने वाले विषय</string>
     <string name="submit">जमा करें</string>
     <string name="class_format">कक्षा %1$d</string>
+    <string name="gender">लिंग</string>
+    <string name="male">पुरुष</string>
+    <string name="female">महिला</string>
+    <string name="primary">प्राथमिक</string>
+    <string name="secondary">माध्यमिक</string>
+    <string name="high_school">हाई स्कूल</string>
+    <string name="adding_data_to_db">डेटाबेस में डेटा जोड़ा जा रहा है</string>
+    <string name="subject_telugu">तेलुगु</string>
+    <string name="subject_hindi">हिंदी</string>
+    <string name="subject_english">अंग्रेजी</string>
+    <string name="subject_math">गणित</string>
+    <string name="subject_science">विज्ञान</string>
+    <string name="subject_social">सामाजिक</string>
+    <string name="subject_physics">भौतिक विज्ञान</string>
+    <string name="subject_biology">जीव विज्ञान</string>
+    <string name="subject_japanese">जापानी</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">छात्र सफलतापूर्वक जोड़ा गया!</string>

@@ -128,8 +128,8 @@
     <string name="feature_coming_soon">ఫీచర్ త్వరలో వస్తుంది</string>
 
     <!-- Add Staff Screen -->
-    <string name="staff_added_success">సిబ్బంది విజయవంతంగా జోడించబడ్డారు!</string>
-    <string name="add_new_staff">కొత్త సిబ్బందిని జోడించండి</string>
+    <string name="staff_added_success">యూజర్ ఐడి తో టీచర్ జోడించబడ్డారు: %1$s</string>
+    <string name="add_new_staff">టీచర్ రిజిస్ట్రేషన్</string>
     <string name="error_title">లోపం</string>
     <string name="ok">సరే</string>
     <string name="cancel">రద్దు చేయండి</string>
@@ -146,6 +146,22 @@
     <string name="classes_taught">బోధించే తరగతులు</string>
     <string name="submit">సమర్పించండి</string>
     <string name="class_format">తరగతి %1$d</string>
+    <string name="gender">లింగం</string>
+    <string name="male">పురుషుడు</string>
+    <string name="female">స్త్రీ</string>
+    <string name="primary">ప్రాథమిక</string>
+    <string name="secondary">సెకండరీ</string>
+    <string name="high_school">హై స్కూల్</string>
+    <string name="adding_data_to_db">డేటాబేస్ లోకి డేటా జోడించబడుతోంది</string>
+    <string name="subject_telugu">తెలుగు</string>
+    <string name="subject_hindi">హిందీ</string>
+    <string name="subject_english">ఇంగ్లీష్</string>
+    <string name="subject_math">గణితం</string>
+    <string name="subject_science">సైన్స్</string>
+    <string name="subject_social">సోషల్</string>
+    <string name="subject_physics">ఫిజిక్స్</string>
+    <string name="subject_biology">బయాలజీ</string>
+    <string name="subject_japanese">జపనీస్</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">విద్యార్థి విజయవంతంగా జోడించబడ్డారు!</string>

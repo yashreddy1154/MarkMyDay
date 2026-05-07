@@ -128,8 +128,8 @@
     <string name="feature_coming_soon">Feature coming soon</string>
 
     <!-- Add Staff Screen -->
-    <string name="staff_added_success">Staff member added successfully!</string>
-    <string name="add_new_staff">Add New Staff</string>
+    <string name="staff_added_success">Teacher added with user id: %1$s</string>
+    <string name="add_new_staff">Teach Register</string>
     <string name="error_title">Error</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -138,14 +138,30 @@
     <string name="fields_completed">%1$d / %2$d required fields completed</string>
     <string name="full_name">Full Name</string>
     <string name="age_auto">Age (auto)</string>
-    <string name="date_of_birth">Date of Birth</string>
+    <string name="date_of_birth">DOB</string>
     <string name="pick_date">Pick date</string>
     <string name="email_address">Email Address</string>
-    <string name="primary_subject">Primary Subject</string>
+    <string name="primary_subject">Primary Sub</string>
     <string name="home_section">Home Section</string>
     <string name="classes_taught">Classes Taught</string>
     <string name="submit">Submit</string>
     <string name="class_format">Class %1$d</string>
+    <string name="gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="primary">Primary</string>
+    <string name="secondary">Secondary</string>
+    <string name="high_school">High School</string>
+    <string name="adding_data_to_db">Adding Data into Database</string>
+    <string name="subject_telugu">Telugu</string>
+    <string name="subject_hindi">Hindi</string>
+    <string name="subject_english">English</string>
+    <string name="subject_math">Math</string>
+    <string name="subject_science">Science</string>
+    <string name="subject_social">Social</string>
+    <string name="subject_physics">Physics</string>
+    <string name="subject_biology">Biology</string>
+    <string name="subject_japanese">Japanese</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">Student added successfully!</string>
