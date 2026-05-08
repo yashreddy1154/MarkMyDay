@@ -179,6 +179,10 @@
     <string name="category_label_simple">श्रेणी: %1$s</string>
     <string name="home_teacher_assigned">होम टीचर सफलतापूर्वक नियुक्त किया गया</string>
     <string name="loading_step">लोड हो रहा है...</string>
+    <string name="select_students_title">%1$s छात्रों का चयन करें</string>
+    <string name="list_of_students">छात्रों की सूची</string>
+    <string name="home_teacher_label">HT: %1$s</string>
+    <string name="student_count">%1$d छात्र</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">छात्र को सफलतापूर्वक जोड़ा गया! प्रवेश संख्या: %1$s</string>

@@ -3,8 +3,10 @@ package com.project.markmyday.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.markmyday.data.model.Student
 import com.project.markmyday.data.model.Teacher
 import com.project.markmyday.data.model.Timetable
+import com.project.markmyday.data.repository.StudentRepository
 import com.project.markmyday.data.repository.TeacherRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,6 +21,7 @@ sealed class TimetableState {
 
 class TimetableViewModel(
     private val teacherRepository: TeacherRepository = TeacherRepository(),
+    private val studentRepository: StudentRepository = StudentRepository(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : ViewModel() {
 
@@ -31,14 +34,24 @@ class TimetableViewModel(
     private val _allTeachers = MutableStateFlow<List<Teacher>>(emptyList())
     val allTeachers: StateFlow<List<Teacher>> = _allTeachers.asStateFlow()
 
+    private val _allStudents = MutableStateFlow<List<Student>>(emptyList())
+    val allStudents: StateFlow<List<Student>> = _allStudents.asStateFlow()
+
     // Key: Class name (e.g., "Class 1"), Value: Selected Teacher
     private val _classTeacherAssignments = MutableStateFlow<Map<String, Teacher?>>(
         (1..10).associate { "Class $it" to null }
     )
     val classTeacherAssignments: StateFlow<Map<String, Teacher?>> = _classTeacherAssignments.asStateFlow()
 
+    // Key: Class name, Value: List of Student IDs
+    private val _classStudentAssignments = MutableStateFlow<Map<String, List<String>>>(
+        (1..10).associate { "Class $it" to emptyList() }
+    )
+    val classStudentAssignments: StateFlow<Map<String, List<String>>> = _classStudentAssignments.asStateFlow()
+
     init {
         fetchTeachers()
+        fetchStudents()
         loadExistingAssignments()
     }
 
@@ -50,20 +63,44 @@ class TimetableViewModel(
         }
     }
 
+    private fun fetchStudents() {
+        viewModelScope.launch {
+            studentRepository.getAllStudents().collect { students ->
+                _allStudents.value = students
+                
+                // Initialize students for each class if not already loaded from Firestore
+                val currentAssignments = _classStudentAssignments.value.toMutableMap()
+                (1..10).forEach { i ->
+                    val className = "Class $i"
+                    if (currentAssignments[className].isNullOrEmpty()) {
+                        val classStudents = students.filter { it.studentClass == i.toString() }
+                        currentAssignments[className] = classStudents.map { it.studentId }
+                    }
+                }
+                _classStudentAssignments.value = currentAssignments
+            }
+        }
+    }
+
     private fun loadExistingAssignments() {
         viewModelScope.launch {
             try {
                 val snapshot = firestore.collection("timetable").get().await()
                 val existing = snapshot.toObjects(Timetable::class.java)
-                val currentAssignments = _classTeacherAssignments.value.toMutableMap()
+                val currentTeacherAssignments = _classTeacherAssignments.value.toMutableMap()
+                val currentStudentAssignments = _classStudentAssignments.value.toMutableMap()
                 
                 existing.forEach { timetable ->
                     val teacher = _allTeachers.value.find { it.teacherId == timetable.homeTeacherId }
                     if (teacher != null) {
-                        currentAssignments[timetable.className] = teacher
+                        currentTeacherAssignments[timetable.className] = teacher
+                    }
+                    if (timetable.studentList.isNotEmpty()) {
+                        currentStudentAssignments[timetable.className] = timetable.studentList
                     }
                 }
-                _classTeacherAssignments.value = currentAssignments
+                _classTeacherAssignments.value = currentTeacherAssignments
+                _classStudentAssignments.value = currentStudentAssignments
             } catch (e: Exception) {
                 // Handle error
             }
@@ -88,12 +125,18 @@ class TimetableViewModel(
         _classTeacherAssignments.value = currentMap
     }
 
+    fun updateClassStudents(className: String, studentIds: List<String>) {
+        val currentMap = _classStudentAssignments.value.toMutableMap()
+        currentMap[className] = studentIds
+        _classStudentAssignments.value = currentMap
+    }
+
     fun nextStep() {
         if (_currentStep.value < 3) {
-            if (_currentStep.value == 1) {
-                saveStep1Data()
-            } else {
-                _currentStep.value += 1
+            when (_currentStep.value) {
+                1 -> saveStep1Data()
+                2 -> saveStep2Data()
+                else -> _currentStep.value += 1
             }
         }
     }
@@ -104,21 +147,23 @@ class TimetableViewModel(
             try {
                 val assignments = _classTeacherAssignments.value
                 
-                // 1. Update 'timetable' collection
+                // Update 'timetable' and 'teachers'
                 assignments.forEach { (className, teacher) ->
                     if (teacher != null) {
-                        val timetable = Timetable(
-                            className = className,
-                            homeTeacherId = teacher.teacherId,
-                            homeTeacherName = teacher.name
+                        // We use merge here to preserve studentIds if they exist
+                        val timetableData = hashMapOf(
+                            "className" to className,
+                            "homeTeacherId" to teacher.teacherId,
+                            "homeTeacherName" to teacher.name
                         )
-                        firestore.collection("timetable").document(className).set(timetable).await()
+                        firestore.collection("timetable").document(className)
+                            .set(timetableData, com.google.firebase.firestore.SetOptions.merge()).await()
                         
                         // 2. Update 'teachers' collection
                         val updatedTeacher = teacher.copy(homeSection = className)
                         teacherRepository.updateTeacher(updatedTeacher)
 
-                        // 3. Update 'users' collection (find by teacherId)
+                        // 3. Update 'users' collection
                         val userQuery = firestore.collection("users")
                             .whereEqualTo("teacherId", teacher.teacherId)
                             .get()
@@ -135,6 +180,28 @@ class TimetableViewModel(
                 _currentStep.value = 2
             } catch (e: Exception) {
                 _state.value = TimetableState.Error(e.localizedMessage ?: "Failed to save assignments")
+            }
+        }
+    }
+
+    private fun saveStep2Data() {
+        viewModelScope.launch {
+            _state.value = TimetableState.Loading
+            try {
+                val studentAssignments = _classStudentAssignments.value
+                
+                studentAssignments.forEach { (className, studentIds) ->
+                    if (studentIds.isNotEmpty()) {
+                        val data = mapOf("studentList" to studentIds)
+                        firestore.collection("timetable").document(className)
+                            .set(data, com.google.firebase.firestore.SetOptions.merge()).await()
+                    }
+                }
+                
+                _state.value = TimetableState.Success
+                _currentStep.value = 3
+            } catch (e: Exception) {
+                _state.value = TimetableState.Error(e.localizedMessage ?: "Failed to save student list")
             }
         }
     }

@@ -35,7 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.LocalSettingsViewModel
 import com.project.markmyday.R
+import com.project.markmyday.data.model.Student
 import com.project.markmyday.data.model.Teacher
+import com.project.markmyday.data.model.Timetable
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.viewmodel.SettingsViewModel
 import com.project.markmyday.viewmodel.TimetableState
@@ -79,7 +81,13 @@ fun CreateTimetableScreen(
     val currentStep by viewModel.currentStep.collectAsState()
     val state by viewModel.state.collectAsState()
     val assignments by viewModel.classTeacherAssignments.collectAsState()
+    val studentAssignments by viewModel.classStudentAssignments.collectAsState()
     val teachers by viewModel.allTeachers.collectAsState()
+    val students by viewModel.allStudents.collectAsState()
+
+    LaunchedEffect(currentStep) {
+        viewModel.resetState()
+    }
 
     Scaffold(
         topBar = {
@@ -152,7 +160,7 @@ fun CreateTimetableScreen(
                 ) { step ->
                     when (step) {
                         1 -> Step1Content(teachers, assignments, onAssign = { cls, t -> viewModel.assignTeacherToClass(cls, t) })
-                        2 -> StepPlaceholder(stringResource(R.string.step_2_name))
+                        2 -> Step2Content(students, assignments, studentAssignments, onUpdateStudents = { cls, ids -> viewModel.updateClassStudents(cls, ids) })
                         3 -> StepPlaceholder(stringResource(R.string.step_3_name))
                     }
                 }
@@ -518,6 +526,227 @@ fun getSubjectColor(subject: String): Color {
         "social" -> Color(0xFFFF9800) // Orange
         "japanese" -> Color(0xFF212121) // Black
         else -> MaterialTheme.colorScheme.primary
+    }
+}
+
+@Composable
+fun Step2Content(
+    allStudents: List<Student>,
+    teacherAssignments: Map<String, Teacher?>,
+    studentAssignments: Map<String, List<String>>,
+    onUpdateStudents: (String, List<String>) -> Unit
+) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(bottom = 80.dp)
+    ) {
+        items(teacherAssignments.keys.toList()) { className ->
+            ClassStudentCard(
+                className = className,
+                homeTeacher = teacherAssignments[className],
+                allStudents = allStudents,
+                selectedStudentIds = studentAssignments[className] ?: emptyList(),
+                onStudentsSelected = { onUpdateStudents(className, it) }
+            )
+        }
+    }
+}
+
+@Composable
+fun ClassStudentCard(
+    className: String,
+    homeTeacher: Teacher?,
+    allStudents: List<Student>,
+    selectedStudentIds: List<String>,
+    onStudentsSelected: (List<String>) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = className,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.home_teacher_label, homeTeacher?.name ?: "N/A"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Button(
+                onClick = { showDialog = true },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                Text(
+                    text = if (selectedStudentIds.isEmpty()) stringResource(R.string.list_of_students) else stringResource(R.string.student_count, selectedStudentIds.size),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+    }
+
+    if (showDialog) {
+        val classNum = className.split(" ").last()
+        val classStudents = allStudents.filter { it.studentClass == classNum }
+        
+        SelectStudentsDialog(
+            className = className,
+            classStudents = classStudents,
+            initiallySelectedIds = selectedStudentIds,
+            onDismiss = { showDialog = false },
+            onConfirm = {
+                onStudentsSelected(it)
+                showDialog = false
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectStudentsDialog(
+    className: String,
+    classStudents: List<Student>,
+    initiallySelectedIds: List<String>,
+    onDismiss: () -> Unit,
+    onConfirm: (List<String>) -> Unit
+) {
+    // Current selection state
+    var selectedIds by remember { mutableStateOf(initiallySelectedIds.toSet()) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 32.dp) // Extra padding to avoid system navigation bar
+        ) {
+            Text(
+                text = stringResource(R.string.select_students_title, className),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+
+            // Removed weight and fillMaxHeight so the list wraps and shows the button below it
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 450.dp), // Limit max height so it doesn't cover whole screen
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                items(classStudents) { student ->
+                    StudentSelectionCard(
+                        student = student,
+                        isSelected = selectedIds.contains(student.studentId),
+                        onToggle = {
+                            selectedIds = if (selectedIds.contains(student.studentId)) {
+                                selectedIds - student.studentId
+                            } else {
+                                selectedIds + student.studentId
+                            }
+                        }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { onConfirm(selectedIds.toList()) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(stringResource(R.string.ok), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun StudentSelectionCard(
+    student: Student,
+    isSelected: Boolean,
+    onToggle: () -> Unit
+) {
+    Surface(
+        onClick = onToggle,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { onToggle() }
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = student.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    InfoPill(text = student.gender, color = if (student.gender.lowercase() == "male") Color(0xFF2196F3) else Color(0xFFE91E63))
+                    InfoPill(text = "${student.age} yrs", color = MaterialTheme.colorScheme.secondary)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InfoPill(text: String, color: Color) {
+    Surface(
+        color = color.copy(alpha = 0.1f),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.2f))
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
     }
 }
 

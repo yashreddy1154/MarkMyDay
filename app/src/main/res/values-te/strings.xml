@@ -179,6 +179,10 @@
     <string name="category_label_simple">వర్గం: %1$s</string>
     <string name="home_teacher_assigned">హోమ్ టీచర్ విజయవంతంగా కేటాయించబడ్డారు</string>
     <string name="loading_step">లోడ్ అవుతోంది...</string>
+    <string name="select_students_title">%1$s విద్యార్థులను ఎంచుకోండి</string>
+    <string name="list_of_students">విద్యార్థుల జాబితా</string>
+    <string name="home_teacher_label">HT: %1$s</string>
+    <string name="student_count">%1$d విద్యార్థులు</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">విద్యార్థి విజయవంతంగా జోడించబడ్డారు! అడ్మిషన్ నంబర్: %1$s</string>

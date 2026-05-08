@@ -179,6 +179,10 @@
     <string name="category_label_simple">Category: %1$s</string>
     <string name="home_teacher_assigned">Home teacher assigned successfully</string>
     <string name="loading_step">Loading...</string>
+    <string name="select_students_title">Select %1$s Students</string>
+    <string name="list_of_students">List of Students</string>
+    <string name="home_teacher_label">HT: %1$s</string>
+    <string name="student_count">%1$d Students</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">Successfully added student! Admission No: %1$s</string>
