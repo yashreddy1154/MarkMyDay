@@ -107,28 +107,9 @@ fun AddStaffScreen(
             state = state,
             onStateChange = { state = it },
             onBack = onBack,
-            onSubmit = { onSubmit(state) }
+            onSubmit = { onSubmit(state) },
+            registrationState = registrationState
         )
-
-        // Loading overlay
-        if (registrationState is TeacherRegistrationState.Loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.7f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(R.string.adding_data_to_db),
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    CircularProgressIndicator(color = Color.White)
-                }
-            }
-        }
 
         // Error dialog
         if (registrationState is TeacherRegistrationState.Error) {
@@ -167,7 +148,8 @@ fun AddStaffContent(
     state: AddStaffFormState,
     onStateChange: (AddStaffFormState) -> Unit,
     onBack: () -> Unit,
-    onSubmit: () -> Unit
+    onSubmit: () -> Unit,
+    registrationState: TeacherRegistrationState
 ) {
     val context = LocalContext.current
     val subjects = listOf(
@@ -410,15 +392,33 @@ fun AddStaffContent(
                 onClick = onSubmit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(64.dp),
                 shape = RoundedCornerShape(16.dp),
-                enabled = filledCount == requiredFields.size
+                enabled = filledCount == requiredFields.size && registrationState !is TeacherRegistrationState.Loading
             ) {
-                Text(
-                    stringResource(R.string.submit),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (registrationState is TeacherRegistrationState.Loading) {
+                        Text(
+                            stringResource(R.string.adding_to_database),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(4.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            trackColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
+                        )
+                    } else {
+                        Text(
+                            stringResource(R.string.submit),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }

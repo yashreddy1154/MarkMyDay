@@ -58,9 +58,19 @@ class TeacherViewModel(
     fun deleteTeacher(teacherId: String) {
         viewModelScope.launch {
             try {
+                // 1. Find and delete from 'users' collection using teacherId
+                val usersQuery = firestore.collection("users")
+                    .whereEqualTo("teacherId", teacherId)
+                    .get()
+                    .await()
+                
+                for (document in usersQuery.documents) {
+                    firestore.collection("users").document(document.id).delete().await()
+                }
+
+                // 2. Delete from 'teachers' collection
                 repository.deleteTeacher(teacherId)
-                // Note: We might also want to delete from 'users' collection and Firebase Auth
-                // but that requires UID which is not currently in Teacher model.
+
             } catch (e: Exception) {
                 _registrationState.value = TeacherRegistrationState.Error(e.localizedMessage ?: "Delete failed")
             }

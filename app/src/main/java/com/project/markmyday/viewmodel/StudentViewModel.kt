@@ -73,6 +73,17 @@ class StudentViewModel(
     fun deleteStudent(studentId: String) {
         viewModelScope.launch {
             try {
+                // 1. Find and delete from 'users' collection using studentId
+                val usersQuery = firestore.collection("users")
+                    .whereEqualTo("studentId", studentId)
+                    .get()
+                    .await()
+
+                for (document in usersQuery.documents) {
+                    firestore.collection("users").document(document.id).delete().await()
+                }
+
+                // 2. Delete from 'students' collection
                 repository.deleteStudent(studentId)
             } catch (e: Exception) {
                 _registrationState.value = StudentRegistrationState.Error(e.localizedMessage ?: "Delete failed")

@@ -9,7 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -282,7 +283,7 @@ fun StudentListItem(
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
+                            imageVector = Icons.Outlined.Edit,
                             contentDescription = stringResource(R.string.edit),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
@@ -293,7 +294,7 @@ fun StudentListItem(
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
+                            imageVector = Icons.Outlined.Delete,
                             contentDescription = stringResource(R.string.delete),
                             tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                             modifier = Modifier.size(20.dp)
@@ -311,7 +312,7 @@ fun StudentListItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 InfoTag(
-                    icon = Icons.Default.Badge,
+                    icon = Icons.Outlined.Badge,
                     text = student.studentId,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -355,7 +356,7 @@ fun StudentListItem(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Phone,
+                        imageVector = Icons.Outlined.Phone,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant

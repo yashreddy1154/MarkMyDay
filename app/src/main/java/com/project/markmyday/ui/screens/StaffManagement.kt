@@ -9,7 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.project.markmyday.R
 import com.project.markmyday.data.model.Teacher
+import com.project.markmyday.viewmodel.TeacherRegistrationState
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -118,7 +120,8 @@ fun StaffManagementScreen(
                         )
                     }
                     teacherToEdit = null
-                }
+                },
+                registrationState = TeacherRegistrationState.Idle
             )
         }
     }
@@ -271,7 +274,7 @@ fun TeacherListItem(
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
+                            imageVector = Icons.Outlined.Edit,
                             contentDescription = stringResource(R.string.edit),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
@@ -282,7 +285,7 @@ fun TeacherListItem(
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
+                            imageVector = Icons.Outlined.Delete,
                             contentDescription = stringResource(R.string.delete),
                             tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                             modifier = Modifier.size(20.dp)
@@ -300,7 +303,7 @@ fun TeacherListItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 InfoTag(
-                    icon = Icons.Default.Badge,
+                    icon = Icons.Outlined.Badge,
                     text = teacher.teacherId,
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -346,7 +349,7 @@ fun TeacherListItem(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Phone,
+                        imageVector = Icons.Outlined.Phone,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
