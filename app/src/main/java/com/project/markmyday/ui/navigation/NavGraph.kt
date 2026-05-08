@@ -167,6 +167,9 @@ fun AppNavigation(
                         "add_student" -> {
                             context.startActivity(android.content.Intent(context, AddStudentActivity::class.java))
                         }
+                        "create_timetable" -> {
+                            context.startActivity(android.content.Intent(context, CreateTimetableActivity::class.java))
+                        }
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
                         "students" -> navController.navigate(Screen.StudentManagement.route)
                         "settings" -> navController.navigate(Screen.Settings.route)

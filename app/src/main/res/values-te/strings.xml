@@ -58,6 +58,7 @@
     <string name="tile_student_management">విద్యార్థి నిర్వహణ</string>
     <string name="tile_add_staff">సిబ్బందిని జోడించండి</string>
     <string name="tile_add_student">విద్యార్థిని జోడించండి</string>
+    <string name="tile_create_timetable">టైమ్‌టేబుల్ సృష్టించండి</string>
 
     <!-- Navigation Labels -->
     <string name="nav_home">హోమ్</string>
@@ -165,6 +166,19 @@
     <string name="subject_physics">ఫిజిక్స్</string>
     <string name="subject_biology">బయాలజీ</string>
     <string name="subject_japanese">జపనీస్</string>
+
+    <!-- Create Timetable -->
+    <string name="create_timetable_title">టైమ్‌టేబుల్ సృష్టించండి</string>
+    <string name="step_1_name">హోమ్ టీచర్‌ను జోడించండి</string>
+    <string name="step_2_name">విద్యార్థులను జోడించండి</string>
+    <string name="step_3_name">టైమ్‌టేబుల్‌ను సవరించండి</string>
+    <string name="next">తరువాత</string>
+    <string name="select_teacher">టీచర్‌ను ఎంచుకోండి</string>
+    <string name="teacher_name_label">పేరు: %1$s</string>
+    <string name="primary_subject_label">ప్రైమరీ సబ్జెక్ట్: %1$s</string>
+    <string name="category_label_simple">వర్గం: %1$s</string>
+    <string name="home_teacher_assigned">హోమ్ టీచర్ విజయవంతంగా కేటాయించబడ్డారు</string>
+    <string name="loading_step">లోడ్ అవుతోంది...</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">విద్యార్థి విజయవంతంగా జోడించబడ్డారు! అడ్మిషన్ నంబర్: %1$s</string>

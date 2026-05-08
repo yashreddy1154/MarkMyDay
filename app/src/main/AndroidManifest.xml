@@ -39,6 +39,12 @@
             android:label="@string/title_activity_add_student"
             android:theme="@style/Theme.MarkMyDay" />
 
+        <activity
+            android:name=".ui.screens.CreateTimetableActivity"
+            android:exported="false"
+            android:label="@string/create_timetable_title"
+            android:theme="@style/Theme.MarkMyDay" />
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">

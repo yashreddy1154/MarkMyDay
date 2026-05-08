@@ -58,6 +58,7 @@
     <string name="tile_student_management">छात्र प्रबंधन</string>
     <string name="tile_add_staff">कर्मचारी जोड़ें</string>
     <string name="tile_add_student">छात्र जोड़ें</string>
+    <string name="tile_create_timetable">समय सारणी बनाएं</string>
 
     <!-- Navigation Labels -->
     <string name="nav_home">होम</string>
@@ -165,6 +166,19 @@
     <string name="subject_physics">भौतिक विज्ञान</string>
     <string name="subject_biology">जीव विज्ञान</string>
     <string name="subject_japanese">जापानी</string>
+
+    <!-- Create Timetable -->
+    <string name="create_timetable_title">समय सारणी बनाएं</string>
+    <string name="step_1_name">होम टीचर जोड़ें</string>
+    <string name="step_2_name">छात्रों को जोड़ें</string>
+    <string name="step_3_name">समय सारणी संपादित करें</string>
+    <string name="next">अगला</string>
+    <string name="select_teacher">शिक्षक चुनें</string>
+    <string name="teacher_name_label">नाम: %1$s</string>
+    <string name="primary_subject_label">प्राथमिक विषय: %1$s</string>
+    <string name="category_label_simple">श्रेणी: %1$s</string>
+    <string name="home_teacher_assigned">होम टीचर सफलतापूर्वक नियुक्त किया गया</string>
+    <string name="loading_step">लोड हो रहा है...</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">छात्र को सफलतापूर्वक जोड़ा गया! प्रवेश संख्या: %1$s</string>

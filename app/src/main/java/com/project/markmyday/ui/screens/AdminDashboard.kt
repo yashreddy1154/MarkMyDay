@@ -48,6 +48,7 @@ fun AdminDashboard(
     val adminTiles = listOf(
         DashboardTile("notices", stringResource(R.string.tile_notices), Icons.Default.Campaign),
         DashboardTile("staff_management", stringResource(R.string.tile_staff_list), Icons.Default.Badge),
+        DashboardTile("create_timetable", stringResource(R.string.tile_create_timetable), Icons.Default.CalendarToday),
         DashboardTile("add_staff", stringResource(R.string.tile_add_staff), Icons.Default.PersonAdd),
         DashboardTile("add_student", stringResource(R.string.tile_add_student), Icons.Default.PersonAddAlt1),
         DashboardTile("timetable", stringResource(R.string.tile_timetables), Icons.AutoMirrored.Filled.EventNote),

@@ -58,6 +58,7 @@
     <string name="tile_student_management">Student Management</string>
     <string name="tile_add_staff">Add Staff</string>
     <string name="tile_add_student">Add Student</string>
+    <string name="tile_create_timetable">Create Timetable</string>
 
     <!-- Navigation Labels -->
     <string name="nav_home">Home</string>
@@ -165,6 +166,19 @@
     <string name="subject_physics">Physics</string>
     <string name="subject_biology">Biology</string>
     <string name="subject_japanese">Japanese</string>
+
+    <!-- Create Timetable -->
+    <string name="create_timetable_title">Create Timetable</string>
+    <string name="step_1_name">Add Home Teacher</string>
+    <string name="step_2_name">Add Students</string>
+    <string name="step_3_name">Edit Timetable</string>
+    <string name="next">Next</string>
+    <string name="select_teacher">Select Teacher</string>
+    <string name="teacher_name_label">Name: %1$s</string>
+    <string name="primary_subject_label">Primary Sub: %1$s</string>
+    <string name="category_label_simple">Category: %1$s</string>
+    <string name="home_teacher_assigned">Home teacher assigned successfully</string>
+    <string name="loading_step">Loading...</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">Successfully added student! Admission No: %1$s</string>
