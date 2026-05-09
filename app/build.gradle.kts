@@ -68,6 +68,15 @@ dependencies {
     // Google Play Services
     implementation(libs.play.services.base)
     
+    // CameraX
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.mlkit.vision)
+    
+    // ML Kit Barcode Scanning
+    implementation(libs.mlkit.barcode.scanning)
+    
     // Firebase BoM
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

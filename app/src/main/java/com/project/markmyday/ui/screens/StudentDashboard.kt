@@ -131,7 +131,8 @@ fun StudentDashboardHomeContent(
         DashboardTile("results", stringResource(R.string.tile_results), Icons.Default.Grade),
         DashboardTile("leave", stringResource(R.string.tile_leave), Icons.Default.HistoryEdu),
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
-        DashboardTile("exams", stringResource(R.string.tile_exams), Icons.Default.History, badgeCount = 1),
+        DashboardTile("exams", stringResource(R.string.tile_exams), Icons.Default.Quiz, badgeCount = 1),
+        DashboardTile("leaderboard", "Leaderboard", Icons.Default.Leaderboard),
         DashboardTile("fees", stringResource(R.string.tile_fees), Icons.Default.Payments),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     )

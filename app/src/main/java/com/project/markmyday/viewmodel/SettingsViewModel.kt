@@ -107,6 +107,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun logout() {
         unsubscribeFromTopics()
         auth.signOut()
+        
+        // Clear auth cache to prevent stale data on next login
+        getApplication<Application>().getSharedPreferences("auth_cache", Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .apply()
+
         viewModelScope.launch {
             _logoutEvent.emit(Unit)
         }

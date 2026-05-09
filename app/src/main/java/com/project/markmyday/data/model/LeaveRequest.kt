@@ -5,10 +5,12 @@ import com.google.firebase.Timestamp
 data class LeaveRequest(
     val id: String = "",
     val studentId: String = "",
+    val studentName: String = "",
     val classSection: String = "",
     val startDate: Timestamp? = null,
     val endDate: Timestamp? = null,
     val reason: String = "",
     val status: String = "pending",
-    val appliedAt: Timestamp? = null
+    val appliedAt: Timestamp? = null,
+    val statusUpdateTimestamp: Timestamp? = null
 )

@@ -89,6 +89,10 @@
     <string name="no_admissions_yet">अभी तक कोई प्रवेश नहीं जोड़ा गया है।</string>
     <string name="class_prefix">कक्षा: %1$s</string>
     <string name="by_prefix">द्वारा: %1$s</string>
+    <string name="delete_admission">प्रवेश हटाएं</string>
+    <string name="delete_admission_confirm">क्या आप वाकई इस प्रवेश रिकॉर्ड को हटाना चाहते हैं?</string>
+    <string name="edit_admission">प्रवेश संपादित करें</string>
+    <string name="update_admission">प्रवेश अपडेट करें</string>
 
     <!-- Happenings Screen -->
     <string name="happenings_title">सूचनाएं और कार्यक्रम</string>

@@ -28,6 +28,8 @@ import com.project.markmyday.ui.models.TimetableEntry
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import androidx.compose.ui.tooling.preview.Preview
 
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +48,7 @@ fun TeacherDashboard(
 ) {
     val notificationViewModel: NotificationViewModel = viewModel()
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(userRole) {
         notificationViewModel.fetchNotifications(userRole)
@@ -55,7 +58,7 @@ fun TeacherDashboard(
         DashboardTile("attendance", stringResource(R.string.tile_mark_attendance), Icons.Default.Checklist, badgeText = "80%"),
         DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
         DashboardTile("results", stringResource(R.string.tile_post_results), Icons.Default.Description),
-        DashboardTile("leave", stringResource(R.string.tile_leave_request), Icons.Default.EventBusy),
+        DashboardTile("leave", stringResource(R.string.tile_leave_request), Icons.Default.HistoryEdu),
         DashboardTile("exams", stringResource(R.string.tile_manage_exams), Icons.Default.Quiz, badgeCount = 2),
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("notifications", stringResource(R.string.tile_notices), Icons.Default.Notifications, badgeCount = if (hasUnread) 1 else 0),
@@ -173,6 +176,15 @@ fun TeacherDashboard(
             
             TimetableSection(entries = timetable)
             
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ScanCard(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                onOpenScanner = {
+                    context.startActivity(Intent(context, ScanActivity::class.java))
+                }
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
@@ -186,6 +198,70 @@ fun TeacherDashboard(
             DashboardTileGrid(tiles = teacherTiles) { onTileClick(it.id) }
             
             Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun ScanCard(
+    onOpenScanner: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Surface(
+                    modifier = Modifier.size(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.QrCodeScanner,
+                        contentDescription = null,
+                        modifier = Modifier.padding(12.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Mark Daily Attendance",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Scan student QR codes to record presence",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Button(
+                onClick = onOpenScanner,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Open Scanner")
+            }
         }
     }
 }

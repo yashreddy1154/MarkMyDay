@@ -41,21 +41,30 @@ fun DashboardTopBar(
             containerColor = Color.Transparent
         ),
         title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                        RoundedCornerShape(16.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
                 if (icon != null) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 Text(
                     title, 
-                    fontWeight = FontWeight.ExtraBold,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.primary,
-                    letterSpacing = 0.5.sp
+                    letterSpacing = 1.sp
                 )
             }
         },
@@ -63,33 +72,34 @@ fun DashboardTopBar(
             Box(
                 modifier = Modifier
                     .padding(end = 16.dp)
-                    .size(40.dp)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
+                    .size(44.dp)
+                    .background(
+                        Brush.linearGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                            )
+                        ), 
+                        CircleShape
+                    )
                     .clickable { onNotificationClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Default.Notifications, 
                     contentDescription = "Notifications",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
                 )
 
                 if (notificationCount > 0) {
                     Box(
                         modifier = Modifier
-                            .size(16.dp)
+                            .size(10.dp)
                             .background(BadgeRed, CircleShape)
                             .align(Alignment.TopEnd)
-                            .offset(x = 2.dp, y = (-2).dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (notificationCount > 99) "99+" else notificationCount.toString(),
-                            color = Color.White,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                            .offset(x = (-2).dp, y = 2.dp)
+                    )
                 }
             }
         }
@@ -103,38 +113,64 @@ fun WelcomeSection(
     homeSection: String? = null,
     subject: String? = null
 ) {
-    Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    stringResource(id = R.string.hello), 
-                    fontSize = 16.sp, 
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    fontWeight = FontWeight.Medium
-                )
-        Text(
-            name, 
-            fontSize = 28.sp, 
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                role, 
-                fontSize = 14.sp, 
-                color = MaterialTheme.colorScheme.primary, 
-                fontWeight = FontWeight.Bold
+                stringResource(id = R.string.hello), 
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                fontWeight = FontWeight.Medium
             )
-            if (homeSection != null || subject != null) {
-                Text(
-                    " | ",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                Icons.Default.WavingHand, 
+                contentDescription = null, 
+                tint = Color(0xFFFFD600),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        Text(
+            name, 
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Black,
+            color = MaterialTheme.colorScheme.onBackground,
+            letterSpacing = (-0.5).sp
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Surface(
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "${homeSection ?: ""} ${if (subject != null) "($subject)" else ""}",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.SemiBold
+                    role, 
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary, 
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp
                 )
+                if (homeSection != null || subject != null) {
+                    Text(
+                        " • ",
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        "${homeSection ?: ""} ${if (subject != null) "($subject)" else ""}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
@@ -211,17 +247,24 @@ fun TimetableCard(entry: TimetableEntry) {
 
 @Composable
 fun DashboardTileGrid(tiles: List<DashboardTile>, onTileClick: (DashboardTile) -> Unit) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        val gridHeight = if (tiles.size > 8) 600.dp else 500.dp
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // 2 columns for better visibility as per UI ideas
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.height(gridHeight),
-            userScrollEnabled = false
-        ) {
-            items(tiles) { tile ->
-                DashboardTileCard(tile, onTileClick)
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        tiles.chunked(2).forEach { rowTiles ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                rowTiles.forEach { tile ->
+                    Box(modifier = Modifier.weight(1f)) {
+                        DashboardTileCard(tile, onTileClick)
+                    }
+                }
+                // If the last row has only 1 item, add a spacer to maintain alignment
+                if (rowTiles.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
@@ -232,52 +275,91 @@ fun DashboardTileCard(tile: DashboardTile, onClick: (DashboardTile) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(110.dp)
+            .height(100.dp)
             .clickable { onClick(tile) },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(24.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(2.dp),
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp, 
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
+        )
     ) {
-        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            if (tile.badgeCount != null || tile.badgeText != null) {
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .align(Alignment.TopEnd)
-                ) {
-                    Text(
-                        text = tile.badgeText ?: tile.badgeCount.toString(),
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Subtle background accent
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(4.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.secondary
+                            )
+                        )
                     )
-                }
-            }
+            )
+
             Row(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                        .size(46.dp)
+                        .background(
+                            Brush.linearGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.04f)
+                                )
+                            ), 
+                            RoundedCornerShape(14.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = tile.icon,
                         contentDescription = tile.label,
-                        modifier = Modifier.size(28.dp),
+                        modifier = Modifier.size(24.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = tile.label,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                
+                Spacer(modifier = Modifier.width(14.dp))
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = tile.label,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
+                        lineHeight = 18.sp
+                    )
+                }
+
+                if (tile.badgeCount != null || tile.badgeText != null) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape,
+                        modifier = Modifier.size(22.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = tile.badgeText ?: tile.badgeCount.toString(),
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                        }
+                    }
+                }
             }
         }
     }

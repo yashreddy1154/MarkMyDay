@@ -22,13 +22,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.data.model.NotificationData
 import com.project.markmyday.viewmodel.NotificationViewModel
+import com.project.markmyday.ui.components.DashboardBottomBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen(role: String, onBackClick: () -> Unit) {
+fun NotificationScreen(
+    role: String, 
+    onBackClick: () -> Unit,
+    onNavigate: ((String) -> Unit)? = null
+) {
     val viewModel: NotificationViewModel = viewModel()
     val notifications by viewModel.notifications.collectAsState()
 
@@ -47,11 +52,18 @@ fun NotificationScreen(role: String, onBackClick: () -> Unit) {
             TopAppBar(
                 title = { Text("Notifications") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    if (onNavigate == null) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (onNavigate != null) {
+                DashboardBottomBar(currentRoute = "happenings", onNavigate = onNavigate)
+            }
         }
     ) { padding ->
         if (notifications.isEmpty()) {
@@ -76,6 +88,12 @@ fun NotificationScreen(role: String, onBackClick: () -> Unit) {
 fun NotificationCard(notification: NotificationData) {
     val date = Date(notification.timestamp)
     val timeString = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(date)
+    
+    val categoryLabel = when {
+        notification.audience == "all" -> "General Notice"
+        notification.audience == "teachers" || notification.audience == "teacher" -> "Teacher Notice"
+        else -> "Personal Update" // This is for leave status or targeted messages
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -92,10 +110,18 @@ fun NotificationCard(notification: NotificationData) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                    .background(
+                        if (categoryLabel == "Personal Update") MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), 
+                        CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Notifications, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    imageVector = Icons.Default.Notifications, 
+                    contentDescription = null, 
+                    tint = if (categoryLabel == "Personal Update") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                )
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -104,15 +130,15 @@ fun NotificationCard(notification: NotificationData) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if (notification.audience == "teachers") "Teacher Notice" else "General Notice",
+                        text = categoryLabel,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary
+                        color = if (categoryLabel == "Personal Update") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = "By ${notification.author}",
                         fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Text(

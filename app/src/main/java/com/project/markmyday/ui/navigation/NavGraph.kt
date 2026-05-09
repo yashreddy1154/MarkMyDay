@@ -11,20 +11,30 @@ import androidx.navigation.navArgument
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.ui.screens.*
 import com.project.markmyday.ui.Auth.AuthenticationScreen
+import com.project.markmyday.viewmodel.AuthViewModel
+import com.project.markmyday.viewmodel.AuthResult
 import com.project.markmyday.viewmodel.TeacherViewModel
 import com.project.markmyday.viewmodel.StudentViewModel
 
 sealed class Screen(val route: String) {
     object Authentication : Screen("auth")
     object RoleSelector : Screen("role_selector")
-    object StudentDashboard : Screen("student_dashboard/{name}/{role}")
+    object StudentDashboard : Screen("student_dashboard/{name}/{role}/{studentId}")
     object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}/{section}/{subject}")
     object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
     object Notifications : Screen("notifications/{role}")
     object Admissions : Screen("admissions")
     object StaffManagement : Screen("staff_management")
     object StudentManagement : Screen("student_management")
+    object AdminLeaveManagement : Screen("admin_leave_management")
+    object TeacherLeaveView : Screen("teacher_leave_view")
     object AdminCreateNotification : Screen("admin_create_notification")
+    object QuizQuestionUpload : Screen("quiz_question_upload")
+    object QuizTaking : Screen("quiz_taking/{subject}/{className}/{userName}/{studentId}") {
+        fun createRoute(subject: String, className: String, userName: String, studentId: String) = 
+            "quiz_taking/$subject/$className/${java.net.URLEncoder.encode(userName, "UTF-8")}/$studentId"
+    }
+    object Leaderboard : Screen("leaderboard")
     
     // Bottom Bar Screens
     object Happenings : Screen("happenings")
@@ -40,31 +50,48 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppNavigation(
     startDestination: String = Screen.Authentication.route,
-    initialDashboardRoute: String = Screen.StudentDashboard.route
+    initialDashboardRoute: String? = null
 ) {
     val navController = rememberNavController()
     
+    // Use a fixed start destination to avoid "not a direct child" errors
+    // If an initial route is provided (e.g. from session check), navigate there once
+    LaunchedEffect(initialDashboardRoute) {
+        initialDashboardRoute?.let {
+            navController.navigate(it) {
+                popUpTo(Screen.Authentication.route) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
+    
     // Track the last dashboard route to know where "Home" should go
-    // Use rememberSaveable to survive configuration changes
-    var lastDashboardRoute by rememberSaveable { mutableStateOf(initialDashboardRoute) }
+    var lastDashboardRoute by rememberSaveable { mutableStateOf("") }
 
-    NavHost(navController = navController, startDestination = startDestination) {
+    NavHost(navController = navController, startDestination = Screen.Authentication.route) {
         composable(Screen.Authentication.route) {
-            AuthenticationScreen(onLoginSuccess = { name, role, section, subject ->
+            AuthenticationScreen(onLoginSuccess = { name, role, studentId, section, subject ->
                 // Routing logic based on user role
                 val encodedName = java.net.URLEncoder.encode(name, "UTF-8")
                 val encodedRole = java.net.URLEncoder.encode(role, "UTF-8")
                 val encodedSection = java.net.URLEncoder.encode(section ?: "N/A", "UTF-8")
                 val encodedSubject = java.net.URLEncoder.encode(subject ?: "N/A", "UTF-8")
+                val encodedStudentId = java.net.URLEncoder.encode(studentId ?: "N/A", "UTF-8")
 
                 val destination = when (role.lowercase()) {
                     "principal", "headmaster", "admin" -> "admin_dashboard/$encodedName/$encodedRole"
                     "teacher" -> "teacher_dashboard/$encodedName/$encodedRole/$encodedSection/$encodedSubject"
-                    "student" -> "student_dashboard/$encodedName/$encodedRole"
-                    else -> "student_dashboard/$encodedName/$encodedRole" // Default fallback
+                    "student" -> {
+                        val displayRole = if (section != null && section != "N/A") "Class $section" else role
+                        val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
+                        "student_dashboard/$encodedName/$encodedDisplayRole/$encodedStudentId"
+                    }
+                    else -> "student_dashboard/$encodedName/$encodedRole/$encodedStudentId" 
                 }
 
-                lastDashboardRoute = destination
+                if (lastDashboardRoute.isEmpty()) {
+                    lastDashboardRoute = destination
+                }
 
                 navController.navigate(destination) {
                     popUpTo(Screen.Authentication.route) { inclusive = true }
@@ -86,12 +113,22 @@ fun AppNavigation(
             Screen.StudentDashboard.route,
             arguments = listOf(
                 navArgument("name") { type = NavType.StringType },
-                navArgument("role") { type = NavType.StringType }
+                navArgument("role") { type = NavType.StringType },
+                navArgument("studentId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: "Student"
             val role = backStackEntry.arguments?.getString("role") ?: "Student"
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
             
+            // Sync lastDashboardRoute if it's empty (e.g. on direct navigation)
+            if (lastDashboardRoute.isEmpty()) {
+                lastDashboardRoute = Screen.StudentDashboard.route
+                    .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
+                    .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+                    .replace("{studentId}", java.net.URLEncoder.encode(studentId, "UTF-8"))
+            }
+
             StudentDashboard(
                 userName = name,
                 userRole = role,
@@ -99,8 +136,18 @@ fun AppNavigation(
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
-                        "results" -> navController.navigate(Screen.Reports.route)
+                        "results" -> navController.navigate(Screen.Leaderboard.route + "?role=student")
                         "notifications" -> navController.navigate("notifications/$role")
+                        "exams" -> {
+                            val classNum = role.filter { it.isDigit() }.ifEmpty { "" }
+                            if (classNum.isNotEmpty()) {
+                                navController.navigate(Screen.QuizTaking.createRoute("Mixed Test", classNum, name, studentId))
+                            } else {
+                                // Fallback or alert if class is missing
+                                navController.navigate(Screen.QuizTaking.createRoute("Mixed Test", "10", name, studentId))
+                            }
+                        }
+                        "leaderboard" -> navController.navigate(Screen.Leaderboard.route + "?role=student")
                         "settings" -> navController.navigate(Screen.Settings.route)
                     }
                 },
@@ -122,6 +169,15 @@ fun AppNavigation(
             val section = backStackEntry.arguments?.getString("section") ?: "N/A"
             val subject = backStackEntry.arguments?.getString("subject") ?: "N/A"
 
+            // Sync lastDashboardRoute if it's empty
+            if (lastDashboardRoute.isEmpty()) {
+                lastDashboardRoute = Screen.TeacherDashboard.route
+                    .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
+                    .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+                    .replace("{section}", java.net.URLEncoder.encode(section, "UTF-8"))
+                    .replace("{subject}", java.net.URLEncoder.encode(subject, "UTF-8"))
+            }
+
             TeacherDashboard(
                 userName = name,
                 userRole = role,
@@ -133,6 +189,10 @@ fun AppNavigation(
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
                         "notifications" -> navController.navigate("notifications/$role")
+                        "exams" -> navController.navigate(Screen.QuizQuestionUpload.route)
+                        "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher")
+                        "admissions" -> navController.navigate(Screen.Admissions.route)
+                        "leave" -> navController.navigate(Screen.TeacherLeaveView.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -151,6 +211,13 @@ fun AppNavigation(
             val role = backStackEntry.arguments?.getString("role") ?: "Administrator"
             val context = androidx.compose.ui.platform.LocalContext.current
 
+            // Sync lastDashboardRoute if it's empty
+            if (lastDashboardRoute.isEmpty()) {
+                lastDashboardRoute = Screen.AdminDashboard.route
+                    .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
+                    .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+            }
+
             AdminDashboard(
                 userName = name,
                 userRole = role,
@@ -160,7 +227,8 @@ fun AppNavigation(
                         "admissions" -> navController.navigate(Screen.Admissions.route)
                         "notices" -> navController.navigate(Screen.AdminCreateNotification.route)
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
-                        "reports" -> navController.navigate(Screen.Reports.route)
+                        "reports" -> navController.navigate(Screen.Leaderboard.route + "?role=admin")
+                        "leave" -> navController.navigate(Screen.AdminLeaveManagement.route)
                         "add_staff" -> {
                             context.startActivity(android.content.Intent(context, AddStaffActivity::class.java))
                         }
@@ -171,8 +239,12 @@ fun AppNavigation(
                             context.startActivity(android.content.Intent(context, CreateTimetableActivity::class.java))
                         }
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
+                        "attendance_overview" -> {
+                            context.startActivity(android.content.Intent(context, AdminAttendanceOverviewActivity::class.java))
+                        }
                         "students" -> navController.navigate(Screen.StudentManagement.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
+                        "quiz_upload" -> navController.navigate(Screen.QuizQuestionUpload.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -206,9 +278,17 @@ fun AppNavigation(
 
         composable(Screen.Admissions.route) {
             AdmissionsScreen(
-                role = "Administrator",
+                role = "Staff",
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable(Screen.AdminLeaveManagement.route) {
+            AdminLeaveManagementScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.TeacherLeaveView.route) {
+            TeacherLeaveViewScreen(onBack = { navController.popBackStack() })
         }
 
         composable(
@@ -223,10 +303,52 @@ fun AppNavigation(
             AdminCreateNotificationScreen(onBack = { navController.popBackStack() })
         }
 
+        composable(Screen.QuizQuestionUpload.route) {
+            QuizQuestionUploadScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = Screen.QuizTaking.route,
+            arguments = listOf(
+                navArgument("subject") { type = NavType.StringType },
+                navArgument("className") { type = NavType.StringType },
+                navArgument("userName") { type = NavType.StringType },
+                navArgument("studentId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val subject = backStackEntry.arguments?.getString("subject") ?: ""
+            val className = backStackEntry.arguments?.getString("className") ?: ""
+            val userName = backStackEntry.arguments?.getString("userName") ?: "Student"
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
+            QuizTakingScreen(
+                subject = subject,
+                className = className,
+                userName = userName,
+                studentId = studentId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.Leaderboard.route + "?role={role}",
+            arguments = listOf(navArgument("role") { type = NavType.StringType; defaultValue = "student" })
+        ) { backStackEntry ->
+            val role = backStackEntry.arguments?.getString("role") ?: "student"
+            LeaderboardScreen(
+                role = role,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
         // New Bottom Bar Routes
         composable(Screen.Happenings.route) {
-            HappeningsScreen(
-                onNotificationClick = { navController.navigate(Screen.Notifications.route) },
+            val authViewModel: AuthViewModel = viewModel()
+            val authState by authViewModel.authState.collectAsState()
+            val role = if (authState is AuthResult.Success) (authState as AuthResult.Success).role else "Student"
+            
+            NotificationScreen(
+                role = role, 
+                onBackClick = { /* No back on main tabs */ },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
         }
@@ -276,16 +398,23 @@ fun AppNavigation(
 }
 
 private fun handleBottomNav(route: String, navController: NavHostController, lastDashboardRoute: String) {
-    val destination = if (route == "dashboard") lastDashboardRoute else route
+    // Map internal route names to actual screen routes if needed
+    val actualRoute = when (route) {
+        "marks" -> {
+            val role = if (lastDashboardRoute.contains("admin")) "admin" 
+                      else if (lastDashboardRoute.contains("teacher")) "teacher" 
+                      else "student"
+            Screen.Leaderboard.route + "?role=$role"
+        }
+        "dashboard" -> lastDashboardRoute
+        else -> route
+    }
     
-    if (navController.currentBackStackEntry?.destination?.route == destination) {
+    if (navController.currentBackStackEntry?.destination?.route == actualRoute) {
         return
     }
 
-    navController.navigate(destination) {
-        // Pop up to the dashboard route if it's in the stack. 
-        // We use popUpTo with the route name directly.
-        // If it's not found, Navigation usually handles it by not popping.
+    navController.navigate(actualRoute) {
         popUpTo(lastDashboardRoute) {
             saveState = true
         }

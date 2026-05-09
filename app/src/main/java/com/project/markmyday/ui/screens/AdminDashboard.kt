@@ -48,15 +48,18 @@ fun AdminDashboard(
     val adminTiles = listOf(
         DashboardTile("notices", stringResource(R.string.tile_notices), Icons.Default.Campaign),
         DashboardTile("staff_management", stringResource(R.string.tile_staff_list), Icons.Default.Badge),
+        DashboardTile("attendance_overview", "Daily Overview", Icons.Default.FactCheck),
         DashboardTile("create_timetable", stringResource(R.string.tile_create_timetable), Icons.Default.CalendarToday),
         DashboardTile("add_staff", stringResource(R.string.tile_add_staff), Icons.Default.PersonAdd),
         DashboardTile("add_student", stringResource(R.string.tile_add_student), Icons.Default.PersonAddAlt1),
         DashboardTile("timetable", stringResource(R.string.tile_timetables), Icons.AutoMirrored.Filled.EventNote),
         DashboardTile("students", stringResource(R.string.tile_students), Icons.Default.People),
         DashboardTile("admissions", stringResource(R.string.tile_new_admission), Icons.Default.School),
+        DashboardTile("leave", stringResource(R.string.tile_leave), Icons.Default.HistoryEdu),
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings),
-        DashboardTile("reports", stringResource(R.string.nav_reports), Icons.Default.Assessment)
+        DashboardTile("reports", stringResource(R.string.nav_reports), Icons.Default.Assessment),
+        DashboardTile("quiz_upload", "Upload Quiz", Icons.Default.Quiz)
     )
 
     Scaffold(

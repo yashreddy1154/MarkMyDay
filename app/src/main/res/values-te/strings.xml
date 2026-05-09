@@ -89,6 +89,10 @@
     <string name="no_admissions_yet">ఇంకా ప్రవేశాలు జోడించబడలేదు.</string>
     <string name="class_prefix">తరగతి: %1$s</string>
     <string name="by_prefix">ద్వారా: %1$s</string>
+    <string name="delete_admission">అడ్మిషన్ తొలగించు</string>
+    <string name="delete_admission_confirm">మీరు ఖచ్చితంగా ఈ అడ్మిషన్ రికార్డును తొలగించాలనుకుంటున్నారా?</string>
+    <string name="edit_admission">అడ్మిషన్ సవరించు</string>
+    <string name="update_admission">అడ్మిషన్ అప్‌డేట్ చేయండి</string>
 
     <!-- Happenings Screen -->
     <string name="happenings_title">నోటీసులు &amp; ఈవెంట్‌లు</string>

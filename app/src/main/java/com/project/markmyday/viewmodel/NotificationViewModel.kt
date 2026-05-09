@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,6 +19,7 @@ import kotlinx.coroutines.tasks.await
 
 
 class NotificationViewModel(application: Application) : AndroidViewModel(application) {
+    private val auth = FirebaseAuth.getInstance()
     private val database by lazy { FirebaseDatabase.getInstance().getReference("notifications") }
     private val prefs = application.getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
     private var listener: ValueEventListener? = null
@@ -58,7 +60,8 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
                                 userRole.contains("teacher") -> 
                                     audience == "all" || audience == "teachers" || audience == "teacher"
                                     
-                                else -> audience == "all"
+                                // For students, show general notifications OR those specifically for their ID
+                                else -> audience == "all" || audience == auth.currentUser?.uid
                             }
 
                             if (show) {

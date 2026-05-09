@@ -24,8 +24,15 @@ import androidx.compose.runtime.getValue
 import com.project.markmyday.viewmodel.AuthViewModel
 import com.project.markmyday.viewmodel.AuthResult
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -80,16 +87,43 @@ class MainActivity : AppCompatActivity() {
                         when (authState) {
                             is AuthResult.Loading -> {
                                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    CircularProgressIndicator()
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            text = "Welcome to",
+                                            style = MaterialTheme.typography.titleLarge,
+                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                        )
+                                        Text(
+                                            text = "MarkMyDay",
+                                            style = MaterialTheme.typography.displayMedium,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
                             is AuthResult.Success -> {
                                 val result = authState as AuthResult.Success
+                                // Use the session UID or a stable ID for the route if available, 
+                                // but for now we follow the existing pattern with URL encoding to prevent crashes
+                                val encodedName = java.net.URLEncoder.encode(result.name, "UTF-8")
+                                val encodedRole = java.net.URLEncoder.encode(result.role, "UTF-8")
+                                
                                 val initialDashboardRoute = when (result.role.lowercase()) {
-                                    "principal", "headmaster", "admin" -> "admin_dashboard/${result.name}/${result.role}"
-                                    "teacher" -> "teacher_dashboard/${result.name}/${result.role}/${result.homeSection ?: "N/A"}/${result.subject ?: "N/A"}"
-                                    "student" -> "student_dashboard/${result.name}/${result.role}"
-                                    else -> "student_dashboard/${result.name}/${result.role}"
+                                    "principal", "headmaster", "admin" -> "admin_dashboard/$encodedName/$encodedRole"
+                                    "teacher" -> {
+                                        val section = java.net.URLEncoder.encode(result.homeSection ?: "N/A", "UTF-8")
+                                        val subject = java.net.URLEncoder.encode(result.subject ?: "N/A", "UTF-8")
+                                        "teacher_dashboard/$encodedName/$encodedRole/$section/$subject"
+                                    }
+                                    "student" -> {
+                                        val studentId = java.net.URLEncoder.encode(result.studentId ?: "N/A", "UTF-8")
+                                        "student_dashboard/$encodedName/$encodedRole/$studentId"
+                                    }
+                                    else -> {
+                                        val studentId = java.net.URLEncoder.encode(result.studentId ?: "N/A", "UTF-8")
+                                        "student_dashboard/$encodedName/$encodedRole/$studentId"
+                                    }
                                 }
                                 AppNavigation(
                                     startDestination = initialDashboardRoute,

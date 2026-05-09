@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <queries>
         <package android:name="com.google.android.gms" />
@@ -21,6 +24,24 @@
         android:supportsRtl="true"
         android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.MarkMyDay">
+        <activity
+            android:name=".ui.screens.AdminAttendanceOverviewActivity"
+            android:exported="false"
+            android:label="Daily Overview"
+            android:theme="@style/Theme.MarkMyDay" />
+
+        <activity
+            android:name=".ui.screens.AttendanceStatusActivity"
+            android:exported="false"
+            android:label="Attendance Status"
+            android:theme="@style/Theme.MarkMyDay" />
+
+        <activity
+            android:name=".ui.screens.ScanActivity"
+            android:exported="false"
+            android:label="Scan QR Code"
+            android:theme="@style/Theme.MarkMyDay" />
+
         <activity
             android:name=".ui.screens.GlobalUpdatesActivity"
             android:exported="false"
