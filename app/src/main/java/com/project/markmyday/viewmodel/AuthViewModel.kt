@@ -125,6 +125,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 val subject = document.getString("subject")
                 val studentId = document.getString("studentId")
 
+                Log.d("AuthViewModel", "User data fetched: Name=$name, Role=$role, Class=$homeSection")
+
                 subscribeUserToTopics(role)
 
                 val successResult = AuthResult.Success(name, role, studentId, homeSection, subject)

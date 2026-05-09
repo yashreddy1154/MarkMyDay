@@ -12,10 +12,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,7 +59,7 @@ fun AdminLeaveManagementScreen(
                     AdminLeaveCard(
                         request = request,
                         onApprove = { viewModel.updateLeaveStatus(request, "approved") },
-                        onReject = { viewModel.updateLeaveStatus(request, "rejected") }
+                        onReject = { reason -> viewModel.updateLeaveStatus(request, "rejected", reason) }
                     )
                 }
             }
@@ -74,13 +71,51 @@ fun AdminLeaveManagementScreen(
 fun AdminLeaveCard(
     request: LeaveRequest,
     onApprove: () -> Unit,
-    onReject: () -> Unit
+    onReject: (String) -> Unit
 ) {
     val dateFormatter = remember { SimpleDateFormat("dd MMM", Locale.getDefault()) }
+    var showRejectDialog by remember { mutableStateOf(false) }
+    var rejectReason by remember { mutableStateOf("") }
+
     val statusColor = when (request.status) {
         "approved" -> Color(0xFF4CAF50)
         "rejected" -> MaterialTheme.colorScheme.error
         else -> Color(0xFFFFA000)
+    }
+
+    if (showRejectDialog) {
+        AlertDialog(
+            onDismissRequest = { showRejectDialog = false },
+            title = { Text("Reject Leave Request") },
+            text = {
+                Column {
+                    Text("Please provide a reason for rejection:")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = rejectReason,
+                        onValueChange = { rejectReason = it },
+                        placeholder = { Text("e.g. Too many leaves this month") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onReject(rejectReason)
+                        showRejectDialog = false
+                    },
+                    enabled = rejectReason.isNotBlank()
+                ) {
+                    Text("Confirm Reject")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRejectDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     Card(
@@ -135,7 +170,7 @@ fun AdminLeaveCard(
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(
-                        onClick = onReject,
+                        onClick = { showRejectDialog = true },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                         shape = RoundedCornerShape(12.dp)

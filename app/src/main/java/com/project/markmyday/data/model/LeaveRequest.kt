@@ -12,5 +12,6 @@ data class LeaveRequest(
     val reason: String = "",
     val status: String = "pending",
     val appliedAt: Timestamp? = null,
-    val statusUpdateTimestamp: Timestamp? = null
+    val statusUpdateTimestamp: Timestamp? = null,
+    val rejectionReason: String = "",
 )

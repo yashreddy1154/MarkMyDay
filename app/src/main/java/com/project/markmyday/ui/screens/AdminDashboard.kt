@@ -59,7 +59,8 @@ fun AdminDashboard(
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings),
         DashboardTile("reports", stringResource(R.string.nav_reports), Icons.Default.Assessment),
-        DashboardTile("quiz_upload", "Upload Quiz", Icons.Default.Quiz)
+        DashboardTile("quiz_upload", "Upload Quiz", Icons.Default.Quiz),
+        DashboardTile("course_manager", "Course Manager", Icons.Default.VideoLibrary)
     )
 
     Scaffold(

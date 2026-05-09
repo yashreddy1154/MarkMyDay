@@ -66,6 +66,13 @@
             android:label="@string/create_timetable_title"
             android:theme="@style/Theme.MarkMyDay" />
 
+        <activity
+            android:name=".ui.screens.VideoPlayerActivity"
+            android:exported="false"
+            android:label="Lesson Player"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">

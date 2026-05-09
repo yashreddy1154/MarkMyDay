@@ -35,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.viewmodel.NotificationViewModel
+import com.project.markmyday.viewmodel.EngagementViewModel
 
 @Composable
 fun TeacherDashboard(
@@ -47,11 +48,16 @@ fun TeacherDashboard(
     onNavigate: (String) -> Unit,
 ) {
     val notificationViewModel: NotificationViewModel = viewModel()
+    val engagementViewModel: EngagementViewModel = viewModel()
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
+    val engagementSummaries by engagementViewModel.engagementSummaries.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(userRole) {
+    LaunchedEffect(userRole, homeSection) {
         notificationViewModel.fetchNotifications(userRole)
+        if (homeSection != "N/A") {
+            engagementViewModel.fetchEngagement(homeSection)
+        }
     }
 
     val teacherTiles = listOf(
@@ -63,6 +69,7 @@ fun TeacherDashboard(
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("notifications", stringResource(R.string.tile_notices), Icons.Default.Notifications, badgeCount = if (hasUnread) 1 else 0),
         DashboardTile("admissions", stringResource(R.string.tile_new_admission), Icons.Default.School),
+        DashboardTile("course_manager", "Course Manager", Icons.Default.VideoLibrary),
         DashboardTile("messages", stringResource(R.string.tile_messages), Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     )
@@ -185,6 +192,15 @@ fun TeacherDashboard(
                 }
             )
 
+            if (homeSection != "N/A") {
+                Spacer(modifier = Modifier.height(16.dp))
+                WatchlistCard(
+                    summaries = engagementSummaries,
+                    onExport = { engagementViewModel.exportReport(context) },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
@@ -198,6 +214,89 @@ fun TeacherDashboard(
             DashboardTileGrid(tiles = teacherTiles) { onTileClick(it.id) }
             
             Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun WatchlistCard(
+    summaries: List<com.project.markmyday.data.model.StudentEngagementSummary>,
+    onExport: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Student Watchlist (Today)",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                IconButton(onClick = onExport) {
+                    Icon(Icons.Default.Download, contentDescription = "Export Report", tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            if (summaries.isEmpty()) {
+                Text(
+                    "No watch activity detected today.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            } else {
+                summaries.take(5).forEach { summary ->
+                    val totalSeconds = summary.videoStats.values.sumOf { it.timeSpentSeconds }
+                    val hours = totalSeconds / 3600.0
+                    
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(summary.studentName, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            String.format("%.2f hrs", hours),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                
+                if (summaries.size > 5) {
+                    Text(
+                        "and ${summaries.size - 5} more...",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Button(
+                onClick = onExport,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Export Daily Report")
+            }
         }
     }
 }

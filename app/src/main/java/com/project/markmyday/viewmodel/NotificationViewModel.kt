@@ -48,8 +48,10 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
                     try {
                         val item = doc.getValue(NotificationData::class.java)
                         if (item != null) {
-                            val audience = item.audience.lowercase()
+                            val audienceOriginal = item.audience
+                            val audienceLower = audienceOriginal.lowercase()
                             val userRole = role.lowercase()
+                            val currentUid = auth.currentUser?.uid
                             
                             // Client-side filtering
                             val show = when {
@@ -58,10 +60,13 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
                                 userRole.contains("headmaster") -> true
                                 
                                 userRole.contains("teacher") -> 
-                                    audience == "all" || audience == "teachers" || audience == "teacher"
+                                    audienceLower == "all" || 
+                                    audienceLower == "teachers" || 
+                                    audienceLower == "teacher" || 
+                                    audienceOriginal == currentUid
                                     
-                                // For students, show general notifications OR those specifically for their ID
-                                else -> audience == "all" || audience == auth.currentUser?.uid
+                                // For students, show general notifications OR those specifically for their ID (case-sensitive)
+                                else -> audienceLower == "all" || audienceOriginal == currentUid
                             }
 
                             if (show) {

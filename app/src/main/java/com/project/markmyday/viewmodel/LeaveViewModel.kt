@@ -119,34 +119,41 @@ class LeaveViewModel(
         }
     }
 
-    fun updateLeaveStatus(leaveRequest: LeaveRequest, status: String) {
+    fun updateLeaveStatus(leaveRequest: LeaveRequest, status: String, reason: String = "") {
         viewModelScope.launch {
             try {
-                val updateData = mapOf(
+                val updateData = mutableMapOf<String, Any>(
                     "status" to status,
                     "statusUpdateTimestamp" to Timestamp.now()
                 )
+                if (reason.isNotEmpty()) {
+                    updateData["rejectionReason"] = reason
+                }
                 
                 firestore.collection("leaves").document(leaveRequest.id)
                     .update(updateData)
                     .await()
                 
                 // Add to Realtime Database notifications for the student
-                sendLeaveStatusNotification(leaveRequest, status)
+                sendLeaveStatusNotification(leaveRequest, status, reason)
             } catch (e: Exception) {
                 // Handle error
             }
         }
     }
     
-    private fun sendLeaveStatusNotification(leaveRequest: LeaveRequest, status: String) {
+    private fun sendLeaveStatusNotification(leaveRequest: LeaveRequest, status: String, reason: String = "") {
         val notificationId = realtimeDb.push().key ?: return
         
         val heading = if (status == "approved") "Leave Approved! ✅" else "Leave Rejected ❌"
-        val message = if (status == "approved") {
+        var message = if (status == "approved") {
             "Your leave request for ${leaveRequest.studentName} has been approved."
         } else {
             "Your leave request for ${leaveRequest.studentName} was rejected."
+        }
+        
+        if (reason.isNotEmpty()) {
+            message += "\nReason: $reason"
         }
         
         val notification = NotificationData(
@@ -154,7 +161,7 @@ class LeaveViewModel(
             heading = heading,
             message = message,
             author = "Administrator",
-            audience = leaveRequest.studentId, // We'll use studentId as audience for targeted notification
+            audience = leaveRequest.studentId, // Uses the studentId stored in the request
             timestamp = System.currentTimeMillis()
         )
         

@@ -89,9 +89,10 @@ fun NotificationCard(notification: NotificationData) {
     val date = Date(notification.timestamp)
     val timeString = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(date)
     
+    val audienceLower = notification.audience.lowercase()
     val categoryLabel = when {
-        notification.audience == "all" -> "General Notice"
-        notification.audience == "teachers" || notification.audience == "teacher" -> "Teacher Notice"
+        audienceLower == "all" -> "General Notice"
+        audienceLower == "teachers" || audienceLower == "teacher" -> "Teacher Notice"
         else -> "Personal Update" // This is for leave status or targeted messages
     }
 

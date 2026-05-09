@@ -30,6 +30,7 @@ sealed class Screen(val route: String) {
     object TeacherLeaveView : Screen("teacher_leave_view")
     object AdminCreateNotification : Screen("admin_create_notification")
     object QuizQuestionUpload : Screen("quiz_question_upload")
+    object CourseManager : Screen("course_manager")
     object QuizTaking : Screen("quiz_taking/{subject}/{className}/{userName}/{studentId}") {
         fun createRoute(subject: String, className: String, userName: String, studentId: String) = 
             "quiz_taking/$subject/$className/${java.net.URLEncoder.encode(userName, "UTF-8")}/$studentId"
@@ -53,6 +54,8 @@ fun AppNavigation(
     initialDashboardRoute: String? = null
 ) {
     val navController = rememberNavController()
+    // Define AuthViewModel here to share it across all composables in this NavHost
+    val authViewModel: AuthViewModel = viewModel()
     
     // Use a fixed start destination to avoid "not a direct child" errors
     // If an initial route is provided (e.g. from session check), navigate there once
@@ -197,6 +200,7 @@ fun AppNavigation(
                         "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher")
                         "admissions" -> navController.navigate(Screen.Admissions.route)
                         "leave" -> navController.navigate(Screen.TeacherLeaveView.route)
+                        "course_manager" -> navController.navigate(Screen.CourseManager.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -251,6 +255,7 @@ fun AppNavigation(
                         "students" -> navController.navigate(Screen.StudentManagement.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
                         "quiz_upload" -> navController.navigate(Screen.QuizQuestionUpload.route)
+                        "course_manager" -> navController.navigate(Screen.CourseManager.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -313,6 +318,10 @@ fun AppNavigation(
             QuizQuestionUploadScreen(onBack = { navController.popBackStack() })
         }
 
+        composable(Screen.CourseManager.route) {
+            CourseManagerScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(
             route = Screen.QuizTaking.route,
             arguments = listOf(
@@ -348,7 +357,6 @@ fun AppNavigation(
 
         // New Bottom Bar Routes
         composable(Screen.Happenings.route) {
-            val authViewModel: AuthViewModel = viewModel()
             val authState by authViewModel.authState.collectAsState()
             val role = if (authState is AuthResult.Success) (authState as AuthResult.Success).role else "Student"
             
@@ -360,7 +368,25 @@ fun AppNavigation(
         }
 
         composable(Screen.Learning.route) {
-            LearningScreen(
+            val authState by authViewModel.authState.collectAsState()
+            val role = remember(authState) {
+                if (authState is AuthResult.Success) {
+                    val success = authState as AuthResult.Success
+                    if (success.role.lowercase() == "student") {
+                        val section = success.homeSection
+                        if (section != null) {
+                            if (!section.startsWith("Class")) "Class $section" else section
+                        } else {
+                            "Student"
+                        }
+                    } else {
+                        success.role
+                    }
+                } else "Student"
+            }
+            
+            CourseLibraryScreen(
+                userRole = role,
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )

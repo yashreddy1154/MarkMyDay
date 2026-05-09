@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Campaign
-import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -31,21 +30,6 @@ fun HappeningsScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Un
         Text(stringResource(R.string.latest_updates), fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
         Text(stringResource(R.string.no_notices), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
-    }
-}
-
-@Composable
-fun LearningScreen(onNotificationClick: () -> Unit, onNavigate: (String) -> Unit) {
-    DummyBaseScreen(
-        title = stringResource(R.string.learning_center),
-        icon = Icons.Default.School,
-        currentRoute = "SKP",
-        onNotificationClick = onNotificationClick,
-        onNavigate = onNavigate,
-    ) {
-        Text(stringResource(R.string.my_courses), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(stringResource(R.string.study_material_empty), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
     }
 }
 
