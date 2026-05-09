@@ -55,7 +55,7 @@ fun AdminDashboard(
         DashboardTile("timetable", stringResource(R.string.tile_timetables), Icons.AutoMirrored.Filled.EventNote),
         DashboardTile("students", stringResource(R.string.tile_students), Icons.Default.People),
         DashboardTile("admissions", stringResource(R.string.tile_new_admission), Icons.Default.School),
-        DashboardTile("leave", stringResource(R.string.tile_leave), Icons.Default.HistoryEdu),
+        DashboardTile("leave", stringResource(R.string.tile_manage_leaves), Icons.Default.HistoryEdu),
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings),
         DashboardTile("reports", stringResource(R.string.nav_reports), Icons.Default.Assessment),

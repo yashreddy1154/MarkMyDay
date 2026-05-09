@@ -122,11 +122,13 @@ fun AppNavigation(
             val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
             
             // Sync lastDashboardRoute if it's empty (e.g. on direct navigation)
-            if (lastDashboardRoute.isEmpty()) {
-                lastDashboardRoute = Screen.StudentDashboard.route
-                    .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
-                    .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
-                    .replace("{studentId}", java.net.URLEncoder.encode(studentId, "UTF-8"))
+            val currentRoute = Screen.StudentDashboard.route
+                .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
+                .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+                .replace("{studentId}", java.net.URLEncoder.encode(studentId, "UTF-8"))
+            
+            if (lastDashboardRoute != currentRoute) {
+                lastDashboardRoute = currentRoute
             }
 
             StudentDashboard(
@@ -169,13 +171,15 @@ fun AppNavigation(
             val section = backStackEntry.arguments?.getString("section") ?: "N/A"
             val subject = backStackEntry.arguments?.getString("subject") ?: "N/A"
 
-            // Sync lastDashboardRoute if it's empty
-            if (lastDashboardRoute.isEmpty()) {
-                lastDashboardRoute = Screen.TeacherDashboard.route
-                    .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
-                    .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
-                    .replace("{section}", java.net.URLEncoder.encode(section, "UTF-8"))
-                    .replace("{subject}", java.net.URLEncoder.encode(subject, "UTF-8"))
+            // Sync lastDashboardRoute
+            val currentRoute = Screen.TeacherDashboard.route
+                .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
+                .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+                .replace("{section}", java.net.URLEncoder.encode(section, "UTF-8"))
+                .replace("{subject}", java.net.URLEncoder.encode(subject, "UTF-8"))
+
+            if (lastDashboardRoute != currentRoute) {
+                lastDashboardRoute = currentRoute
             }
 
             TeacherDashboard(
@@ -211,11 +215,13 @@ fun AppNavigation(
             val role = backStackEntry.arguments?.getString("role") ?: "Administrator"
             val context = androidx.compose.ui.platform.LocalContext.current
 
-            // Sync lastDashboardRoute if it's empty
-            if (lastDashboardRoute.isEmpty()) {
-                lastDashboardRoute = Screen.AdminDashboard.route
-                    .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
-                    .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+            // Sync lastDashboardRoute
+            val currentRoute = Screen.AdminDashboard.route
+                .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
+                .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+
+            if (lastDashboardRoute != currentRoute) {
+                lastDashboardRoute = currentRoute
             }
 
             AdminDashboard(

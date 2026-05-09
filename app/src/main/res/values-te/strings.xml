@@ -43,6 +43,7 @@
     <string name="tile_assignments">అసైన్‌మెంట్‌లు</string>
     <string name="tile_results">నా ఫలితాలు</string>
     <string name="tile_leave">సెలవు కోసం దరఖాస్తు చేయండి</string>
+    <string name="tile_manage_leaves">సెలవులను నిర్వహించండి</string>
     <string name="tile_updates">గ్లోబల్ అప్‌డేట్‌లు</string>
     <string name="tile_exams">రాబోయే పరీక్షలు</string>
     <string name="tile_fees">ఫీజు స్టేట్‌మెంట్</string>

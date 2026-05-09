@@ -30,44 +30,74 @@ class AdminAttendanceViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private var teachersListener: com.google.firebase.firestore.ListenerRegistration? = null
+    private val attendanceListeners = mutableListOf<com.google.firebase.firestore.ListenerRegistration>()
+
     fun fetchDailyOverview() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val teachersSnapshot = firestore.collection("teachers").get().await()
+        if (teachersListener != null) return // Already listening
+
+        _isLoading.value = true
+        
+        // 1. Listen for teachers collection changes
+        teachersListener = firestore.collection("teachers").addSnapshotListener { teachersSnapshot, error ->
+            if (error != null) {
+                _isLoading.value = false
+                return@addSnapshotListener
+            }
+
+            if (teachersSnapshot != null) {
                 val allTeachers = teachersSnapshot.toObjects(Teacher::class.java)
-                
-                val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                
-                val presentList = mutableListOf<TeacherAttendanceStatus>()
-                val absentList = mutableListOf<TeacherAttendanceStatus>()
+                setupAttendanceListeners(allTeachers)
+            }
+        }
+    }
 
-                for (teacher in allTeachers) {
-                    val logDoc = firestore.collection("teachers")
-                        .document(teacher.teacherId)
-                        .collection("attendance_logs")
-                        .document(today)
-                        .get()
-                        .await()
+    private fun setupAttendanceListeners(allTeachers: List<Teacher>) {
+        // Clear old listeners
+        attendanceListeners.forEach { it.remove() }
+        attendanceListeners.clear()
 
-                    if (logDoc.exists() && logDoc.getString("status") == "Present") {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        
+        // Local map to track attendance status per teacher
+        val attendanceMap = mutableMapOf<String, TeacherAttendanceStatus>()
+        allTeachers.forEach { teacher ->
+            attendanceMap[teacher.teacherId] = TeacherAttendanceStatus(teacher, false)
+        }
+
+        allTeachers.forEach { teacher ->
+            val listener = firestore.collection("teachers")
+                .document(teacher.teacherId)
+                .collection("attendance_logs")
+                .document(today)
+                .addSnapshotListener { logDoc, error ->
+                    if (error != null) return@addSnapshotListener
+
+                    if (logDoc != null && logDoc.exists() && logDoc.getString("status") == "Present") {
                         val timestamp = logDoc.getTimestamp("time")
                         val scanTime = if (timestamp != null) {
                             SimpleDateFormat("hh:mm a", Locale.getDefault()).format(timestamp.toDate())
                         } else null
-                        presentList.add(TeacherAttendanceStatus(teacher, true, scanTime))
+                        attendanceMap[teacher.teacherId] = TeacherAttendanceStatus(teacher, true, scanTime)
                     } else {
-                        absentList.add(TeacherAttendanceStatus(teacher, false))
+                        attendanceMap[teacher.teacherId] = TeacherAttendanceStatus(teacher, false)
                     }
-                }
 
-                _presentTeachers.value = presentList
-                _absentTeachers.value = absentList
-            } catch (e: Exception) {
-                // Handle error
-            } finally {
-                _isLoading.value = false
-            }
+                    // Update UI flows
+                    val presentList = attendanceMap.values.filter { it.isPresent }.sortedByDescending { it.scanTime }
+                    val absentList = attendanceMap.values.filter { !it.isPresent }.sortedBy { it.teacher.name }
+                    
+                    _presentTeachers.value = presentList
+                    _absentTeachers.value = absentList
+                    _isLoading.value = false
+                }
+            attendanceListeners.add(listener)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        teachersListener?.remove()
+        attendanceListeners.forEach { it.remove() }
     }
 }

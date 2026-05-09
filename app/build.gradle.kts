@@ -76,6 +76,7 @@ dependencies {
     
     // ML Kit Barcode Scanning
     implementation(libs.mlkit.barcode.scanning)
+    implementation("org.apache.poi:poi-ooxml:5.5.1")
     
     // Firebase BoM
     implementation(platform(libs.firebase.bom))

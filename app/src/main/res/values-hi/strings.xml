@@ -43,6 +43,7 @@
     <string name="tile_assignments">असाइनमेंट</string>
     <string name="tile_results">मेरे परिणाम</string>
     <string name="tile_leave">छुट्टी के लिए आवेदन</string>
+    <string name="tile_manage_leaves">छुट्टियों का प्रबंधन</string>
     <string name="tile_updates">वैश्विक अपडेट</string>
     <string name="tile_exams">आगामी परीक्षाएं</string>
     <string name="tile_fees">शुल्क विवरण</string>

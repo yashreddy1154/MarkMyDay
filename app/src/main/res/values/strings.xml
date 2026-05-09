@@ -43,6 +43,7 @@
     <string name="tile_assignments">Assignments</string>
     <string name="tile_results">My Results</string>
     <string name="tile_leave">Apply Leave</string>
+    <string name="tile_manage_leaves">Manage Leaves</string>
     <string name="tile_updates">Global Updates</string>
     <string name="tile_exams">Upcoming Exams</string>
     <string name="tile_fees">Fee Statement</string>

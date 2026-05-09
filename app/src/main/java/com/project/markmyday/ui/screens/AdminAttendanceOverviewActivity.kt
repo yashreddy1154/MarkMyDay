@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +41,7 @@ fun AdminAttendanceOverviewScreen(
     onBack: () -> Unit,
     viewModel: AdminAttendanceViewModel = viewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val presentTeachers by viewModel.presentTeachers.collectAsState()
     val absentTeachers by viewModel.absentTeachers.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -61,6 +63,33 @@ fun AdminAttendanceOverviewScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (!isLoading && (presentTeachers.isNotEmpty() || absentTeachers.isNotEmpty())) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    tonalElevation = 8.dp,
+                    shadowElevation = 8.dp
+                ) {
+                    Button(
+                        onClick = {
+                            com.project.markmyday.utils.ExcelUtils.exportAttendanceToExcel(
+                                context,
+                                presentTeachers,
+                                absentTeachers
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Share, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Export to Spreadsheet")
+                    }
+                }
+            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
@@ -74,7 +103,7 @@ fun AdminAttendanceOverviewScreen(
                 }
             }
 
-            if (isLoading) {
+            if (isLoading && presentTeachers.isEmpty() && absentTeachers.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
