@@ -24,12 +24,12 @@ class CourseViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    fun fetchCoursesForClass(className: String) {
-        android.util.Log.d("CourseViewModel", "Fetching courses for class: $className")
+    fun fetchAllCourses() {
+        android.util.Log.d("CourseViewModel", "Fetching all courses (Global)")
         viewModelScope.launch {
             _isLoading.value = true
-            repository.getCoursesForClass(className).collect { courses ->
-                android.util.Log.d("CourseViewModel", "Found ${courses.size} courses")
+            repository.getAllCourses().collect { courses ->
+                android.util.Log.d("CourseViewModel", "Found ${courses.size} global courses")
                 _coursesBySubject.value = courses.groupBy { it.subject }
                 _isLoading.value = false
             }

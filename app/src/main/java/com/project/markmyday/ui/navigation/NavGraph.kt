@@ -369,24 +369,16 @@ fun AppNavigation(
 
         composable(Screen.Learning.route) {
             val authState by authViewModel.authState.collectAsState()
-            val role = remember(authState) {
+            val roleInfo = remember(authState) {
                 if (authState is AuthResult.Success) {
                     val success = authState as AuthResult.Success
-                    if (success.role.lowercase() == "student") {
-                        val section = success.homeSection
-                        if (section != null) {
-                            if (!section.startsWith("Class")) "Class $section" else section
-                        } else {
-                            "Student"
-                        }
-                    } else {
-                        success.role
-                    }
+                    val section = success.homeSection
+                    if (section != null && section != "N/A") "Class $section" else success.role
                 } else "Student"
             }
             
             CourseLibraryScreen(
-                userRole = role,
+                userRole = roleInfo,
                 onNotificationClick = { navController.navigate(Screen.Notifications.route) },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )

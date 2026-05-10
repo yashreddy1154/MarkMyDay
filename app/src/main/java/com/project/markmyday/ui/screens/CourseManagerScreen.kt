@@ -124,35 +124,15 @@ fun CourseManagerScreen(
             Text("Add Lesson Manually", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Class Selection
-                ExposedDropdownMenuBox(
-                    expanded = classExpanded,
-                    onExpandedChange = { classExpanded = !classExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = className,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Select Class") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = classExpanded,
-                        onDismissRequest = { classExpanded = false }
-                    ) {
-                        classes.forEach { classNum ->
-                            DropdownMenuItem(
-                                text = { Text("Class $classNum") },
-                                onClick = {
-                                    className = "Class $classNum"
-                                    classExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
+                // Class Selection (Simplified to Text Field)
+                OutlinedTextField(
+                    value = className,
+                    onValueChange = { className = it },
+                    label = { Text("Class (e.g. Class 10)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = { Text("Class 10") }
+                )
 
                 // Subject
                 OutlinedTextField(

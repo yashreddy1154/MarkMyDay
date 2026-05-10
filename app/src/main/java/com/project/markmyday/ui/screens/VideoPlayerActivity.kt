@@ -57,7 +57,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         supportActionBar?.title = videoTitle
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val iFramePlayerOptions = IFramePlayerOptions.Builder()
+        val iFramePlayerOptions = IFramePlayerOptions.Builder(this)
             .controls(1)
             .fullscreen(1) // Enable fullscreen button
             .build()

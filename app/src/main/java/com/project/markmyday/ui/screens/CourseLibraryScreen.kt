@@ -52,8 +52,8 @@ fun CourseLibraryScreen(
 
     android.util.Log.d("CourseLibrary", "Screen recomposed with userRole: $userRole")
 
-    LaunchedEffect(userRole) {
-        viewModel.fetchCoursesForClass(userRole)
+    LaunchedEffect(Unit) {
+        viewModel.fetchAllCourses()
     }
 
     Scaffold(
@@ -88,7 +88,7 @@ fun CourseLibraryScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "No study material found for $userRole.",
+                        "No study material found.",
                         color = Color.Gray
                     )
                 }
@@ -177,12 +177,31 @@ fun VideoItem(video: CourseVideo, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold,
                     maxLines = 2
                 )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = video.subject,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text(
+                            text = video.class_level,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Text(
+                        text = video.subject,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
