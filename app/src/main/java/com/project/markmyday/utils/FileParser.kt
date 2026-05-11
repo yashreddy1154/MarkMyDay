@@ -26,7 +26,13 @@ object FileParser {
                 val tokens = rows[i]
                 if (tokens.size >= 8) {
                     val subject = tokens[0]
-                    val className = tokens[1]
+                    var className = tokens[1]
+                    
+                    // Requirement: GK or Current Affairs to all
+                    if (subject.trim().lowercase() == "gk" || subject.trim().lowercase().contains("current affairs")) {
+                        className = "ALL"
+                    }
+                    
                     val questionText = tokens[2]
                     val options = listOf(tokens[3], tokens[4], tokens[5], tokens[6])
                     val correctAnswerLabel = tokens[7]
@@ -147,7 +153,13 @@ object FileParser {
                 val row = sheet.getRow(i) ?: continue
                 if (row.lastCellNum >= 8) {
                     val subject = getCellValue(row.getCell(0))
-                    val className = getCellValue(row.getCell(1))
+                    var className = getCellValue(row.getCell(1))
+                    
+                    // Requirement: GK or Current Affairs to all
+                    if (subject.trim().lowercase() == "gk" || subject.trim().lowercase().contains("current affairs")) {
+                        className = "ALL"
+                    }
+
                     val questionText = getCellValue(row.getCell(2))
                     val optA = getCellValue(row.getCell(3))
                     val optB = getCellValue(row.getCell(4))
