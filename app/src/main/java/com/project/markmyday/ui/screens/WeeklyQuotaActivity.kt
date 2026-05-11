@@ -33,14 +33,26 @@ import com.project.markmyday.viewmodel.TimetableViewModel
 
 @Composable
 fun getSubjectColorInternal(subject: String): Color {
+    val telugu = stringResource(R.string.subject_telugu_label).lowercase()
+    val hindi = stringResource(R.string.subject_hindi_label).lowercase()
+    val english = stringResource(R.string.subject_english_label).lowercase()
+    val math = stringResource(R.string.subject_math_label).lowercase()
+    val physics = stringResource(R.string.subject_physics_label).lowercase()
+    val biology = stringResource(R.string.subject_biology_label).lowercase()
+    val science = stringResource(R.string.subject_science_label).lowercase()
+    val social = stringResource(R.string.subject_social_label).lowercase()
+    val computer = stringResource(R.string.subject_computer_label).lowercase()
+
     return when (subject.lowercase()) {
-        "telugu" -> Color(0xFF1E88E5) // Blue
-        "math" -> Color(0xFF9E9E9E) // Grey
-        "physics" -> Color(0xFF03A9F4) // Light Blue
-        "biology" -> Color(0xFF4CAF50) // Green
-        "science" -> Color(0xFF26A69A) // Mix of Blue and Green (Teal)
-        "social" -> Color(0xFFFF9800) // Orange
-        "japanese" -> Color(0xFF212121) // Black
+        telugu -> Color(0xFF1E88E5) // Blue
+        math -> Color(0xFF9E9E9E) // Grey
+        physics -> Color(0xFF03A9F4) // Light Blue
+        biology -> Color(0xFF4CAF50) // Green
+        science -> Color(0xFF26A69A) // Mix of Blue and Green (Teal)
+        social -> Color(0xFFFF9800) // Orange
+        hindi -> Color(0xFFE91E63) // Pink/Custom
+        english -> Color(0xFF673AB7) // Deep Purple/Custom
+        computer -> Color(0xFF212121) // Black
         else -> Color(0xFF6200EE) // Default Purple
     }
 }
@@ -80,13 +92,30 @@ fun WeeklyQuotaContent(
     val maxClasses = if (classNum in 1..5) 42 else 60
     
     val subjects = if (classNum in 8..10) {
-        listOf("Telugu", "Hindi", "English", "Math", "Physics", "Biology", "Social")
+        listOf(
+            stringResource(R.string.subject_telugu_label),
+            stringResource(R.string.subject_hindi_label),
+            stringResource(R.string.subject_english_label),
+            stringResource(R.string.subject_math_label),
+            stringResource(R.string.subject_physics_label),
+            stringResource(R.string.subject_biology_label),
+            stringResource(R.string.subject_social_label)
+        )
     } else {
-        listOf("Telugu", "Hindi", "English", "Math", "Science", "Social")
+        listOf(
+            stringResource(R.string.subject_telugu_label),
+            stringResource(R.string.subject_hindi_label),
+            stringResource(R.string.subject_english_label),
+            stringResource(R.string.subject_math_label),
+            stringResource(R.string.subject_science_label),
+            stringResource(R.string.subject_social_label)
+        )
     }
 
     // Initialize local state from existing data or defaults
     val existingTimetable = timetables.find { it.className == className }
+    val homeTeacherId = existingTimetable?.homeTeacherId ?: ""
+    
     var localQuotas by remember(existingTimetable) {
         val initialMap = subjects.associateWith { subject ->
             existingTimetable?.weeklyQuota?.get(subject) ?: SubjectQuota(subject = subject)
@@ -96,13 +125,32 @@ fun WeeklyQuotaContent(
 
     val currentTotal = localQuotas.values.sumOf { it.classCount }
 
+    // Auto-select Home Teacher logic
+    LaunchedEffect(allTeachers, homeTeacherId) {
+        if (homeTeacherId.isNotEmpty()) {
+            val homeTeacher = allTeachers.find { it.teacherId == homeTeacherId }
+            if (homeTeacher != null) {
+                val subject = homeTeacher.subject
+                val currentQuota = localQuotas[subject]
+                if (currentQuota != null && currentQuota.teacherId != homeTeacherId) {
+                    val newMap = localQuotas.toMutableMap()
+                    newMap[subject] = currentQuota.copy(
+                        teacherId = homeTeacher.teacherId,
+                        teacherName = homeTeacher.name
+                    )
+                    localQuotas = newMap
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Weekly Quota", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.weekly_quota_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -119,7 +167,7 @@ fun WeeklyQuotaContent(
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("OK", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(stringResource(R.string.ok), fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
         }
     ) { padding ->
@@ -138,7 +186,7 @@ fun WeeklyQuotaContent(
             )
 
             Text(
-                text = "Total Classes: $currentTotal / $maxClasses",
+                text = stringResource(R.string.total_classes_format, currentTotal, maxClasses),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = if (currentTotal > maxClasses) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -156,6 +204,7 @@ fun WeeklyQuotaContent(
                         quota = quota,
                         allTeachers = allTeachers,
                         classNum = classNum,
+                        homeTeacherId = homeTeacherId,
                         onQuotaChange = { updatedQuota ->
                             val newMap = localQuotas.toMutableMap()
                             newMap[subject] = updatedQuota
@@ -174,8 +223,10 @@ fun SubjectQuotaCard(
     quota: SubjectQuota,
     allTeachers: List<Teacher>,
     classNum: Int,
+    homeTeacherId: String,
     onQuotaChange: (SubjectQuota) -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var showTeacherDialog by remember { mutableStateOf(false) }
     
     // Filter teachers by subject and category
@@ -189,7 +240,13 @@ fun SubjectQuotaCard(
         teacher.subject.equals(subject, ignoreCase = true) && categoryMatch
     }
 
-    val isLanguage = subject.lowercase() in listOf("telugu", "hindi", "english")
+    val hasHomeTeacherInList = filteredTeachers.any { it.teacherId == homeTeacherId }
+
+    val isLanguage = subject.lowercase() in listOf(
+        stringResource(R.string.subject_telugu_label).lowercase(),
+        stringResource(R.string.subject_hindi_label).lowercase(),
+        stringResource(R.string.subject_english_label).lowercase()
+    )
     val subjectColor = getSubjectColorInternal(subject)
 
     Card(
@@ -225,7 +282,7 @@ fun SubjectQuotaCard(
                     border = BorderStroke(1.dp, subjectColor.copy(alpha = 0.2f))
                 ) {
                     Text(
-                        text = if (quota.teacherName.isEmpty()) "Select Teacher" else quota.teacherName,
+                        text = if (quota.teacherName.isEmpty()) stringResource(R.string.select_teacher) else quota.teacherName,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
@@ -235,7 +292,7 @@ fun SubjectQuotaCard(
 
                 if (isLanguage) {
                     Text(
-                        text = "Max 7 periods",
+                        text = stringResource(R.string.max_periods_hint, 7),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.padding(top = 4.dp, start = 4.dp)
@@ -295,13 +352,13 @@ fun SubjectQuotaCard(
     if (showTeacherDialog) {
         AlertDialog(
             onDismissRequest = { showTeacherDialog = false },
-            title = { Text("Select Teacher for $subject") },
+            title = { Text(stringResource(R.string.select_teacher_for_subject, subject)) },
             text = {
                 LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
                     if (filteredTeachers.isEmpty()) {
                         item {
                             Text(
-                                "No teachers found for this subject and class category.",
+                                stringResource(R.string.no_teachers_found_error),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(16.dp)
@@ -309,13 +366,21 @@ fun SubjectQuotaCard(
                         }
                     } else {
                         items(filteredTeachers) { teacher ->
+                            val isHomeTeacher = teacher.teacherId == homeTeacherId
+                            val isClickable = !hasHomeTeacherInList || isHomeTeacher
+                            
                             TeacherSelectionItem(
                                 teacher = teacher,
                                 isSelected = quota.teacherId == teacher.teacherId,
                                 onSelect = {
-                                    onQuotaChange(quota.copy(teacherId = teacher.teacherId, teacherName = teacher.name))
-                                    showTeacherDialog = false
-                                }
+                                    if (isClickable) {
+                                        onQuotaChange(quota.copy(teacherId = teacher.teacherId, teacherName = teacher.name))
+                                        showTeacherDialog = false
+                                    } else {
+                                        android.widget.Toast.makeText(context, context.getString(R.string.home_teacher_error), android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                                isHomeTeacher = isHomeTeacher
                             )
                         }
                     }
@@ -323,7 +388,7 @@ fun SubjectQuotaCard(
             },
             confirmButton = {
                 TextButton(onClick = { showTeacherDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

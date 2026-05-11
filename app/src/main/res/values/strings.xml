@@ -213,6 +213,29 @@
     <string name="select_subject">Select Subject</string>
     <string name="busy_label">(Busy)</string>
     <string name="save_period">Save Period</string>
+    <string name="weekly_classes">Weekly\nClasses</string>
+    <string name="total_classes_format">Total Classes: %1$d / %2$d</string>
+    <string name="max_periods_hint">Max %1$d periods</string>
+    <string name="home_teacher_badge">HOME TEACHER</string>
+    <string name="home_teacher_error">Home teacher has to be selected</string>
+    <string name="select_teacher_for_subject">Select Teacher for %1$s</string>
+    <string name="no_teachers_found_error">No teachers found for this subject and class category.</string>
+    <string name="subject_quotas_title">Subject Quotas (Weekly)</string>
+    <string name="edit_period_title">Edit Period %1$d</string>
+    <string name="no_subject">No Subject</string>
+    <string name="no_teacher_assigned">No Teacher assigned</string>
+    <string name="weekly_quota_title">Weekly Quota</string>
+    <string name="weekly_quota_placeholder">Weekly Quota Screen for %1$s</string>
+    <string name="edit_timetable_placeholder">Edit Timetable Screen for %1$s</string>
+    <string name="subject_telugu_label">Telugu</string>
+    <string name="subject_hindi_label">Hindi</string>
+    <string name="subject_english_label">English</string>
+    <string name="subject_math_label">Math</string>
+    <string name="subject_science_label">Science</string>
+    <string name="subject_social_label">Social</string>
+    <string name="subject_physics_label">Physics</string>
+    <string name="subject_biology_label">Biology</string>
+    <string name="subject_computer_label">Computer</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">Successfully added student! Admission No: %1$s</string>

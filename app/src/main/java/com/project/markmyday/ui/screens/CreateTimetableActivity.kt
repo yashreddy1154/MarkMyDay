@@ -464,6 +464,7 @@ fun CategoryBadge(category: String) {
 fun TeacherSelectionItem(
     teacher: Teacher,
     isSelected: Boolean,
+    isHomeTeacher: Boolean = false,
     onSelect: () -> Unit
 ) {
     val subjectColor = getSubjectColor(teacher.subject)
@@ -477,7 +478,7 @@ fun TeacherSelectionItem(
         color = if (isSelected) subjectColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface,
         border = BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) subjectColor else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            color = if (isSelected) subjectColor else if (isHomeTeacher) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
     ) {
         Row(
@@ -503,11 +504,28 @@ fun TeacherSelectionItem(
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = teacher.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = teacher.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (isHomeTeacher) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_teacher_badge),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 
@@ -834,7 +852,7 @@ fun ClassSelectionCard(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "Weekly\nClasses",
+                        text = stringResource(R.string.weekly_classes),
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
