@@ -2,10 +2,13 @@ package com.project.markmyday.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -94,126 +97,157 @@ fun TeacherDashboard(
             DashboardBottomBar(currentRoute = "dashboard", onNavigate = onNavigate)
         }
     ) { padding ->
-        Column(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    WelcomeSection(
-                        name = userName,
-                        role = userRole,
-                        homeSection = homeSection,
-                        subject = subject
-                    )
-                    
-                    Surface(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape),
-                        color = MaterialTheme.colorScheme.surface,
-                        shadowElevation = 4.dp
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = "App Icon",
-                            modifier = Modifier.padding(12.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-
-            // Teacher banner
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Box(
+            // 1. Welcome Header
+            item(span = { GridItemSpan(2) }) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary
-                                )
-                            )
-                        )
-                        .padding(20.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(2.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            stringResource(R.string.class_in_session),
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            stringResource(R.string.next_class_starts),
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 13.sp
-                        )
+                            Text(
+                                text = "Hello, $userName",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "$userRole • $homeSection • $subject",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
-                        Icon(
-                            Icons.Default.Timer,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
-                            modifier = Modifier.size(40.dp)
-                        )
+                        Surface(
+                            modifier = Modifier.size(56.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.School,
+                                contentDescription = "Avatar",
+                                modifier = Modifier.padding(12.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            TimetableSection(entries = timetable)
-            
-            Spacer(modifier = Modifier.height(16.dp))
 
-            ScanCard(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                onOpenScanner = {
-                    context.startActivity(Intent(context, ScanActivity::class.java))
+            // 2. Banner
+            item(span = { GridItemSpan(2) }) {
+                Card(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.secondary
+                                    )
+                                )
+                            )
+                            .padding(20.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.class_in_session),
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    stringResource(R.string.next_class_starts),
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    fontSize = 13.sp
+                                )
+                            }
+                            Icon(
+                                Icons.Default.Timer,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.5f),
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
                 }
-            )
+            }
 
-            if (homeSection != "N/A") {
-                Spacer(modifier = Modifier.height(16.dp))
-                WatchlistCard(
-                    summaries = engagementSummaries,
-                    onExport = { engagementViewModel.exportReport(context) },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+            // 3. Timetable Section
+            item(span = { GridItemSpan(2) }) {
+                TimetableSection(entries = timetable)
+            }
+
+            // 4. Scan Card
+            item(span = { GridItemSpan(2) }) {
+                ScanCard(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onOpenScanner = {
+                        context.startActivity(Intent(context, ScanActivity::class.java))
+                    }
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = stringResource(R.string.faculty_portal),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            
-            DashboardTileGrid(tiles = teacherTiles) { onTileClick(it.id) }
-            
-            Spacer(modifier = Modifier.height(24.dp))
+            // 5. Watchlist Card
+            if (homeSection != "N/A") {
+                item(span = { GridItemSpan(2) }) {
+                    WatchlistCard(
+                        summaries = engagementSummaries,
+                        onExport = { engagementViewModel.exportReport(context) },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
+
+            // 6. Section Title
+            item(span = { GridItemSpan(2) }) {
+                Text(
+                    text = stringResource(R.string.faculty_portal),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            // 7. Tiles
+            items(teacherTiles, key = { it.id }) { tile ->
+                Box(modifier = Modifier.padding(horizontal = 4.dp)) {
+                    AnimatedDashboardTile(
+                        tile = tile,
+                        onClick = { onTileClick(tile.id) }
+                    )
+                }
+            }
+
+            item(span = { GridItemSpan(2) }) {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
     }
 }

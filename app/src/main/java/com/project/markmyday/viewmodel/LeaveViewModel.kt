@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.project.markmyday.data.model.LeaveRequest
 import com.project.markmyday.data.model.NotificationData
@@ -40,6 +41,9 @@ class LeaveViewModel(
     private var studentClassSection: String = ""
     private var studentName: String = ""
 
+    private var historyListener: ListenerRegistration? = null
+    private var allLeavesListener: ListenerRegistration? = null
+
     init {
         loadUserData()
         fetchLeaveHistory()
@@ -61,7 +65,7 @@ class LeaveViewModel(
 
     private fun fetchLeaveHistory() {
         val uid = auth.currentUser?.uid ?: return
-        firestore.collection("leaves")
+        historyListener = firestore.collection("leaves")
             .whereEqualTo("studentId", uid)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
@@ -78,7 +82,7 @@ class LeaveViewModel(
     }
 
     private fun fetchAllLeaves() {
-        firestore.collection("leaves")
+        allLeavesListener = firestore.collection("leaves")
             .orderBy("appliedAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) return@addSnapshotListener
@@ -176,5 +180,11 @@ class LeaveViewModel(
 
     fun resetSubmissionState() {
         _submissionState.value = LeaveSubmissionState.Idle
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        historyListener?.remove()
+        allLeavesListener?.remove()
     }
 }

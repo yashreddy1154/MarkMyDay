@@ -3,10 +3,13 @@ package com.project.markmyday.ui.screens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -144,103 +147,140 @@ fun StudentDashboardHomeContent(
         TimetableEntry("Telugu", "TU101", "04:00 - 05:00 PM", "Room 10")
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                WelcomeSection(name = userName, role = userRole)
-
-                Surface(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape),
-                    color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 4.dp
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.School,
-                        contentDescription = "App Icon",
-                        modifier = Modifier.padding(12.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        }
-
-        // Student banner
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-        ) {
-            Box(
+        // 1. Welcome Header
+        item(span = { GridItemSpan(2) }) {
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    )
-                    .padding(20.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(2.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            stringResource(R.string.keep_learning),
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            text = "Hello, $userName",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            stringResource(R.string.assignments_due),
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 13.sp
+                            text = "$userRole • ${getCurrentDate()}",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    Icon(
-                        Icons.Default.RocketLaunch,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.5f),
-                        modifier = Modifier.size(40.dp)
-                    )
+                    Surface(
+                        modifier = Modifier.size(56.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.School,
+                            contentDescription = "Avatar",
+                            modifier = Modifier.padding(12.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // 2. Banner
+        item(span = { GridItemSpan(2) }) {
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary,
+                                    MaterialTheme.colorScheme.secondary
+                                )
+                            )
+                        )
+                        .padding(20.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.keep_learning),
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                stringResource(R.string.assignments_due),
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 13.sp
+                            )
+                        }
+                        Icon(
+                            Icons.Default.RocketLaunch,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.5f),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
+        }
 
-        TimetableSection(entries = timetable)
+        // 3. Timetable Section
+        item(span = { GridItemSpan(2) }) {
+            TimetableSection(entries = timetable)
+        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // 4. Section Title
+        item(span = { GridItemSpan(2) }) {
+            Text(
+                text = stringResource(R.string.my_dashboard),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
 
-        Text(
-            text = stringResource(R.string.my_dashboard),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        // 5. Tiles
+        items(studentTiles, key = { it.id }) { tile ->
+            Box(modifier = Modifier.padding(horizontal = 4.dp)) {
+                AnimatedDashboardTile(
+                    tile = tile,
+                    onClick = { onTileClick(tile.id) }
+                )
+            }
+        }
 
-        DashboardTileGrid(tiles = studentTiles, onTileClick = { onTileClick(it.id) })
-
-        Spacer(modifier = Modifier.height(24.dp))
+        item(span = { GridItemSpan(2) }) {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
     }
+}
+
+private fun getCurrentDate(): String {
+    val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d", java.util.Locale.getDefault())
+    return java.time.LocalDate.now().format(formatter)
 }
 
 @Preview(showBackground = true)
