@@ -154,10 +154,10 @@ fun AppNavigation(
                         "exams" -> {
                             val classNum = role.filter { it.isDigit() }.ifEmpty { "" }
                             if (classNum.isNotEmpty()) {
-                                navController.navigate(Screen.QuizTaking.createRoute("Mixed Test", classNum, name, studentId))
+                                navController.navigate(Screen.QuizList.createRoute(classNum, name, studentId))
                             } else {
-                                // Fallback or alert if class is missing
-                                navController.navigate(Screen.QuizTaking.createRoute("Mixed Test", "10", name, studentId))
+                                // Fallback
+                                navController.navigate(Screen.QuizList.createRoute("10", name, studentId))
                             }
                         }
                         "leaderboard" -> {
@@ -331,6 +331,26 @@ fun AppNavigation(
 
         composable(Screen.CourseManager.route) {
             CourseManagerScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = Screen.QuizList.route,
+            arguments = listOf(
+                navArgument("className") { type = NavType.StringType },
+                navArgument("userName") { type = NavType.StringType },
+                navArgument("studentId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val className = backStackEntry.arguments?.getString("className") ?: ""
+            val userName = backStackEntry.arguments?.getString("userName") ?: "Student"
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
+            QuizListScreen(
+                className = className,
+                onQuizSelected = { subject ->
+                    navController.navigate(Screen.QuizTaking.createRoute(subject, className, userName, studentId))
+                },
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable(

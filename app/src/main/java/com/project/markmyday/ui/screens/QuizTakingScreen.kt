@@ -69,7 +69,7 @@ fun QuizTakingScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.startQuiz(className, userName, studentId)
+        viewModel.startQuiz(className, userName, studentId, subject)
     }
 
     var showWarning by remember { mutableStateOf(false) }

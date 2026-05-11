@@ -53,18 +53,25 @@ class QuizTakingViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun startQuiz(className: String, studentName: String = "Student", studentId: String = "") {
+    fun startQuiz(className: String, studentName: String = "Student", studentId: String = "", targetSubject: String = "Mixed") {
         this.studentName = studentName
         this.className = className
-        this.subject = "Mixed"
+        this.subject = targetSubject
         val actualDuration: Long = 15 * 60 * 1000 
         
         viewModelScope.launch {
             _quizState.value = QuizState.Loading
             
-            // 1. Fetch mixed questions for the specific class
+            // 1. Fetch questions for the specific class/subject
             val dbClass = if (!className.startsWith("Class")) "Class $className" else className
-            quizRepository.getQuestionsForClass(dbClass).collect { allClassQuestions ->
+            
+            val flow = if (targetSubject == "Mixed") {
+                quizRepository.getQuestionsForClass(dbClass)
+            } else {
+                quizRepository.getQuestions(targetSubject, dbClass)
+            }
+
+            flow.collect { allClassQuestions ->
                 
                 // 2. Identify questions already taken today (to ensure fresh ones in Attempt 2)
                 val takenIds = quizRepository.getAttemptedQuestionIds(studentId, className)
