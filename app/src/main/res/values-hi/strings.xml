@@ -188,6 +188,8 @@
     <string name="step_3_name">समय सारणी संपादित करें</string>
     <string name="next">अगला</string>
     <string name="select_teacher">शिक्षक चुनें</string>
+    <string name="add_teacher">शिक्षक जोड़ें</string>
+    <string name="edit_teacher">शिक्षक संपादित करें</string>
     <string name="teacher_name_label">नाम: %1$s</string>
     <string name="primary_subject_label">प्राथमिक विषय: %1$s</string>
     <string name="category_label_simple">श्रेणी: %1$s</string>
@@ -273,4 +275,9 @@
     <string name="dummy_news_desc_5">आगामी गर्मियों की छुट्टियों के लिए आधिकारिक कार्यक्रम जारी।</string>
     <string name="dummy_news_title_6">स्पोर्ट्स मीट 2024</string>
     <string name="dummy_news_desc_6">अगले महीने से वार्षिक अंतर-स्कूल खेल प्रतियोगिता शुरू होगी।</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard_title">लीडरबोर्ड</string>
+    <string name="privacy_placeholder">---</string>
+    <string name="score_format">%1$d/%2$d</string>
 </resources>

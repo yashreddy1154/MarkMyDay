@@ -189,6 +189,8 @@
     <string name="step_3_name">Edit Timetable</string>
     <string name="next">Next</string>
     <string name="select_teacher">Select Teacher</string>
+    <string name="add_teacher">Add Teacher</string>
+    <string name="edit_teacher">Edit Teacher</string>
     <string name="teacher_name_label">Name: %1$s</string>
     <string name="primary_subject_label">Primary Sub: %1$s</string>
     <string name="category_label_simple">Category: %1$s</string>

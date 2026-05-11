@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -307,8 +308,17 @@ fun ClassTeacherCard(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                 ) {
+                    if (selectedTeacher != null) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
                     Text(
-                        text = if (selectedTeacher == null) stringResource(R.string.select_teacher) else selectedTeacher.name,
+                        text = if (selectedTeacher == null) stringResource(R.string.add_teacher) else stringResource(R.string.edit_teacher),
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         style = MaterialTheme.typography.labelLarge
                     )
