@@ -66,6 +66,8 @@ fun StudentDashboard(
         currentSubScreen = "home"
     }
 
+    var searchQuery by remember { mutableStateOf("") }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -74,23 +76,20 @@ fun StudentDashboard(
                     icon = Icons.Default.Face,
                     title = stringResource(R.string.my_school_life),
                     onNotificationClick = onNotificationClick,
-                    notificationCount = if (hasUnread) 1 else 0
+                    notificationCount = if (hasUnread) 1 else 0,
+                    onProfileClick = { onTileClick("settings") }
                 )
-                "attendance" -> TopAppBar(
-                    title = { Text(stringResource(R.string.tile_attendance), fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = { currentSubScreen = "home" }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                        }
-                    }
+                "attendance" -> DashboardTopBar(
+                    title = stringResource(R.string.tile_attendance),
+                    onNotificationClick = onNotificationClick,
+                    notificationCount = if (hasUnread) 1 else 0,
+                    onBackClick = { currentSubScreen = "home" }
                 )
-                "leave" -> TopAppBar(
-                    title = { Text(stringResource(R.string.tile_leave), fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = { currentSubScreen = "home" }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                        }
-                    }
+                "leave" -> DashboardTopBar(
+                    title = stringResource(R.string.tile_leave),
+                    onNotificationClick = onNotificationClick,
+                    notificationCount = if (hasUnread) 1 else 0,
+                    onBackClick = { currentSubScreen = "home" }
                 )
             }
         },
@@ -104,17 +103,22 @@ fun StudentDashboard(
                 .fillMaxSize()
         ) {
             when (currentSubScreen) {
-                "home" -> StudentDashboardHomeContent(
-                    userName = userName,
-                    userRole = userRole,
-                    onTileClick = { id ->
-                        when (id) {
-                            "attendance" -> currentSubScreen = "attendance"
-                            "leave" -> currentSubScreen = "leave"
-                            else -> onTileClick(id)
+                "home" -> {
+                    SearchBar(query = searchQuery, onQueryChange = { searchQuery = it })
+                    Spacer(modifier = Modifier.height(8.dp))
+                    StudentDashboardHomeContent(
+                        userName = userName,
+                        userRole = userRole,
+                        searchQuery = searchQuery,
+                        onTileClick = { id ->
+                            when (id) {
+                                "attendance" -> currentSubScreen = "attendance"
+                                "leave" -> currentSubScreen = "leave"
+                                else -> onTileClick(id)
+                            }
                         }
-                    }
-                )
+                    )
+                }
                 "attendance" -> StudentAttendanceDashboardScreen(onBack = { currentSubScreen = "home" })
                 "leave" -> LeaveScreen(onBack = { currentSubScreen = "home" })
             }
@@ -126,6 +130,7 @@ fun StudentDashboard(
 fun StudentDashboardHomeContent(
     userName: String,
     userRole: String,
+    searchQuery: String = "",
     onTileClick: (String) -> Unit
 ) {
     val studentTiles = listOf(
@@ -138,7 +143,7 @@ fun StudentDashboardHomeContent(
         DashboardTile("leaderboard", stringResource(R.string.leaderboard_title), Icons.Default.Leaderboard),
         DashboardTile("fees", stringResource(R.string.tile_fees), Icons.Default.Payments),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
-    )
+    ).filter { it.label.contains(searchQuery, ignoreCase = true) }
 
     val timetable = listOf(
         TimetableEntry("Mathematics", "MA101", "09:00 - 10:00 AM", "Room 101"),
@@ -156,91 +161,56 @@ fun StudentDashboardHomeContent(
     ) {
         // 1. Welcome Header
         item(span = { GridItemSpan(2) }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(2.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Hello, $userName",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "$userRole • ${getCurrentDate()}",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Surface(
-                        modifier = Modifier.size(56.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = "Avatar",
-                            modifier = Modifier.padding(12.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
+            WelcomeSection(
+                name = userName,
+                role = userRole,
+                date = getCurrentDate(),
+                icon = Icons.Default.School
+            )
         }
 
         // 2. Banner
         item(span = { GridItemSpan(2) }) {
             Card(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary
-                                )
-                            )
-                        )
-                        .padding(20.dp)
+                        .padding(24.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 stringResource(R.string.keep_learning),
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 stringResource(R.string.assignments_due),
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 13.sp
+                                color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f),
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        Icon(
-                            Icons.Default.RocketLaunch,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
-                            modifier = Modifier.size(40.dp)
-                        )
+                        Surface(
+                            modifier = Modifier.size(50.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.15f)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    Icons.Default.RocketLaunch,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSecondary,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }

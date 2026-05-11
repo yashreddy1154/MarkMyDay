@@ -29,6 +29,7 @@ import com.project.markmyday.R
 import com.project.markmyday.viewmodel.SettingsUiState
 import com.project.markmyday.viewmodel.SettingsViewModel
 import com.project.markmyday.viewmodel.LocalSettingsViewModel
+import com.project.markmyday.ui.components.DashboardTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,118 +54,150 @@ fun SettingsScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { 
-                    Text(
-                        stringResource(R.string.settings), 
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+            DashboardTopBar(
+                title = stringResource(R.string.settings),
+                onNotificationClick = { /* Handled by caller */ },
+                icon = Icons.Default.Settings
             )
         },
         bottomBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(24.dp)
             ) {
                 Button(
                     onClick = { viewModel.logout() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .height(60.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
+                        contentColor = MaterialTheme.colorScheme.error
                     ),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.logout), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        stringResource(R.string.logout), 
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold)
+                    )
                 }
             }
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // 1. Profile Section
             SettingsSection(
-                title = stringResource(R.string.profile_details),
+                title = "Account Details",
                 icon = Icons.Default.Person
             ) {
                 when (val state = uiState) {
                     is SettingsUiState.Loading -> {
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        Box(modifier = Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(modifier = Modifier.size(32.dp))
                         }
                     }
                     is SettingsUiState.Success -> {
-                        Row(
-                            verticalAlignment = Alignment.Top,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
-                                contentAlignment = Alignment.Center
+                        val profile = state.profile
+                        var showPassword by remember { mutableStateOf(false) }
+
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            // Profile Header
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(40.dp),
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                                )
+                                Surface(
+                                    modifier = Modifier.size(72.dp),
+                                    shape = RoundedCornerShape(24.dp),
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.Default.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(32.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = profile.name,
+                                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = profile.role.replaceFirstChar { it.uppercase() },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = state.profile.name,
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+                            // Details Grid
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                // ID and Password
+                                DetailItem(label = "User ID", value = profile.id, icon = Icons.Default.Badge)
+                                
+                                DetailItem(
+                                    label = "Password",
+                                    value = if (showPassword) (profile.password ?: "N/A") else "••••••••",
+                                    icon = Icons.Default.Lock,
+                                    trailingIcon = {
+                                        IconButton(onClick = { showPassword = !showPassword }) {
+                                            Icon(
+                                                imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                                contentDescription = "Toggle Password Visibility",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
                                 )
-                                if (state.profile.studentClass != null) {
-                                    Text(
-                                        text = stringResource(R.string.class_label_simple, state.profile.studentClass),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+
+                                // Academic Info
+                                if (profile.role.lowercase() == "teacher") {
+                                    DetailItem(label = "Subject", value = profile.subject ?: "N/A", icon = Icons.Default.Book)
+                                } else {
+                                    DetailItem(label = "Class", value = profile.studentClass ?: "N/A", icon = Icons.Default.School)
                                 }
-                                if (state.profile.parentName != null) {
-                                    Text(
-                                        text = stringResource(R.string.parent_label, state.profile.parentName),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+
+                                // Parent Details (for Students)
+                                if (profile.role.lowercase() == "student") {
+                                    if (!profile.motherName.isNullOrBlank()) {
+                                        DetailItem(
+                                            label = "Mother", 
+                                            value = "${profile.motherName} (${profile.motherPhone ?: "N/A"})", 
+                                            icon = Icons.Default.Person
+                                        )
+                                    }
+                                    if (!profile.fatherName.isNullOrBlank()) {
+                                        DetailItem(
+                                            label = "Father", 
+                                            value = "${profile.fatherName} (${profile.fatherPhone ?: "N/A"})", 
+                                            icon = Icons.Default.Person
+                                        )
+                                    }
                                 }
-                                Text(
-                                    text = stringResource(R.string.id_label_simple, state.profile.id),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
                     }
@@ -176,119 +209,84 @@ fun SettingsScreen(
 
             // 2. Preferences Section
             SettingsSection(
-                title = stringResource(R.string.language),
-                icon = Icons.Default.Language
+                title = "App Preferences",
+                icon = Icons.Default.Tune
             ) {
-                val languages = listOf(
-                    "తెలుగు" to "te",
-                    "English" to "en",
-                    "हिन्दी" to "hi",
-                    "ਪੰਜਾਬੀ" to "pa"
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        text = "Preferred Language",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    val languages = listOf(
+                        "తెలుగు" to "te",
+                        "English" to "en",
+                        "हिन्दी" to "hi",
+                        "ਪੰਜਾਬੀ" to "pa"
+                    )
 
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    languages.chunked(2).forEach { rowLanguages ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            rowLanguages.forEach { (name, code) ->
-                                OutlinedCard(
-                                    onClick = { viewModel.setLanguage(code) },
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(50.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = CardDefaults.outlinedCardColors(
-                                        containerColor = if (currentLanguage == code) 
-                                            MaterialTheme.colorScheme.primaryContainer 
-                                        else 
-                                            Color.Transparent
-                                    ),
-                                    border = androidx.compose.foundation.BorderStroke(
-                                        1.dp, 
-                                        if (currentLanguage == code) 
-                                            MaterialTheme.colorScheme.primary 
-                                        else 
-                                            MaterialTheme.colorScheme.outline
-                                    )
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = name,
-                                            style = MaterialTheme.typography.bodyLarge.copy(
-                                                fontWeight = if (currentLanguage == code) FontWeight.Bold else FontWeight.Medium,
-                                                color = if (currentLanguage == code) 
-                                                    MaterialTheme.colorScheme.onPrimaryContainer 
-                                                else 
-                                                    MaterialTheme.colorScheme.onSurface
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                            if (rowLanguages.size == 1) {
-                                Spacer(modifier = Modifier.weight(1f))
-                            }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        languages.take(2).forEach { (name, code) ->
+                            LanguageChoiceChip(
+                                name = name,
+                                selected = currentLanguage == code,
+                                onClick = { viewModel.setLanguage(code) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        languages.drop(2).forEach { (name, code) ->
+                            LanguageChoiceChip(
+                                name = name,
+                                selected = currentLanguage == code,
+                                onClick = { viewModel.setLanguage(code) },
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(modifier = Modifier.alpha(0.5f))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
 
                     // Dark Mode Toggle
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.DarkMode, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(stringResource(R.string.dark_mode))
-                        }
-                        Switch(
-                            checked = isDarkMode,
-                            onCheckedChange = { viewModel.toggleDarkMode(it) }
-                        )
-                    }
+                    PreferenceToggle(
+                        title = stringResource(R.string.dark_mode),
+                        icon = Icons.Default.DarkMode,
+                        checked = isDarkMode,
+                        onCheckedChange = { viewModel.toggleDarkMode(it) }
+                    )
 
                     // Notifications Toggle
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(stringResource(R.string.notifications))
-                        }
-                        Switch(
-                            checked = notificationsEnabled,
-                            onCheckedChange = { viewModel.toggleNotifications(it) }
-                        )
-                    }
+                    PreferenceToggle(
+                        title = stringResource(R.string.notifications),
+                        icon = Icons.Default.NotificationsActive,
+                        checked = notificationsEnabled,
+                        onCheckedChange = { viewModel.toggleNotifications(it) }
+                    )
                 }
             }
 
-            // 3. More Section
+            // 3. Support Section
             SettingsSection(
-                title = stringResource(R.string.more),
-                icon = Icons.Default.Add
+                title = "Support & Legal",
+                icon = Icons.Default.SupportAgent
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     ClickableSettingsItem(
-                        icon = Icons.Default.Policy,
+                        icon = Icons.Default.Gavel,
                         title = stringResource(R.string.terms_and_policies),
                         onClick = onNavigateToTerms
                     )
                     ClickableSettingsItem(
                         icon = Icons.Default.Info,
-                        title = stringResource(R.string.about_app),
+                        title = "About MarkMyDay",
                         onClick = onNavigateToAbout
                     )
                 }
@@ -296,6 +294,115 @@ fun SettingsScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+fun DetailItem(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    trailingIcon: @Composable (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        if (trailingIcon != null) {
+            trailingIcon()
+        }
+    }
+}
+
+@Composable
+fun LanguageChoiceChip(
+    name: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        border = if (selected) null else androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Medium,
+                    color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun PreferenceToggle(
+    title: String,
+    icon: ImageVector,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+            ) {
+                Icon(
+                    imageVector = icon, 
+                    contentDescription = null, 
+                    modifier = Modifier.padding(8.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+            )
+        )
     }
 }
 

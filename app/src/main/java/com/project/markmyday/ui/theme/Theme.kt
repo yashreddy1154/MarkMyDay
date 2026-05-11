@@ -13,9 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = SchoolBlueSecondary,
-    secondary = SchoolBlueTertiary,
-    tertiary = Color.White,
+    primary = PrimaryPurpleLight,
+    secondary = AccentYellow,
+    tertiary = CardWhite,
     background = Color(0xFF121212),
     surface = Color(0xFF1E1E1E),
     onPrimary = Color.Black,
@@ -26,16 +26,17 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = SchoolBluePrimary,
-    secondary = SchoolBlueSecondary,
-    tertiary = SchoolBlueTertiary,
-    background = DashboardBackground,
-    surface = CardBackground,
+    primary = PrimaryPurple,
+    secondary = AccentYellow,
+    tertiary = PrimaryPurpleLight,
+    background = AppBackground,
+    surface = CardWhite,
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = TextDark,
-    onBackground = TextDark,
-    onSurface = TextDark
+    onSecondary = TextCharcoal,
+    onTertiary = Color.White,
+    onBackground = TextCharcoal,
+    onSurface = TextCharcoal,
+    outlineVariant = TextSlate.copy(alpha = 0.1f)
 )
 
 @Composable

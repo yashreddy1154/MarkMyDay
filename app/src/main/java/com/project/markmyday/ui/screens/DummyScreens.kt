@@ -94,7 +94,8 @@ fun DummyBaseScreen(
             DashboardTopBar(
                 title = title,
                 onNotificationClick = onNotificationClick,
-                icon = icon
+                icon = icon,
+                onProfileClick = { onNavigate("settings") }
             )
         },
         bottomBar = {

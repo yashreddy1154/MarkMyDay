@@ -23,6 +23,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.data.model.NotificationData
 import com.project.markmyday.viewmodel.NotificationViewModel
 import com.project.markmyday.ui.components.DashboardBottomBar
+import com.project.markmyday.ui.components.DashboardTopBar
+import androidx.compose.material.icons.filled.Campaign
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,16 +50,12 @@ fun NotificationScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = { Text("Notifications") },
-                navigationIcon = {
-                    if (onNavigate == null) {
-                        IconButton(onClick = onBackClick) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                }
+            DashboardTopBar(
+                title = "Notices & Updates",
+                onNotificationClick = { /* Already on notification screen */ },
+                icon = Icons.Default.Campaign
             )
         },
         bottomBar = {
@@ -68,13 +66,26 @@ fun NotificationScreen(
     ) { padding ->
         if (notifications.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("No notifications yet", style = MaterialTheme.typography.bodyLarge)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        Icons.Default.Notifications, 
+                        contentDescription = null, 
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "No notifications yet", 
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         } else {
             LazyColumn(
                 modifier = Modifier.padding(padding).fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(notifications) { notification ->
                     NotificationCard(notification)
@@ -87,77 +98,93 @@ fun NotificationScreen(
 @Composable
 fun NotificationCard(notification: NotificationData) {
     val date = Date(notification.timestamp)
-    val timeString = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(date)
+    val timeString = SimpleDateFormat("MMM dd, yyyy • HH:mm", Locale.getDefault()).format(date)
     
     val audienceLower = notification.audience.lowercase()
     val categoryLabel = when {
-        audienceLower == "all" -> "General Notice"
-        audienceLower == "teachers" || audienceLower == "teacher" -> "Teacher Notice"
-        else -> "Personal Update" // This is for leave status or targeted messages
+        audienceLower == "all" -> "Global Broadcast"
+        audienceLower == "teachers" || audienceLower == "teacher" -> "Teacher Memo"
+        else -> "Personal Alert"
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(
-                        if (categoryLabel == "Personal Update") MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
-                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), 
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications, 
-                    contentDescription = null, 
-                    tint = if (categoryLabel == "Personal Update") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Surface(
+                    color = if (categoryLabel == "Personal Alert") MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                            else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = categoryLabel,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
-                        color = if (categoryLabel == "Personal Update") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "By ${notification.author}",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = categoryLabel.uppercase(),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = if (categoryLabel == "Personal Alert") MaterialTheme.colorScheme.onSecondaryContainer
+                                else MaterialTheme.colorScheme.primary
                     )
                 }
                 Text(
-                    text = notification.heading,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = notification.message,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
                     text = timeString,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = notification.heading,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = notification.message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(20.dp))
+            
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    modifier = Modifier.size(32.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications, 
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "Posted by ${notification.author}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    fontWeight = FontWeight.Bold
                 )
             }
         }

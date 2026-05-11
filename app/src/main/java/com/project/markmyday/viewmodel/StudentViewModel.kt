@@ -164,7 +164,9 @@ class StudentViewModel(
                     "motherName" to formState.motherName,
                     "motherPhone" to formState.motherPhone,
                     "fatherName" to formState.fatherName,
-                    "fatherPhone" to formState.fatherPhone
+                    "fatherPhone" to formState.fatherPhone,
+                    "dob" to formState.dob,
+                    "password" to password
                 )
                 firestore.collection("users").document(uid).set(userMap).await()
 

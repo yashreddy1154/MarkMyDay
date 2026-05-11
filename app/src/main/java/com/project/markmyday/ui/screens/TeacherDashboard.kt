@@ -36,6 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.viewmodel.NotificationViewModel
 import com.project.markmyday.viewmodel.EngagementViewModel
@@ -63,6 +66,8 @@ fun TeacherDashboard(
         }
     }
 
+    var searchQuery by remember { androidx.compose.runtime.mutableStateOf("") }
+
     val teacherTiles = listOf(
         DashboardTile("attendance", stringResource(R.string.tile_mark_attendance), Icons.Default.Checklist, badgeText = "80%"),
         DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
@@ -75,7 +80,7 @@ fun TeacherDashboard(
         DashboardTile("course_manager", stringResource(R.string.tile_course_manager), Icons.Default.VideoLibrary),
         DashboardTile("messages", stringResource(R.string.tile_messages), Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
-    )
+    ).filter { it.label.contains(searchQuery, ignoreCase = true) }
 
     val timetable = listOf(
         TimetableEntry("Mobile Dev", "CS402", "09:00 - 10:00 AM", "Room 302"),
@@ -90,7 +95,8 @@ fun TeacherDashboard(
                 icon = Icons.Default.CastForEducation,
                 title = stringResource(R.string.teacher_hub),
                 onNotificationClick = onNotificationClick,
-                notificationCount = if (hasUnread) 1 else 0
+                notificationCount = if (hasUnread) 1 else 0,
+                onProfileClick = { onTileClick("settings") }
             )
         },
         bottomBar = {
@@ -108,91 +114,60 @@ fun TeacherDashboard(
         ) {
             // 1. Welcome Header
             item(span = { GridItemSpan(2) }) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    elevation = CardDefaults.cardElevation(2.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Hello, $userName",
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = "$userRole • $homeSection • $subject",
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Surface(
-                            modifier = Modifier.size(56.dp),
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primaryContainer
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.School,
-                                contentDescription = "Avatar",
-                                modifier = Modifier.padding(12.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
+                WelcomeSection(
+                    name = userName,
+                    role = "$homeSection • $subject",
+                    icon = Icons.Default.CastForEducation
+                )
+            }
+
+            // 1.5 Search Bar
+            item(span = { GridItemSpan(2) }) {
+                SearchBar(query = searchQuery, onQueryChange = { searchQuery = it })
             }
 
             // 2. Banner
             item(span = { GridItemSpan(2) }) {
                 Card(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(32.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(
-                                        MaterialTheme.colorScheme.primary,
-                                        MaterialTheme.colorScheme.secondary
-                                    )
-                                )
-                            )
-                            .padding(20.dp)
+                            .padding(24.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     stringResource(R.string.class_in_session),
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     stringResource(R.string.next_class_starts),
-                                    color = Color.White.copy(alpha = 0.8f),
-                                    fontSize = 13.sp
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
                             }
-                            Icon(
-                                Icons.Default.Timer,
-                                contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.5f),
-                                modifier = Modifier.size(40.dp)
-                            )
+                            Surface(
+                                modifier = Modifier.size(50.dp),
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        Icons.Default.Timer,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -260,35 +235,46 @@ fun WatchlistCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(24.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Student Watchlist (Today)",
+                    text = "Student Watchlist",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary
                 )
-                IconButton(onClick = onExport) {
+                IconButton(
+                    onClick = onExport,
+                    modifier = Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
+                ) {
                     Icon(Icons.Default.Download, contentDescription = "Export Report", tint = MaterialTheme.colorScheme.primary)
                 }
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
             if (summaries.isEmpty()) {
-                Text(
-                    "No watch activity detected today.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "No activity detected today.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             } else {
                 summaries.take(5).forEach { summary ->
                     val totalSeconds = summary.videoStats.values.sumOf { it.timeSpentSeconds }
@@ -297,39 +283,54 @@ fun WatchlistCard(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(summary.studentName, style = MaterialTheme.typography.bodyMedium)
+                        Surface(
+                            modifier = Modifier.size(8.dp),
+                            shape = CircleShape,
+                            color = if (hours > 2) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+                        ) {}
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            summary.studentName, 
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
                         Text(
                             String.format("%.2f hrs", hours),
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant)
                 }
                 
                 if (summaries.size > 5) {
                     Text(
-                        "and ${summaries.size - 5} more...",
+                        "and ${summaries.size - 5} more students...",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             
             Button(
                 onClick = onExport,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-                shape = RoundedCornerShape(8.dp)
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                ),
+                shape = RoundedCornerShape(20.dp)
             ) {
-                Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Export Daily Report")
+                Text("View Detailed Insights", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -342,14 +343,13 @@ fun ScanCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+        )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -358,42 +358,44 @@ fun ScanCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Surface(
-                    modifier = Modifier.size(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer
+                    modifier = Modifier.size(64.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(
                         imageVector = Icons.Default.QrCodeScanner,
                         contentDescription = null,
-                        modifier = Modifier.padding(12.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        modifier = Modifier.padding(16.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
                 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Mark Daily Attendance",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        text = "Smart Attendance",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Scan student QR codes to record presence",
-                        style = MaterialTheme.typography.bodySmall,
+                        text = "Quick scan student QR codes",
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             
             Button(
                 onClick = onOpenScanner,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp)
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(20.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Open Scanner")
+                Icon(Icons.Default.CenterFocusStrong, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("Launch Scanner", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
