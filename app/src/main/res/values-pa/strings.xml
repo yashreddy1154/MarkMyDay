@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ਮਾਰਕ ਮਾਈ ਡੇ</string>
+    <string name="title_activity_add_staff">ਸਟਾਫ ਜੋੜੋ</string>
+    <string name="title_activity_add_student">ਵਿਦਿਆਰਥੀ ਜੋੜੋ</string>
     <string name="settings">ਸੈਟਿੰਗਾਂ</string>
     <string name="profile_details">ਪ੍ਰੋਫਾਈਲ ਵੇਰਵੇ</string>
     <string name="preferences">ਤਰਜੀਹਾਂ</string>
@@ -9,28 +11,256 @@
     <string name="more">ਹੋਰ</string>
     <string name="terms_and_policies">ਸ਼ਰਤਾਂ ਅਤੇ ਨੀਤੀਆਂ</string>
     <string name="about_app">ਐਪ ਬਾਰੇ</string>
+    <string name="app_creators">ਐਪ ਬਣਾਉਣ ਵਾਲੇ</string>
     <string name="logout">ਲੌਗਆਉਟ</string>
+    <string name="name_label">ਨਾਮ: %1$s</string>
+    <string name="role_label">ਭੂਮਿਕਾ: %1$s</string>
+    <string name="android_dev">ਐਂਡਰਾਇਡ ਡਿਵੈਲਪਰ</string>
+    <string name="error_profile">ਗਲਤੀ: %1$s</string>
+    <string name="back">ਪਿੱਛੇ</string>
+    <string name="telugu">ਤੇਲਗੂ</string>
+    <string name="hindi">ਹਿੰਦੀ</string>
+    <string name="english">ਅੰਗਰੇਜ਼ੀ</string>
+    <string name="punjabi">ਪੰਜਾਬੀ</string>
+    <string name="news_image">ਖਬਰਾਂ ਦੀ ਤਸਵੀਰ</string>
+    <string name="no_title">ਕੋਈ ਸਿਰਲੇਖ ਨਹੀਂ</string>
+    <string name="no_description">ਕੋਈ ਵੇਰਵਾ ਨਹੀਂ</string>
+
+
+    <!-- Dashboard Strings -->
     <string name="hello">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ 👋,</string>
+    <string name="my_school_life">ਮੇਰਾ ਸਕੂਲ ਜੀਵਨ</string>
+    <string name="teacher_hub">ਅਧਿਆਪਕ ਕੇਂਦਰ</string>
+    <string name="admin_hub">ਐਡਮਿਨ ਕੇਂਦਰ</string>
+    <string name="school_schedule">ਸਕੂਲ ਦੀ ਸਮਾਂ ਸਾਰਣੀ</string>
+    <string name="view_all">ਸਾਰੇ ਦੇਖੋ</string>
+    <string name="my_dashboard">ਮੇਰਾ ਡੈਸ਼ਬੋਰਡ</string>
+    <string name="faculty_portal">ਫੈਕਲਟੀ ਪੋਰਟਲ</string>
+    <string name="search_anything">ਕੁਝ ਵੀ ਖੋਜੋ...</string>
+    <string name="keep_learning">ਸਿੱਖਦੇ ਰਹੋ! 🚀</string>
+    <string name="assignments_due">ਤੁਹਾਡੇ 3 ਅਸਾਈਨਮੈਂਟ ਜਲਦੀ ਜਮ੍ਹਾਂ ਹੋਣ ਵਾਲੇ ਹਨ।</string>
+    <string name="class_in_session">ਕਲਾਸ ਚੱਲ ਰਹੀ ਹੈ 👩‍🏫</string>
+    <string name="next_class_starts">ਤੁਹਾਡੀ ਅਗਲੀ ਕਲਾਸ 15 ਮਿੰਟ ਵਿੱਚ ਸ਼ੁਰੂ ਹੋਵੇਗੀ।</string>
+
+    <!-- Tile Labels -->
+    <string name="tile_attendance">ਹਾਜ਼ਰੀ</string>
+    <string name="tile_assignments">ਅਸਾਈਨਮੈਂਟ</string>
+    <string name="tile_results">ਮੇਰੇ ਨਤੀਜੇ</string>
+    <string name="tile_leave">ਛੁੱਟੀ ਲਈ ਅਪਲਾਈ ਕਰੋ</string>
+    <string name="tile_manage_leaves">ਛੁੱਟੀਆਂ ਦਾ ਪ੍ਰਬੰਧ</string>
+    <string name="tile_updates">ਗਲੋਬਲ ਅਪਡੇਟਸ</string>
+    <string name="tile_exams">ਆਉਣ ਵਾਲੀਆਂ ਪ੍ਰੀਖਿਆਵਾਂ</string>
+    <string name="tile_fees">ਫੀਸ ਦਾ ਵੇਰਵਾ</string>
+    <string name="tile_mark_attendance">ਹਾਜ਼ਰੀ ਲਗਾਓ</string>
+    <string name="tile_post_results">ਨਤੀਜੇ ਐਲਾਨੋ</string>
+    <string name="tile_leave_request">ਛੁੱਟੀ ਦੀ ਬੇਨਤੀ</string>
+    <string name="tile_manage_exams">ਪ੍ਰੀਖਿਆ ਪ੍ਰਬੰਧਨ</string>
+    <string name="tile_notices">ਨੋਟਿਸ</string>
+    <string name="tile_new_admission">ਨਵਾਂ ਦਾਖਲਾ</string>
+    <string name="tile_messages">ਸੁਨੇਹੇ</string>
+    <string name="tile_admissions">ਦਾਖਲੇ</string>
+    <string name="tile_staff_management">ਸਟਾਫ ਪ੍ਰਬੰਧਨ</string>
+    <string name="tile_student_management">ਵਿਦਿਆਰਥੀ ਪ੍ਰਬੰਧਨ</string>
+    <string name="tile_add_staff">ਸਟਾਫ ਜੋੜੋ</string>
+    <string name="tile_add_student">ਵਿਦਿਆਰਥੀ ਜੋੜੋ</string>
+    <string name="tile_create_timetable">ਸਮਾਂ ਸਾਰਣੀ ਬਣਾਓ</string>
+
+    <!-- Navigation Labels -->
     <string name="nav_home">ਹੋਮ</string>
     <string name="nav_notices">ਨੋਟਿਸ</string>
     <string name="nav_learning">ਸਿੱਖਿਆ</string>
     <string name="nav_reports">ਰਿਪੋਰਟਾਂ</string>
-    <string name="back">ਪਿੱਛੇ</string>
-    <string name="class_label_simple">ਕਲਾਸ: %1$s</string>
-    <string name="parent_label">ਮਾਪੇ: %1$s</string>
-    <string name="id_label_simple">ਆਈਡੀ: %1$s</string>
-    <string name="password_label">ਪਾਸਵਰਡ: ••••••••</string>
-    <string name="telugu">तेਲਗੂ</string>
-    <string name="hindi">ਹਿੰਦੀ</string>
-    <string name="english">ਅੰਗਰੇਜ਼ੀ</string>
-    <string name="punjabi">ਪੰਜਾਬੀ</string>
+    <string name="manage_your_school">ਆਪਣੇ ਸਕੂਲ ਦਾ ਪ੍ਰਬੰਧ ਕਰੋ 🏫</string>
+    <string name="everything_in_one_place">ਸਭ ਕੁਝ ਇੱਕੋ ਥਾਂ \'ਤੇ।</string>
+    <string name="dashboard_overview">ਡੈਸ਼ਬੋਰਡ ਸੰਖੇਪ</string>
+    <string name="made_for_futures">ਉੱਜਵਲ ਭਵਿੱਖ ਲਈ ਬਣਾਇਆ ਗਿਆ</string>
     <string name="tile_staff_list">ਸਟਾਫ ਦੀ ਸੂਚੀ</string>
     <string name="tile_daily_overview">ਰੋਜ਼ਾਨਾ ਸੰਖੇਪ</string>
     <string name="tile_upload_quiz">ਕਵਿਜ਼ ਅਪਲੋਡ ਕਰੋ</string>
     <string name="tile_course_manager">ਕੋਰਸ ਮੈਨੇਜਰ</string>
+    <string name="tile_timetables">ਸਮਾਂ ਸਾਰਣੀਆਂ</string>
     <string name="tile_students">ਵਿਦਿਆਰਥੀ</string>
-    <string name="tile_manage_leaves">ਛੁੱਟੀਆਂ ਦਾ ਪ੍ਰਬੰਧ</string>
-    <string name="tile_notices">ਨੋਟਿਸ</string>
+
+    <!-- Admissions Screen -->
+    <string name="student_admissions">ਵਿਦਿਆਰਥੀ ਦਾਖਲੇ</string>
+    <string name="new_admission_form">ਨਵਾਂ ਦਾਖਲਾ ਫਾਰਮ 📝</string>
+    <string name="student_name">ਵਿਦਿਆਰਥੀ ਦਾ ਨਾਮ</string>
+    <string name="age">ਉਮਰ</string>
+    <string name="class_label">ਕਲਾਸ</string>
+    <string name="parent_name">ਮਾਪਿਆਂ ਦਾ ਨਾਮ</string>
+    <string name="phone_number">ਫੋਨ ਨੰਬਰ</string>
+    <string name="submit_admission">ਦਾਖਲਾ ਜਮ੍ਹਾਂ ਕਰੋ</string>
+    <string name="students_list_title">ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਸੂਚੀ</string>
+    <string name="admission_no_label">ਦਾਖਲਾ ਨੰਬਰ: %1$s</string>
+    <string name="parent_label">ਮਾਪੇ: %1$s</string>
+    <string name="class_label_simple">ਕਲਾਸ: %1$s</string>
+    <string name="id_label_simple">ਆਈਡੀ: %1$s</string>
+    <string name="password_label">ਪਾਸਵਰਡ: ••••••••</string>
+    <string name="student_list_count">ਵਿਦਿਆਰਥੀ ਸੂਚੀ (%1$d)</string>
+    <string name="no_admissions_yet">ਅਜੇ ਤੱਕ ਕੋਈ ਦਾਖਲਾ ਨਹੀਂ ਜੋੜਿਆ ਗਿਆ।</string>
+    <string name="class_prefix">ਕਲਾਸ: %1$s</string>
+    <string name="by_prefix">ਦੁਆਰਾ: %1$s</string>
+    <string name="delete_admission">ਦਾਖਲਾ ਹਟਾਓ</string>
+    <string name="delete_admission_confirm">ਕੀ ਤੁਸੀਂ ਸੱਚਮੁੱਚ ਇਸ ਦਾਖਲਾ ਰਿਕਾਰਡ ਨੂੰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?</string>
+    <string name="edit_admission">ਦਾਖਲਾ ਸੋਧੋ</string>
+    <string name="update_admission">ਦਾਖਲਾ ਅਪਡੇਟ ਕਰੋ</string>
+
+    <!-- Happenings Screen -->
+    <string name="happenings_title">ਨੋਟਿਸ ਅਤੇ ਸਮਾਗਮ</string>
+    <string name="latest_updates">ਤਾਜ਼ਾ ਸਕੂਲ ਅਪਡੇਟਸ 📢</string>
+    <string name="no_notices">ਅੱਜ ਲਈ ਕੋਈ ਨਵਾਂ ਨੋਟਿਸ ਨਹੀਂ ਹੈ।</string>
+
+    <!-- Learning Screen -->
+    <string name="learning_center">ਸਿਖਲਾਈ ਕੇਂਦਰ</string>
+    <string name="my_courses">ਮੇਰੇ ਕੋਰਸ 📚</string>
+    <string name="study_material_empty">ਤੁਹਾਡੀ ਪੜ੍ਹਾਈ ਦੀ ਸਮੱਗਰੀ ਇੱਥੇ ਦਿਖਾਈ ਦੇਵੇਗੀ।</string>
+
+    <!-- Reports Screen -->
+    <string name="performance_reports">ਪ੍ਰਦਰਸ਼ਨ ਰਿਪੋਰਟਾਂ</string>
+    <string name="academic_progress">ਅਕਾਦਮਿਕ ਪ੍ਰਗਤੀ 📊</string>
+    <string name="report_cards_status">ਪ੍ਰੀਖਿਆਵਾਂ ਤੋਂ ਬਾਅਦ ਰਿਪੋਰਟ ਕਾਰਡ ਉਪਲਬਧ ਹੋਣਗੇ।</string>
+
+    <!-- Terms Screen -->
+    <string name="privacy_policy">ਪ੍ਰਾਈਵੇਸੀ ਪਾਲਿਸੀ</string>
+    <string name="privacy_content">ਅਸੀਂ ਤੁਹਾਡੀ ਪ੍ਰਾਈਵੇਸੀ ਦਾ ਸਤਿਕਾਰ ਕਰਦੇ ਹਾਂ। ਤੁਹਾਡਾ ਸਾਰਾ ਡਾਟਾ ਸਾਡੇ ਸਕੂਲ ਪ੍ਰਬੰਧਨ ਸਿਸਟਮ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਸਟੋਰ ਕੀਤਾ ਗਿਆ ਹੈ।</string>
+    <string name="terms_of_service">ਸੇਵਾ ਦੀਆਂ ਸ਼ਰਤਾਂ</string>
+    <string name="terms_content">MarkMyDay ਦੀ ਵਰਤੋਂ ਕਰਕੇ, ਤੁਸੀਂ ਸਾਡੀ ਸੰਸਥਾ ਦੇ ਨਿਯਮਾਂ ਦੀ ਪਾਲਣਾ ਕਰਨ ਲਈ ਸਹਿਮਤ ਹੁੰਦੇ ਹੋ।</string>
+
+    <!-- About Screen -->
+    <string name="app_version">ਵਰਜਨ %1$s</string>
+    <string name="about_content">MarkMyDay ਇੱਕ ਵਿਆਪਕ ਸਕੂਲ ਪ੍ਰਬੰਧਨ ਪ੍ਰਣਾਲੀ ਹੈ ਜੋ ਪ੍ਰਸ਼ਾਸਕਾਂ, ਅਧਿਆਪਕਾਂ ਅਤੇ ਵਿਦਿਆਰਥੀਆ ਵਿਚਕਾਰ ਸੰਚਾਰ ਨੂੰ ਸੁਚਾਰੂ ਬਣਾਉਣ ਲਈ ਤਿਆਰ ਕੀਤੀ ਗਈ ਹੈ।</string>
+
+    <!-- Authentication Screen -->
+    <string name="learning_adventure">ਆਓ ਆਪਣੀ ਸਿੱਖਣ ਦੀ ਯਾਤਰਾ ਸ਼ੁਰੂ ਕਰੀਏ</string>
+    <string name="start_learning">ਸਿੱਖਣਾ ਸ਼ੁਰੂ ਕਰੋ</string>
+    <string name="welcome_back">ਜੀ ਆਇਆਂ ਨੂੰ!</string>
+    <string name="sign_in_continue">ਆਪਣੀ ਯਾਤਰਾ ਜਾਰੀ ਰੱਖਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ</string>
+    <string name="user_id">ਯੂਜ਼ਰ ਆਈਡੀ</string>
+    <string name="email">ਈਮੇਲ</string>
+    <string name="password">ਪਾਸਵਰਡ</string>
+    <string name="forgot_password">ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?</string>
+    <string name="login_button">ਲੌਗਇਨ</string>
+    <string name="logging_in">ਤੁਹਾਨੂੰ ਲੌਗਇਨ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...</string>
+    <string name="dont_know_details">ਵੇਰਵੇ ਨਹੀਂ ਪਤਾ? </string>
+    <string name="forget_credentials">ਕ੍ਰੇਡੈਂਸ਼ੀਅਲ ਭੁੱਲ ਗਏ</string>
+    <string name="error_empty_fields">ਕਿਰਪਾ ਕਰਕੇ ਯੂਜ਼ਰ ਆਈਡੀ ਅਤੇ ਪਾਸਵਰਡ ਦਰਜ ਕਰੋ</string>
+    <string name="feature_coming_soon">ਇਹ ਸਹੂਲਤ ਜਲਦੀ ਆ ਰਹੀ ਹੈ</string>
+
+    <!-- Add Staff Screen -->
+    <string name="staff_added_success">ਯੂਜ਼ਰ ਆਈਡੀ ਦੇ ਨਾਲ ਅਧਿਆਪਕ ਜੋੜਿਆ ਗਿਆ: %1$s</string>
+    <string name="add_new_staff">ਅਧਿਆਪਕ ਰਜਿਸਟ੍ਰੇਸ਼ਨ</string>
+    <string name="error_title">ਗਲਤੀ</string>
+    <string name="ok">ਠੀਕ ਹੈ</string>
+    <string name="cancel">ਰੱਦ ਕਰੋ</string>
+    <string name="age_limit_error">ਉਮਰ 100 ਸਾਲ ਜਾਂ ਇਸ ਤੋਂ ਘੱਟ ਹੋਣੀ ਚਾਹੀਦੀ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਸਹੀ ਮਿਤੀ ਚੁਣੋ।</string>
+    <string name="teacher_registration">ਅਧਿਆਪਕ ਰਜਿਸਟ੍ਰੇਸ਼ਨ</string>
+    <string name="fields_completed">%1$d / %2$d ਲੋੜੀਂਦੇ ਖੇਤਰ ਪੂਰੇ ਹੋਏ</string>
+    <string name="full_name">ਪੂਰਾ ਨਾਮ</string>
+    <string name="age_auto">ਉਮਰ (ਆਪਣੇ ਆਪ)</string>
+    <string name="date_of_birth">ਜਨਮ ਮਿਤੀ</string>
+    <string name="pick_date">ਮਿਤੀ ਚੁਣੋ</string>
+    <string name="email_address">ਈਮੇਲ ਪਤਾ</string>
+    <string name="primary_subject">ਮੁੱਖ ਵਿਸ਼ਾ</string>
+    <string name="home_section">ਹੋਮ ਸੈਕਸ਼ਨ</string>
+    <string name="classes_taught">ਪੜ੍ਹਾਏ ਜਾਣ ਵਾਲੇ ਵਿਸ਼ੇ</string>
+    <string name="submit">ਜਮ੍ਹਾਂ ਕਰੋ</string>
+    <string name="class_format">ਕਲਾਸ %1$d</string>
+    <string name="gender">ਲਿੰਗ</string>
+    <string name="male">ਪੁਰਸ਼</string>
+    <string name="female">ਇਸਤਰੀ</string>
+    <string name="primary">ਪ੍ਰਾਇਮਰੀ</string>
+    <string name="secondary">ਸੈਕੰਡਰੀ</string>
+    <string name="high_school">ਹਾਈ ਸਕੂਲ</string>
+    <string name="adding_data_to_db">ਡਾਟਾਬੇਸ ਵਿੱਚ ਡਾਟਾ ਜੋੜਿਆ ਜਾ ਰਿਹਾ ਹੈ</string>
+    <string name="subject_telugu">ਤੇਲਗੂ</string>
+    <string name="subject_hindi">ਹਿੰਦੀ</string>
+    <string name="subject_english">ਅੰਗਰੇਜ਼ੀ</string>
+    <string name="subject_math">ਗਣਿਤ</string>
+    <string name="subject_science">ਵਿਗਿਆਨ</string>
+    <string name="subject_social">ਸਮਾਜਿਕ ਸਿੱਖਿਆ</string>
+    <string name="subject_physics">ਭੌਤਿਕ ਵਿਗਿਆਨ</string>
+    <string name="subject_biology">ਜੀਵ ਵਿਗਿਆਨ</string>
+    <string name="subject_japanese">ਜਾਪਾਨੀ</string>
+
+    <!-- Create Timetable -->
+    <string name="create_timetable_title">ਸਮਾਂ ਸਾਰਣੀ ਬਣਾਓ</string>
+    <string name="step_1_name">ਹੋਮ ਟੀਚਰ ਜੋੜੋ</string>
+    <string name="step_2_name">ਵਿਦਿਆਰਥੀ ਜੋੜੋ</string>
+    <string name="step_3_name">ਸਮਾਂ ਸਾਰਣੀ ਸੋਧੋ</string>
+    <string name="next">ਅਗਲਾ</string>
+    <string name="select_teacher">ਅਧਿਆਪਕ ਚੁਣੋ</string>
     <string name="add_teacher">ਅਧਿਆਪਕ ਜੋੜੋ</string>
-    <string name="edit_teacher">ਅਧਿਆਪਕ ਨੂੰ ਸੰਪਾਦਿਤ ਕਰੋ</string>
+    <string name="edit_teacher">ਅਧਿਆਪਕ ਸੋਧੋ</string>
+    <string name="teacher_name_label">ਨਾਮ: %1$s</string>
+    <string name="primary_subject_label">ਮੁੱਖ ਵਿਸ਼ਾ: %1$s</string>
+    <string name="category_label_simple">ਸ਼੍ਰੇਣੀ: %1$s</string>
+    <string name="home_teacher_assigned">ਹੋਮ ਟੀਚਰ ਸਫਲਤਾਪੂਰਵਕ ਨਿਯੁਕਤ ਕੀਤਾ ਗਿਆ</string>
+    <string name="loading_step">ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...</string>
+    <string name="select_students_title">%1$s ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਚੋਣ ਕਰੋ</string>
+    <string name="list_of_students">ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਸੂਚੀ</string>
+    <string name="home_teacher_label">HT: %1$s</string>
+    <string name="student_count">%1$d ਵਿਦਿਆਰਥੀ</string>
+
+    <!-- Add Student Screen -->
+    <string name="student_added_success">ਵਿਦਿਆਰਥੀ ਸਫਲਤਾਪੂਰਵਕ ਜੋੜਿਆ ਗਿਆ! ਦਾਖਲਾ ਨੰਬਰ: %1$s</string>
+    <string name="add_new_student">ਵਿਦਿਆਰਥੀ ਰਜਿਸਟ੍ਰੇਸ਼ਨ</string>
+    <string name="registration_error">ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਗਲਤੀ</string>
+    <string name="student_registration">ਵਿਦਿਆਰਥੀ ਰਜਿਸਟ੍ਰੇਸ਼ਨ</string>
+    <string name="dob_label">ਜਨਮ ਮਿਤੀ</string>
+    <string name="email_optional">ਈਮੇਲ (ਵਿਕਲਪਿਕ)</string>
+    <string name="select_class">ਕਲਾਸ</string>
+    <string name="select_section">ਸੈਕਸ਼ਨ ਚੁਣੋ</string>
+    <string name="error_enter_student_name">ਕਿਰਪਾ ਕਰਕੇ ਵਿਦਿਆਰਥੀ ਦਾ ਨਾਮ ਦਰਜ ਕਰੋ</string>
+    <string name="error_select_class">ਕਿਰਪਾ ਕਰਕੇ ਕਲਾਸ ਚੁਣੋ</string>
+    <string name="error_select_dob">ਕਿਰਪਾ ਕਰਕੇ ਜਨਮ ਮਿਤੀ ਚੁਣੋ</string>
+    <string name="error_registration_failed">ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਅਸਫਲ ਰਹੀ</string>
+    <string name="error_invalid_dob_format">ਗਲਤ ਜਨਮ ਮਿਤੀ ਫਾਰਮੈਟ। 8 ਅੰਕਾਂ (ddMMyyyy) ਦੀ ਲੋੜ ਸੀ।</string>
+    <string name="error_login_failed">ਲੌਗਇਨ ਅਸਫਲ ਰਿਹਾ। ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੇ ਵੇਰਵਿਆਂ ਦੀ ਜਾਂਚ ਕਰੋ।</string>
+    <string name="error_user_not_found">ਯੂਜ਼ਰ ਪ੍ਰੋਫਾਈਲ ਨਹੀਂ ਮਿਲਿਆ।</string>
+    <string name="error_unknown">ਇੱਕ ਅਣਜਾਣ ਗਲਤੀ ਹੋਈ</string>
+    <string name="mother_name">ਮਾਤਾ ਦਾ ਨਾਮ</string>
+    <string name="mother_phone">ਮਾਤਾ ਦਾ ਫੋਨ</string>
+    <string name="father_name">ਪਿਤਾ ਦਾ ਨਾਮ</string>
+    <string name="father_phone">ਪਿਤਾ ਦਾ ਫੋਨ</string>
+    <string name="error_parent_details">ਘੱਟੋ-ਘੱਟ ਇੱਕ ਮਾਪੇ ਦਾ ਵੇਰਵਾ ਲਾਜ਼ਮੀ ਹੈ</string>
+    <string name="adding_to_database">ਡਾਟਾਬੇਸ ਵਿੱਚ ਡਾਟਾ ਜੋੜਿਆ ਜਾ ਰਿਹਾ ਹੈ</string>
+
+
+    <!-- Staff Management Screen -->
+    <string name="delete_staff">ਸਟਾਫ ਹਟਾਓ</string>
+    <string name="delete_confirmation">ਕੀ ਤੁਸੀਂ ਸੱਚਮੁੱਚ %1$s ਨੂੰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?</string>
+    <string name="delete">ਹਟਾਓ</string>
+    <string name="edit_staff_details">ਸਟਾਫ ਦਾ ਵੇਰਵਾ ਸੋਧੋ</string>
+    <string name="search_placeholder">ਨਾਮ ਜਾਂ ਆਈਡੀ ਰਾਹੀਂ ਖੋਜੋ</string>
+    <string name="staff_list_title">ਅਧਿਆਪਕਾਂ ਦੀ ਸੂਚੀ</string>
+    <string name="category_label">ਸ਼੍ਰੇਣੀ: %1$s</string>
+    <string name="name_simple">ਨਾਮ</string>
+    <string name="subject_simple">ਵਿਸ਼ਾ</string>
+    <string name="category_simple">ਸ਼੍ਰੇਣੀ</string>
+    <string name="search_instruction">ਵੇਰਵੇ ਦੇਖਣ ਲਈ ਸਟਾਫ ਦੀ ਖੋਜ ਕਰੋ</string>
+    <string name="id_label">ਆਈਡੀ: %1$s</string>
+    <string name="edit">ਸੋਧੋ</string>
+
+    <!-- Attendance Screen -->
+    <string name="attendance_success">ਹਾਜ਼ਰੀ ਸਫਲਤਾਪੂਰਵਕ ਜਮ੍ਹਾਂ ਹੋ ਗਈ!</string>
+    <string name="submit_attendance">ਹਾਜ਼ਰੀ ਜਮ੍ਹਾਂ ਕਰੋ</string>
+    <string name="no_classes_assigned">ਤੁਹਾਨੂੰ ਕੋਈ ਕਲਾਸ ਨਹੀਂ ਦਿੱਤੀ ਗਈ।</string>
+    <string name="no_students_found">%1$s ਲਈ ਕੋਈ ਵਿਦਿਆਰਥੀ ਨਹੀਂ ਮਿਲਿਆ।</string>
+    <string name="present">ਹਾਜ਼ਰ</string>
+    <string name="absent">ਗੈਰ-ਹਾਜ਼ਰ</string>
+
+    <!-- Global Updates Screen -->
+    <string name="title_global_updates">ਗਲੋਬਲ ਅਪਡੇਟਸ</string>
+    <string name="hot_news">ਤਾਜ਼ਾ ਖ਼ਬਰਾਂ</string>
+    <string name="more_updates">ਹੋਰ ਅਪਡੇਟਸ 📰</string>
+
+    <!-- Role Selector Screen -->
+    <string name="app_tagline">ਤੁਹਾਡਾ ਸਕੂਲ, ਸੌਖਾ ਪ੍ਰਬੰਧਨ</string>
+    <string name="continue_as">ਵਜੋਂ ਜਾਰੀ ਰੱਖੋ</string>
+    <string name="role_student">ਵਿਦਿਆਰਥੀ</string>
+    <string name="student_desc">ਹਾਜ਼ਰੀ, ਅੰਕ ਅਤੇ ਹੋਰ ਦੇਖੋ</string>
+    <string name="role_teacher">ਅਧਿਆਪਕ</string>
+    <string name="teacher_desc">ਕਲਾਸਾਂ ਅਤੇ ਅਸਾਈਨਮੈਂਟਸ ਦਾ ਪ੍ਰਬੰਧ ਕਰੋ</string>
+    <string name="role_admin">ਪ੍ਰਸ਼ਾਸਕ</string>
+    <string name="admin_desc">ਪੂਰਾ ਸਕੂਲ ਹਬ ਪ੍ਰਬੰਧਨ</string>
 </resources>
