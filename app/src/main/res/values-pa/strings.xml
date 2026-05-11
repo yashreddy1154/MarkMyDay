@@ -263,4 +263,22 @@
     <string name="teacher_desc">ਕਲਾਸਾਂ ਅਤੇ ਅਸਾਈਨਮੈਂਟਸ ਦਾ ਪ੍ਰਬੰਧ ਕਰੋ</string>
     <string name="role_admin">ਪ੍ਰਸ਼ਾਸਕ</string>
     <string name="admin_desc">ਪੂਰਾ ਸਕੂਲ ਹਬ ਪ੍ਰਬੰਧਨ</string>
+    <!-- Global Updates Screen Dummy Data -->
+    <string name="dummy_news_title_1">ਨਵੀਂ ਸਿੱਖਿਆ ਨੀਤੀ ਦਾ ਐਲਾਨ</string>
+    <string name="dummy_news_desc_1">ਭਾਰਤ ਨੇ ਸਕੂਲਾਂ ਲਈ ਨਵੇਂ ਡਿਜੀਟਲ ਸਿੱਖਿਆ ਸੁਧਾਰ ਪੇਸ਼ ਕੀਤੇ ਹਨ...</string>
+    <string name="dummy_news_title_2">ਸਕੂਲਾਂ ਵਿੱਚ ਏਆਈ (AI)</string>
+    <string name="dummy_news_desc_2">ਸਕੂਲ ਸ਼ੁਰੂਆਤੀ ਕਲਾਸਾਂ ਲਈ ਏਆਈ ਨੂੰ ਇੱਕ ਵਿਸ਼ੇ ਵਜੋਂ ਪੇਸ਼ ਕਰ ਰਹੇ ਹਨ...</string>
+    <string name="dummy_news_title_3">ਪ੍ਰੀਖਿਆ ਪੈਟਰਨ ਵਿੱਚ ਬਦਲਾਅ</string>
+    <string name="dummy_news_desc_3">CBSE ਨੇ 2026 ਅਕਾਦਮਿਕ ਸਾਲ ਲਈ ਪ੍ਰੀਖਿਆ ਪੈਟਰਨ ਅਪਡੇਟ ਕੀਤਾ ਹੈ...</string>
+    <string name="dummy_news_title_4">ਡਿਜੀਟਲ ਲਾਇਬ੍ਰੇਰੀ ਤੱਕ ਪਹੁੰਚ</string>
+    <string name="dummy_news_desc_4">ਵਿਦਿਆਰਥੀਆਂ ਨੂੰ ਰਾਸ਼ਟਰੀ ਡਿਜੀਟਲ ਲਾਇਬ੍ਰੇਰੀ ਤੱਕ ਮੁਫਤ ਪਹੁੰਚ ਮਿਲੇਗੀ...</string>
+    <string name="dummy_news_title_5">ਗਰਮੀਆਂ ਦੀਆਂ ਛੁੱਟੀਆਂ 2024</string>
+    <string name="dummy_news_desc_5">ਆਉਣ ਵਾਲੀਆਂ ਗਰਮੀਆਂ ਦੀਆਂ ਛੁੱਟੀਆਂ ਦਾ ਅਧਿਕਾਰਤ ਸ਼ਡਿਊਲ ਜਾਰੀ ਕਰ ਦਿੱਤਾ ਗਿਆ ਹੈ।</string>
+    <string name="dummy_news_title_6">ਸਪੋਰਟਸ ਮੀਟ 2024</string>
+    <string name="dummy_news_desc_6">ਸਾਲਾਨਾ ਅੰਤਰ-ਸਕੂਲ ਖੇਡ ਮੁਕਾਬਲੇ ਅਗਲੇ ਮਹੀਨੇ ਸ਼ੁਰੂ ਹੋਣਗੇ।</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard_title">ਲੀਡਰਬੋਰਡ</string>
+    <string name="privacy_placeholder">---</string>
+    <string name="score_format">%1$d/%2$d</string>
 </resources>
