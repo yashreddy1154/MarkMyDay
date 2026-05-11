@@ -36,6 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.viewmodel.NotificationViewModel
 import com.project.markmyday.viewmodel.EngagementViewModel
@@ -63,6 +66,8 @@ fun TeacherDashboard(
         }
     }
 
+    var searchQuery by remember { androidx.compose.runtime.mutableStateOf("") }
+
     val teacherTiles = listOf(
         DashboardTile("attendance", stringResource(R.string.tile_mark_attendance), Icons.Default.Checklist, badgeText = "80%"),
         DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
@@ -75,7 +80,7 @@ fun TeacherDashboard(
         DashboardTile("course_manager", stringResource(R.string.tile_course_manager), Icons.Default.VideoLibrary),
         DashboardTile("messages", stringResource(R.string.tile_messages), Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
-    )
+    ).filter { it.label.contains(searchQuery, ignoreCase = true) }
 
     val timetable = listOf(
         TimetableEntry("Mobile Dev", "CS402", "09:00 - 10:00 AM", "Room 302"),
@@ -90,7 +95,8 @@ fun TeacherDashboard(
                 icon = Icons.Default.CastForEducation,
                 title = stringResource(R.string.teacher_hub),
                 onNotificationClick = onNotificationClick,
-                notificationCount = if (hasUnread) 1 else 0
+                notificationCount = if (hasUnread) 1 else 0,
+                onProfileClick = { onTileClick("settings") }
             )
         },
         bottomBar = {
@@ -113,6 +119,11 @@ fun TeacherDashboard(
                     role = "$homeSection • $subject",
                     icon = Icons.Default.CastForEducation
                 )
+            }
+
+            // 1.5 Search Bar
+            item(span = { GridItemSpan(2) }) {
+                SearchBar(query = searchQuery, onQueryChange = { searchQuery = it })
             }
 
             // 2. Banner

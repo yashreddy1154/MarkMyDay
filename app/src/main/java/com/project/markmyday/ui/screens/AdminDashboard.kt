@@ -119,7 +119,8 @@ fun AdminDashboard(
                 icon = Icons.Default.AutoGraph,
                 title = stringResource(R.string.app_name),
                 onNotificationClick = onNotificationClick,
-                notificationCount = if (hasUnread) 1 else 0
+                notificationCount = if (hasUnread) 1 else 0,
+                onProfileClick = { onTileClick("settings") }
             )
         },
         bottomBar = {
@@ -265,7 +266,7 @@ fun AdminDashboard(
 
             // Enhanced Search Bar
             item(span = { GridItemSpan(2) }) {
-                SearchBarEnhanced(
+                SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it }
                 )

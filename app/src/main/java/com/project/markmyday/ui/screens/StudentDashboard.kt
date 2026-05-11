@@ -66,6 +66,8 @@ fun StudentDashboard(
         currentSubScreen = "home"
     }
 
+    var searchQuery by remember { mutableStateOf("") }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -74,23 +76,20 @@ fun StudentDashboard(
                     icon = Icons.Default.Face,
                     title = stringResource(R.string.my_school_life),
                     onNotificationClick = onNotificationClick,
-                    notificationCount = if (hasUnread) 1 else 0
+                    notificationCount = if (hasUnread) 1 else 0,
+                    onProfileClick = { onTileClick("settings") }
                 )
-                "attendance" -> TopAppBar(
-                    title = { Text(stringResource(R.string.tile_attendance), fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = { currentSubScreen = "home" }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                        }
-                    }
+                "attendance" -> DashboardTopBar(
+                    title = stringResource(R.string.tile_attendance),
+                    onNotificationClick = onNotificationClick,
+                    notificationCount = if (hasUnread) 1 else 0,
+                    onBackClick = { currentSubScreen = "home" }
                 )
-                "leave" -> TopAppBar(
-                    title = { Text(stringResource(R.string.tile_leave), fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = { currentSubScreen = "home" }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                        }
-                    }
+                "leave" -> DashboardTopBar(
+                    title = stringResource(R.string.tile_leave),
+                    onNotificationClick = onNotificationClick,
+                    notificationCount = if (hasUnread) 1 else 0,
+                    onBackClick = { currentSubScreen = "home" }
                 )
             }
         },
@@ -104,17 +103,22 @@ fun StudentDashboard(
                 .fillMaxSize()
         ) {
             when (currentSubScreen) {
-                "home" -> StudentDashboardHomeContent(
-                    userName = userName,
-                    userRole = userRole,
-                    onTileClick = { id ->
-                        when (id) {
-                            "attendance" -> currentSubScreen = "attendance"
-                            "leave" -> currentSubScreen = "leave"
-                            else -> onTileClick(id)
+                "home" -> {
+                    SearchBar(query = searchQuery, onQueryChange = { searchQuery = it })
+                    Spacer(modifier = Modifier.height(8.dp))
+                    StudentDashboardHomeContent(
+                        userName = userName,
+                        userRole = userRole,
+                        searchQuery = searchQuery,
+                        onTileClick = { id ->
+                            when (id) {
+                                "attendance" -> currentSubScreen = "attendance"
+                                "leave" -> currentSubScreen = "leave"
+                                else -> onTileClick(id)
+                            }
                         }
-                    }
-                )
+                    )
+                }
                 "attendance" -> StudentAttendanceDashboardScreen(onBack = { currentSubScreen = "home" })
                 "leave" -> LeaveScreen(onBack = { currentSubScreen = "home" })
             }
@@ -126,6 +130,7 @@ fun StudentDashboard(
 fun StudentDashboardHomeContent(
     userName: String,
     userRole: String,
+    searchQuery: String = "",
     onTileClick: (String) -> Unit
 ) {
     val studentTiles = listOf(
@@ -138,7 +143,7 @@ fun StudentDashboardHomeContent(
         DashboardTile("leaderboard", stringResource(R.string.leaderboard_title), Icons.Default.Leaderboard),
         DashboardTile("fees", stringResource(R.string.tile_fees), Icons.Default.Payments),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
-    )
+    ).filter { it.label.contains(searchQuery, ignoreCase = true) }
 
     val timetable = listOf(
         TimetableEntry("Mathematics", "MA101", "09:00 - 10:00 AM", "Room 101"),

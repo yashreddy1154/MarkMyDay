@@ -61,7 +61,8 @@ fun CourseLibraryScreen(
             DashboardTopBar(
                 title = stringResource(R.string.learning_center),
                 icon = Icons.Default.School,
-                onNotificationClick = onNotificationClick
+                onNotificationClick = onNotificationClick,
+                onProfileClick = { onNavigate("settings") }
             )
         },
         bottomBar = {
