@@ -156,91 +156,56 @@ fun StudentDashboardHomeContent(
     ) {
         // 1. Welcome Header
         item(span = { GridItemSpan(2) }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(2.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Hello, $userName",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "$userRole • ${getCurrentDate()}",
-                            fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Surface(
-                        modifier = Modifier.size(56.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = "Avatar",
-                            modifier = Modifier.padding(12.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
+            WelcomeSection(
+                name = userName,
+                role = userRole,
+                date = getCurrentDate(),
+                icon = Icons.Default.School
+            )
         }
 
         // 2. Banner
         item(span = { GridItemSpan(2) }) {
             Card(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary
-                                )
-                            )
-                        )
-                        .padding(20.dp)
+                        .padding(24.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 stringResource(R.string.keep_learning),
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 stringResource(R.string.assignments_due),
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 13.sp
+                                color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f),
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        Icon(
-                            Icons.Default.RocketLaunch,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
-                            modifier = Modifier.size(40.dp)
-                        )
+                        Surface(
+                            modifier = Modifier.size(50.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.15f)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    Icons.Default.RocketLaunch,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSecondary,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }

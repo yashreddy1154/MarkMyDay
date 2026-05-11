@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.project.markmyday.R
-import com.project.markmyday.ui.theme.BadgeRed
 import com.project.markmyday.ui.models.DashboardTile
 import com.project.markmyday.ui.models.TimetableEntry
 
@@ -53,26 +52,27 @@ fun DashboardTopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                        RoundedCornerShape(16.dp)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                        RoundedCornerShape(20.dp)
                     )
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 20.dp, vertical = 10.dp)
             ) {
                 if (icon != null) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(24.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                 }
                 Text(
                     title, 
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.primary,
-                    letterSpacing = 1.sp
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 0.5.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         },
@@ -80,14 +80,9 @@ fun DashboardTopBar(
             Box(
                 modifier = Modifier
                     .padding(end = 16.dp)
-                    .size(44.dp)
+                    .size(48.dp)
                     .background(
-                        Brush.linearGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
-                            )
-                        ), 
+                        MaterialTheme.colorScheme.surface, 
                         CircleShape
                     )
                     .clickable { onNotificationClick() },
@@ -97,14 +92,14 @@ fun DashboardTopBar(
                     Icons.Default.Notifications, 
                     contentDescription = "Notifications",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(26.dp)
                 )
 
                 if (notificationCount > 0) {
                     Box(
                         modifier = Modifier
-                            .size(10.dp)
-                            .background(BadgeRed, CircleShape)
+                            .size(12.dp)
+                            .background(MaterialTheme.colorScheme.error, CircleShape)
                             .align(Alignment.TopEnd)
                             .offset(x = (-2).dp, y = 2.dp)
                     )
@@ -118,8 +113,8 @@ fun DashboardTopBar(
 fun WelcomeSection(
     name: String,
     role: String,
-    homeSection: String? = null,
-    subject: String? = null
+    date: String? = null,
+    icon: ImageVector = Icons.Default.Person
 ) {
     val decodedName = remember(name) { 
         try { java.net.URLDecoder.decode(name, "UTF-8") } catch (e: Exception) { name } 
@@ -127,69 +122,53 @@ fun WelcomeSection(
     val decodedRole = remember(role) { 
         try { java.net.URLDecoder.decode(role, "UTF-8") } catch (e: Exception) { role } 
     }
-    val decodedHomeSection = remember(homeSection) { 
-        homeSection?.let { try { java.net.URLDecoder.decode(it, "UTF-8") } catch (e: Exception) { it } }
-    }
-    val decodedSubject = remember(subject) { 
-        subject?.let { try { java.net.URLDecoder.decode(it, "UTF-8") } catch (e: Exception) { it } }
-    }
 
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                stringResource(id = R.string.hello), 
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                fontWeight = FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                Icons.Default.WavingHand, 
-                contentDescription = null, 
-                tint = Color(0xFFFFD600),
-                modifier = Modifier.size(18.dp)
-            )
-        }
-        Text(
-            decodedName, 
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Black,
-            color = MaterialTheme.colorScheme.onBackground,
-            letterSpacing = (-0.5).sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Surface(
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
-            shape = RoundedCornerShape(8.dp)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .background(MaterialTheme.colorScheme.primary, CircleShape)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    decodedRole, 
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary, 
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
-                )
-                if (decodedHomeSection != null || decodedSubject != null) {
-                    Text(
-                        " • ",
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        fontWeight = FontWeight.Bold
+                    text = "Hello, $decodedName! 👋",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                    Text(
-                        "${decodedHomeSection ?: ""} ${if (decodedSubject != null) "($decodedSubject)" else ""}",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = buildString {
+                        append(decodedRole)
+                        if (date != null) {
+                            append(" • ")
+                            append(date)
+                        }
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
+            Surface(
+                modifier = Modifier.size(60.dp),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "Profile",
+                        modifier = Modifier.size(30.dp),
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -222,8 +201,8 @@ fun TimetableSection(entries: List<TimetableEntry>) {
 @Composable
 fun TimetableCard(entry: TimetableEntry) {
     Card(
-        modifier = Modifier.width(220.dp),
-        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.width(260.dp),
+        shape = RoundedCornerShape(32.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -232,20 +211,37 @@ fun TimetableCard(entry: TimetableEntry) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        Brush.verticalGradient(
-                            listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
+                        Brush.horizontalGradient(
+                            listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
                         )
                     )
-                    .padding(16.dp)
+                    .padding(20.dp)
             ) {
                 Column {
-                    Text(entry.subject, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text(entry.code, color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(entry.subject, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                        Surface(
+                            color = Color.White.copy(alpha = 0.2f),
+                            shape = CircleShape
+                        ) {
+                            Text(
+                                entry.code, 
+                                color = Color.White, 
+                                fontSize = 10.sp, 
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Room, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(entry.room, color = Color.White, fontSize = 14.sp)
+                        Icon(Icons.Default.Room, contentDescription = null, tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(entry.room, color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
                     }
                 }
             }
@@ -253,13 +249,13 @@ fun TimetableCard(entry: TimetableEntry) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f))
-                    .padding(12.dp),
-                contentAlignment = Alignment.Center
+                    .padding(16.dp),
+                contentAlignment = Alignment.CenterStart
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AccessTime, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(entry.time, color = MaterialTheme.colorScheme.primary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.AccessTime, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(entry.time, color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
                 }
             }
         }
@@ -312,56 +308,62 @@ fun AnimatedDashboardTile(
                 indication = ripple(bounded = true, radius = 40.dp),
                 onClick = onClick
             ),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 6.dp
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 20.dp, horizontal = 8.dp),
+                .padding(vertical = 24.dp, horizontal = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = tile.icon,
-                    contentDescription = tile.label,
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                
-                if (tile.badgeCount != null || tile.badgeText != null) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .align(Alignment.TopEnd)
-                            .offset(x = 10.dp, y = (-5).dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = tile.badgeText ?: tile.badgeCount.toString(),
-                                color = Color.White,
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Black
-                            )
+            Surface(
+                modifier = Modifier.size(64.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = tile.icon,
+                        contentDescription = tile.label,
+                        modifier = Modifier.size(32.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    
+                    if (tile.badgeCount != null || tile.badgeText != null) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondary,
+                            shape = CircleShape,
+                            modifier = Modifier
+                                .size(22.dp)
+                                .align(Alignment.TopEnd)
+                                .offset(x = 6.dp, y = (-4).dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = tile.badgeText ?: tile.badgeCount.toString(),
+                                    color = MaterialTheme.colorScheme.onSecondary,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                            }
                         }
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = tile.label,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
             )

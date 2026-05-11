@@ -1,64 +1,208 @@
 package com.project.markmyday.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.markmyday.viewmodel.StudentAttendanceViewModel
-import com.project.markmyday.viewmodel.SubjectAttendance
+import com.project.markmyday.ui.theme.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentAttendanceDashboardScreen(
-    onBack: () -> Unit,
-    viewModel: StudentAttendanceViewModel = viewModel()
+    onBack: () -> Unit
 ) {
-    val attendanceStats by viewModel.attendanceStats.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("My Attendance", fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                title = { 
+                    Column {
+                        Text(
+                            "Hello, teja! 👋", 
+                            style = MaterialTheme.typography.titleLarge, 
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            "Ready to mark your attendance today?",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.primary)
+                    }
+                },
+                actions = {
+                    Surface(
+                        modifier = Modifier.padding(end = 16.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        color = PastelGreen
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Today: Present ✅", 
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = SuccessGreen
+                            )
+                        }
                     }
                 }
             )
         }
     ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // 1. Featured Punch Card
+            item {
+                AttendancePunchCard()
+            }
+
+            // 2. Stats Row
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    QuickStatCard(
+                        modifier = Modifier.weight(1f),
+                        value = "94%",
+                        label = "Overall Attendance",
+                        valueColor = MaterialTheme.colorScheme.primary
+                    )
+                    QuickStatCard(
+                        modifier = Modifier.weight(1f),
+                        value = "2 / 5",
+                        label = "Leaves Taken",
+                        valueColor = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
+            // 3. Recent Logs
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Recent Logs", 
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    TextButton(onClick = { /* View All */ }) {
+                        Text("View All", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
+            val logs = listOf(
+                AttendanceLogItem("Monday, May 11", "09:00 AM", "05:00 PM", "On Time"),
+                AttendanceLogItem("Friday, May 8", "09:05 AM", "05:10 PM", "Late"),
+                AttendanceLogItem("Thursday, May 7", "08:58 AM", "04:55 PM", "On Time")
+            )
+
+            items(logs) { log ->
+                LogItemRow(log)
+            }
+        }
+    }
+}
+
+@Composable
+fun AttendancePunchCard() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp),
+        shape = RoundedCornerShape(32.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-        ) {
-            if (isLoading && attendanceStats.isEmpty()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (attendanceStats.isEmpty()) {
-                Text(
-                    text = "No attendance records found.",
-                    modifier = Modifier.align(Alignment.Center),
-                    style = MaterialTheme.typography.bodyLarge
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary)
+                    )
                 )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "SHIFT / CLASS ATTENDANCE",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+
+                // Digital Clock
+                val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                Text(
+                    currentTime,
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(attendanceStats, key = { it.subject }) { stats ->
-                        SubjectAttendanceCard(stats = stats)
+                    Button(
+                        onClick = { /* Punch In */ },
+                        modifier = Modifier.weight(1f).height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text("PUNCH IN", fontWeight = FontWeight.ExtraBold, color = TextCharcoal)
+                    }
+                    OutlinedButton(
+                        onClick = { /* Punch Out */ },
+                        modifier = Modifier.weight(1f).height(56.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text("PUNCH OUT", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -67,74 +211,89 @@ fun StudentAttendanceDashboardScreen(
 }
 
 @Composable
-fun SubjectAttendanceCard(stats: SubjectAttendance) {
-    val percentageDisplay = (stats.percentage * 100).toInt()
-    val progressColor = when {
-        percentageDisplay >= 85 -> MaterialTheme.colorScheme.primary
-        percentageDisplay >= 75 -> Color(0xFF4CAF50) // Green
-        else -> MaterialTheme.colorScheme.error
-    }
-
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(4.dp)
+fun QuickStatCard(
+    modifier: Modifier = Modifier,
+    value: String,
+    label: String,
+    valueColor: Color
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
+            modifier = Modifier.padding(20.dp),
+            horizontalAlignment = Alignment.Start
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Text(
+                value,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Black,
+                color = valueColor
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+data class AttendanceLogItem(
+    val date: String,
+    val inTime: String,
+    val outTime: String,
+    val status: String
+)
+
+@Composable
+fun LogItemRow(log: AttendanceLogItem) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+                color = if (log.status == "On Time") PastelGreen else PastelYellow
             ) {
-                Text(
-                    text = stats.subject,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "$percentageDisplay%",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = progressColor
+                Icon(
+                    imageVector = if (log.status == "On Time") Icons.Default.CheckCircle else Icons.Default.AccessTime,
+                    contentDescription = null,
+                    modifier = Modifier.padding(12.dp),
+                    tint = if (log.status == "On Time") SuccessGreen else Color(0xFFF5B316)
                 )
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            LinearProgressIndicator(
-                progress = { stats.percentage },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(10.dp),
-                color = progressColor,
-                trackColor = progressColor.copy(alpha = 0.2f),
-                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(log.date, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
                 Text(
-                    text = "Attended ${stats.attended} of ${stats.total} classes",
-                    style = MaterialTheme.typography.bodyMedium,
+                    "In: ${log.inTime} | Out: ${log.outTime}",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
-                if (percentageDisplay < 75) {
-                    Text(
-                        text = "Low Attendance",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+            }
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (log.status == "On Time") SuccessGreen.copy(alpha = 0.1f) else Color(0xFFF5B316).copy(alpha = 0.1f)
+            ) {
+                Text(
+                    log.status,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = if (log.status == "On Time") SuccessGreen else Color(0xFFF5B316)
+                )
             }
         }
     }
