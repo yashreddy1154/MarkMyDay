@@ -22,6 +22,7 @@ sealed class TimetableState {
 class TimetableViewModel(
     private val teacherRepository: TeacherRepository = TeacherRepository(),
     private val studentRepository: StudentRepository = StudentRepository(),
+    private val timetableRepository: com.project.markmyday.data.repository.TimetableRepository = com.project.markmyday.data.repository.TimetableRepository(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : ViewModel() {
 
@@ -36,6 +37,15 @@ class TimetableViewModel(
 
     private val _allStudents = MutableStateFlow<List<Student>>(emptyList())
     val allStudents: StateFlow<List<Student>> = _allStudents.asStateFlow()
+
+    private val _allTimetables = MutableStateFlow<List<Timetable>>(emptyList())
+    val allTimetables: StateFlow<List<Timetable>> = _allTimetables.asStateFlow()
+
+    private val _selectedClassName = MutableStateFlow<String?>(null)
+    val selectedClassName: StateFlow<String?> = _selectedClassName.asStateFlow()
+
+    private val _selectedDay = MutableStateFlow("Monday")
+    val selectedDay: StateFlow<String> = _selectedDay.asStateFlow()
 
     // Key: Class name (e.g., "Class 1"), Value: Selected Teacher
     private val _classTeacherAssignments = MutableStateFlow<Map<String, Teacher?>>(
@@ -52,7 +62,7 @@ class TimetableViewModel(
     init {
         fetchTeachers()
         fetchStudents()
-        loadExistingAssignments()
+        fetchTimetables()
     }
 
     private fun fetchTeachers() {
@@ -82,15 +92,15 @@ class TimetableViewModel(
         }
     }
 
-    private fun loadExistingAssignments() {
+    private fun fetchTimetables() {
         viewModelScope.launch {
-            try {
-                val snapshot = firestore.collection("timetable").get().await()
-                val existing = snapshot.toObjects(Timetable::class.java)
+            timetableRepository.getAllTimetables().collect { timetables ->
+                _allTimetables.value = timetables
+                
                 val currentTeacherAssignments = _classTeacherAssignments.value.toMutableMap()
                 val currentStudentAssignments = _classStudentAssignments.value.toMutableMap()
                 
-                existing.forEach { timetable ->
+                timetables.forEach { timetable ->
                     val teacher = _allTeachers.value.find { it.teacherId == timetable.homeTeacherId }
                     if (teacher != null) {
                         currentTeacherAssignments[timetable.className] = teacher
@@ -101,8 +111,97 @@ class TimetableViewModel(
                 }
                 _classTeacherAssignments.value = currentTeacherAssignments
                 _classStudentAssignments.value = currentStudentAssignments
+            }
+        }
+    }
+
+    fun selectClass(className: String) {
+        _selectedClassName.value = className
+        // No longer changing step here, as it's part of Step 3 UI
+    }
+
+    fun selectDay(day: String) {
+        _selectedDay.value = day
+    }
+
+    fun isTeacherBusy(teacherId: String, day: String, periodNumber: Int): Boolean {
+        return _allTimetables.value.any { timetable ->
+            val daySchedule = timetable.weeklySchedule[day]
+            daySchedule?.periods?.any { it.periodNumber == periodNumber && it.teacherId == teacherId } ?: false
+        }
+    }
+
+    fun getSubjectQuotas(className: String): Map<String, Pair<Int, Int>> {
+        val timetable = _allTimetables.value.find { it.className == className } ?: return emptyMap()
+        val counts = mutableMapOf<String, Int>()
+        
+        timetable.weeklySchedule.values.forEach { daySchedule ->
+            daySchedule.periods.forEach { period ->
+                if (period.subject.isNotBlank()) {
+                    counts[period.subject] = counts.getOrDefault(period.subject, 0) + 1
+                }
+            }
+        }
+
+        // Target quotas from the model if available, otherwise defaults
+        val targets: Map<String, Int> = if (timetable.weeklyQuota.isNotEmpty()) {
+            timetable.weeklyQuota.mapValues { it.value.classCount }
+        } else {
+            mapOf(
+                "Math" to 7,
+                "Telugu" to 6,
+                "English" to 6,
+                "Science" to 5,
+                "Social" to 5,
+                "Hindi" to 5
+            )
+        }
+
+        return targets.mapValues { (subject, target) ->
+            counts.getOrDefault(subject, 0) to target
+        }
+    }
+
+    fun savePeriod(
+        className: String,
+        day: String,
+        periodNumber: Int,
+        startTime: String,
+        endTime: String,
+        subject: String,
+        teacher: Teacher?
+    ) {
+        viewModelScope.launch {
+            _state.value = TimetableState.Loading
+            try {
+                val currentTimetable = _allTimetables.value.find { it.className == className } ?: Timetable(className = className)
+                val currentWeeklySchedule = currentTimetable.weeklySchedule.toMutableMap()
+                val currentDaySchedule = currentWeeklySchedule[day] ?: com.project.markmyday.data.model.DaySchedule()
+                val currentPeriods = currentDaySchedule.periods.toMutableList()
+                
+                val existingPeriodIndex = currentPeriods.indexOfFirst { it.periodNumber == periodNumber }
+                val newPeriod = com.project.markmyday.data.model.Period(
+                    periodNumber = periodNumber,
+                    startTime = startTime,
+                    endTime = endTime,
+                    subject = subject,
+                    teacherId = teacher?.teacherId ?: "",
+                    teacherName = teacher?.name ?: ""
+                )
+
+                if (existingPeriodIndex != -1) {
+                    currentPeriods[existingPeriodIndex] = newPeriod
+                } else {
+                    currentPeriods.add(newPeriod)
+                }
+
+                currentWeeklySchedule[day] = currentDaySchedule.copy(periods = currentPeriods.sortedBy { it.periodNumber })
+                val updatedTimetable = currentTimetable.copy(weeklySchedule = currentWeeklySchedule)
+                
+                timetableRepository.updateTimetable(updatedTimetable)
+                _state.value = TimetableState.Success
             } catch (e: Exception) {
-                // Handle error
+                _state.value = TimetableState.Error(e.localizedMessage ?: "Failed to save period")
             }
         }
     }
@@ -207,8 +306,25 @@ class TimetableViewModel(
     }
 
     fun goToStep(step: Int) {
-        if (step in 1..3 && step <= _currentStep.value) {
+        if (step in 1..3) {
             _currentStep.value = step
+        }
+    }
+
+    fun saveWeeklyQuota(className: String, quotaMap: Map<String, com.project.markmyday.data.model.SubjectQuota>, total: Int) {
+        viewModelScope.launch {
+            _state.value = TimetableState.Loading
+            try {
+                val currentTimetable = _allTimetables.value.find { it.className == className } ?: Timetable(className = className)
+                val updatedTimetable = currentTimetable.copy(
+                    weeklyQuota = quotaMap,
+                    totalWeeklyClasses = total
+                )
+                timetableRepository.updateTimetable(updatedTimetable)
+                _state.value = TimetableState.Success
+            } catch (e: Exception) {
+                _state.value = TimetableState.Error(e.localizedMessage ?: "Failed to save quota")
+            }
         }
     }
 

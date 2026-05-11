@@ -186,7 +186,8 @@
     <string name="create_timetable_title">Create Timetable</string>
     <string name="step_1_name">Add Home Teacher</string>
     <string name="step_2_name">Add Students</string>
-    <string name="step_3_name">Edit Timetable</string>
+    <string name="step_3_name">Select Class</string>
+    <string name="step_4_name">Edit Timetable</string>
     <string name="next">Next</string>
     <string name="select_teacher">Select Teacher</string>
     <string name="add_teacher">Add Teacher</string>
@@ -200,6 +201,18 @@
     <string name="list_of_students">List of Students</string>
     <string name="home_teacher_label">HT: %1$s</string>
     <string name="student_count">%1$d Students</string>
+    <string name="edit_timetable">Edit Timetable</string>
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="period_label">Period %1$d</string>
+    <string name="home_room">Home Room</string>
+    <string name="select_subject">Select Subject</string>
+    <string name="busy_label">(Busy)</string>
+    <string name="save_period">Save Period</string>
 
     <!-- Add Student Screen -->
     <string name="student_added_success">Successfully added student! Admission No: %1$s</string>

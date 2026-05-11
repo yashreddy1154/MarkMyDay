@@ -16,7 +16,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -143,9 +145,7 @@ fun CreateTimetableScreen(
             TimetableStepper(
                 currentStep = currentStep,
                 onStepClick = { step ->
-                    if (step < currentStep) {
-                        viewModel.goToStep(step)
-                    }
+                    viewModel.goToStep(step)
                 }
             )
 
@@ -162,7 +162,7 @@ fun CreateTimetableScreen(
                     when (step) {
                         1 -> Step1Content(teachers, assignments, onAssign = { cls, t -> viewModel.assignTeacherToClass(cls, t) })
                         2 -> Step2Content(students, assignments, studentAssignments, onUpdateStudents = { cls, ids -> viewModel.updateClassStudents(cls, ids) })
-                        3 -> StepPlaceholder(stringResource(R.string.step_3_name))
+                        3 -> Step3Content(assignments, studentAssignments)
                     }
                 }
             }
@@ -189,7 +189,6 @@ fun TimetableStepper(
             repeat(3) { index ->
                 val step = index + 1
                 val isActive = step <= currentStep
-                val isClickable = step < currentStep
 
                 Box(
                     modifier = Modifier
@@ -198,9 +197,7 @@ fun TimetableStepper(
                             if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                             CircleShape
                         )
-                        .then(
-                            if (isClickable) Modifier.clickable { onStepClick(step) } else Modifier
-                        ),
+                        .clickable { onStepClick(step) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -757,6 +754,109 @@ fun InfoPill(text: String, color: Color) {
             fontWeight = FontWeight.Bold,
             color = color
         )
+    }
+}
+
+@Composable
+fun Step3Content(
+    teacherAssignments: Map<String, Teacher?>,
+    studentAssignments: Map<String, List<String>>
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(bottom = 80.dp)
+    ) {
+        items(teacherAssignments.keys.toList()) { className ->
+            ClassSelectionCard(
+                className = className,
+                homeTeacher = teacherAssignments[className],
+                onWeeklyClassesClick = {
+                    val intent = android.content.Intent(context, WeeklyQuotaActivity::class.java).apply {
+                        putExtra("className", className)
+                    }
+                    context.startActivity(intent)
+                },
+                onEditTimetableClick = {
+                    val intent = android.content.Intent(context, EditTimetableActivity::class.java).apply {
+                        putExtra("className", className)
+                    }
+                    context.startActivity(intent)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ClassSelectionCard(
+    className: String,
+    homeTeacher: Teacher?,
+    onWeeklyClassesClick: () -> Unit,
+    onEditTimetableClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = className,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = stringResource(R.string.home_teacher_label, homeTeacher?.name ?: "N/A"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Weekly Classes Button
+                Button(
+                    onClick = onWeeklyClassesClick,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "Weekly\nClasses",
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        style = MaterialTheme.typography.labelSmall,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 12.sp
+                    )
+                }
+
+                // Calendar Icon Button
+                IconButton(
+                    onClick = onEditTimetableClick,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = "Edit Timetable",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
     }
 }
 

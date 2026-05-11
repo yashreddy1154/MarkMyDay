@@ -92,6 +92,18 @@
         </provider>
 
         <activity
+            android:name=".ui.screens.WeeklyQuotaActivity"
+            android:exported="false"
+            android:label="Weekly Quota"
+            android:theme="@style/Theme.MarkMyDay" />
+
+        <activity
+            android:name=".ui.screens.EditTimetableActivity"
+            android:exported="false"
+            android:label="Edit Timetable"
+            android:theme="@style/Theme.MarkMyDay" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
