@@ -130,7 +130,9 @@ class TeacherViewModel(
                     "teacherId" to teacherId,
                     "home_section" to formState.homeSection,
                     "subject" to formState.subject,
-                    "teaching_assignments" to formState.classesTaught
+                    "teaching_assignments" to formState.classesTaught,
+                    "dob" to formState.dob,
+                    "password" to password
                 )
                 firestore.collection("users").document(uid).set(userMap).await()
 

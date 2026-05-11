@@ -112,43 +112,92 @@ fun SettingsScreen(
                         }
                     }
                     is SettingsUiState.Success -> {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Surface(
-                                modifier = Modifier.size(72.dp),
-                                shape = RoundedCornerShape(24.dp),
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        val profile = state.profile
+                        var showPassword by remember { mutableStateOf(false) }
+
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            // Profile Header
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Default.Person,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(32.dp),
-                                        tint = MaterialTheme.colorScheme.primary
+                                Surface(
+                                    modifier = Modifier.size(72.dp),
+                                    shape = RoundedCornerShape(24.dp),
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.Default.Person,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(32.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = profile.name,
+                                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = profile.role.replaceFirstChar { it.uppercase() },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = state.profile.name,
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    text = buildString {
-                                        if (state.profile.studentClass != null) {
-                                            append(state.profile.studentClass)
-                                            append(" • ")
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+                            // Details Grid
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                // ID and Password
+                                DetailItem(label = "User ID", value = profile.id, icon = Icons.Default.Badge)
+                                
+                                DetailItem(
+                                    label = "Password",
+                                    value = if (showPassword) (profile.password ?: "N/A") else "••••••••",
+                                    icon = Icons.Default.Lock,
+                                    trailingIcon = {
+                                        IconButton(onClick = { showPassword = !showPassword }) {
+                                            Icon(
+                                                imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                                contentDescription = "Toggle Password Visibility",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(20.dp)
+                                            )
                                         }
-                                        append("ID: ")
-                                        append(state.profile.id.takeLast(6))
-                                    },
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    }
                                 )
+
+                                // Academic Info
+                                if (profile.role.lowercase() == "teacher") {
+                                    DetailItem(label = "Subject", value = profile.subject ?: "N/A", icon = Icons.Default.Book)
+                                } else {
+                                    DetailItem(label = "Class", value = profile.studentClass ?: "N/A", icon = Icons.Default.School)
+                                }
+
+                                // Parent Details (for Students)
+                                if (profile.role.lowercase() == "student") {
+                                    if (!profile.motherName.isNullOrBlank()) {
+                                        DetailItem(
+                                            label = "Mother", 
+                                            value = "${profile.motherName} (${profile.motherPhone ?: "N/A"})", 
+                                            icon = Icons.Default.Person
+                                        )
+                                    }
+                                    if (!profile.fatherName.isNullOrBlank()) {
+                                        DetailItem(
+                                            label = "Father", 
+                                            value = "${profile.fatherName} (${profile.fatherPhone ?: "N/A"})", 
+                                            icon = Icons.Default.Person
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -244,6 +293,46 @@ fun SettingsScreen(
             }
             
             Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun DetailItem(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    trailingIcon: @Composable (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        if (trailingIcon != null) {
+            trailingIcon()
         }
     }
 }

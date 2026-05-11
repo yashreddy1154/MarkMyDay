@@ -56,7 +56,15 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     val logoutEvent: SharedFlow<Unit> = _logoutEvent.asSharedFlow()
 
     init {
-        fetchUserProfile()
+        // Listen for auth state changes to fetch profile immediately upon login/session restore
+        auth.addAuthStateListener { firebaseAuth ->
+            if (firebaseAuth.currentUser != null) {
+                fetchUserProfile()
+            } else {
+                _uiState.value = SettingsUiState.Error("User not authenticated.")
+            }
+        }
+
         // Apply saved dark mode on init
         val savedDarkMode = prefs.getBoolean("dark_mode", false)
         AppCompatDelegate.setDefaultNightMode(
@@ -76,16 +84,30 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                         val role = document.getString("role") ?: "User"
                         val id = document.getString("studentId") ?: document.getString("teacherId") ?: "N/A"
                         val studentClass = document.getString("studentClass") ?: document.getString("home_section")
-                        val parentName = document.getString("fatherName") ?: document.getString("motherName")
                         val email = document.getString("email")
+                        val dob = document.getString("dob")
+                        val password = document.getString("password")
+                        
+                        // New fields
+                        val fatherName = document.getString("fatherName")
+                        val motherName = document.getString("motherName")
+                        val fatherPhone = document.getString("fatherPhone")
+                        val motherPhone = document.getString("motherPhone")
+                        val subject = document.getString("subject")
                         
                         val profile = UserProfile(
                             name = name,
                             role = role,
                             id = id,
                             studentClass = studentClass,
-                            parentName = parentName,
-                            email = email
+                            fatherName = fatherName,
+                            motherName = motherName,
+                            fatherPhone = fatherPhone,
+                            motherPhone = motherPhone,
+                            subject = subject,
+                            email = email,
+                            dob = dob,
+                            password = password
                         )
                         _uiState.value = SettingsUiState.Success(profile)
                     } else {
