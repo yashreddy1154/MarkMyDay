@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface NewsApiService {
     @GET("news")
     suspend fun getNews(
-        @Query("apikey") apiKey: String = "pub_0c15e90006244d749b4ae4ddf391f7f1",
+        @Query("apikey") apiKey: String = "pub_8bbc11822f364b738dbc6cf92288559f",
         @Query("country") country: String = "in"
     ): Response<NewsResponse>
 }

@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
 import com.project.markmyday.viewmodel.SettingsUiState
 import com.project.markmyday.viewmodel.SettingsViewModel
+import com.project.markmyday.viewmodel.LocalSettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -164,11 +165,6 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Text(
-                                    text = stringResource(R.string.password_label),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
                     }
@@ -184,10 +180,10 @@ fun SettingsScreen(
                 icon = Icons.Default.Language
             ) {
                 val languages = listOf(
-                    stringResource(R.string.telugu) to "te",
-                    stringResource(R.string.english) to "en",
-                    stringResource(R.string.hindi) to "hi",
-                    stringResource(R.string.punjabi) to "pa"
+                    "తెలుగు" to "te",
+                    "English" to "en",
+                    "हिन्दी" to "hi",
+                    "ਪੰਜਾਬੀ" to "pa"
                 )
 
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

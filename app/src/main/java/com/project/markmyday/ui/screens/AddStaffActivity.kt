@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.markmyday.LocalSettingsViewModel
+import com.project.markmyday.viewmodel.LocalSettingsViewModel
 import com.project.markmyday.R
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.viewmodel.SettingsViewModel

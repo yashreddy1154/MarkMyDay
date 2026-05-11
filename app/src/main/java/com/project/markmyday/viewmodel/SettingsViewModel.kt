@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.markmyday.data.model.UserProfile
@@ -18,6 +19,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
+val LocalSettingsViewModel = staticCompositionLocalOf<SettingsViewModel> {
+    error("No SettingsViewModel provided")
+}
 
 sealed class SettingsUiState {
     object Loading : SettingsUiState()

@@ -15,6 +15,7 @@ import com.project.markmyday.viewmodel.AuthViewModel
 import com.project.markmyday.viewmodel.AuthResult
 import com.project.markmyday.viewmodel.TeacherViewModel
 import com.project.markmyday.viewmodel.StudentViewModel
+import com.project.markmyday.viewmodel.LocalSettingsViewModel
 
 sealed class Screen(val route: String) {
     object Authentication : Screen("auth")
@@ -410,6 +411,7 @@ fun AppNavigation(
 
         composable(Screen.Settings.route) {
             com.project.markmyday.settings.SettingsScreen(
+                viewModel = LocalSettingsViewModel.current,
                 onBack = { navController.popBackStack() },
                 onLogout = {
                     navController.navigate(Screen.Authentication.route) {

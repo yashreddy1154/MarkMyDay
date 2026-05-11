@@ -37,16 +37,12 @@ import androidx.compose.ui.unit.sp
 import androidx.activity.result.contract.ActivityResultContracts
 
 import com.project.markmyday.viewmodel.SettingsViewModel
+import com.project.markmyday.viewmodel.LocalSettingsViewModel
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
 
 import androidx.appcompat.app.AppCompatActivity
 
 import androidx.appcompat.app.AppCompatDelegate
-
-val LocalSettingsViewModel = staticCompositionLocalOf<SettingsViewModel> {
-    error("No SettingsViewModel provided")
-}
 
 class MainActivity : AppCompatActivity() {
 

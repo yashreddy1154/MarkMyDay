@@ -8,7 +8,6 @@ data class Teacher(
     val gender: String = "",
     val subject: String = "",
     val homeSection: String = "",
-    val classesTaught: List<String> = emptyList(),
     val classesTaughtCategories: List<String> = emptyList(), // Primary, Secondary, High School
     val phone: String = "",
     val email: String = ""
