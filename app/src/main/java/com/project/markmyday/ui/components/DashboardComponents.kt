@@ -321,10 +321,10 @@ fun AnimatedDashboardTile(
     val pressed by interactionSource.collectIsPressedAsState()
     
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.96f else 1f,
+        targetValue = if (pressed) 0.98f else 1f,
         animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMedium
         ),
         label = "scale"
     )
@@ -335,7 +335,7 @@ fun AnimatedDashboardTile(
             .scale(scale)
             .clickable(
                 interactionSource = interactionSource,
-                indication = ripple(bounded = true, radius = 40.dp),
+                indication = ripple(bounded = true, color = MaterialTheme.colorScheme.primary),
                 onClick = onClick
             ),
         shape = RoundedCornerShape(24.dp),
@@ -343,8 +343,8 @@ fun AnimatedDashboardTile(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 8.dp
+            defaultElevation = 2.dp,
+            pressedElevation = 4.dp
         )
     ) {
         Column(

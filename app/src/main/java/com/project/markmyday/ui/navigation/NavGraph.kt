@@ -36,6 +36,10 @@ sealed class Screen(val route: String) {
         fun createRoute(subject: String, className: String, userName: String, studentId: String) = 
             "quiz_taking/$subject/$className/${java.net.URLEncoder.encode(userName, "UTF-8")}/$studentId"
     }
+    object QuizList : Screen("quiz_list/{className}/{userName}/{studentId}") {
+        fun createRoute(className: String, userName: String, studentId: String) = 
+            "quiz_list/$className/${java.net.URLEncoder.encode(userName, "UTF-8")}/$studentId"
+    }
     object Leaderboard : Screen("leaderboard")
     
     // Bottom Bar Screens
@@ -142,7 +146,10 @@ fun AppNavigation(
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
-                        "results" -> navController.navigate(Screen.Leaderboard.route + "?role=student")
+                        "results" -> {
+                            val classNum = role.filter { it.isDigit() }.ifEmpty { "10" }
+                            navController.navigate(Screen.Leaderboard.route + "?role=student&userClass=$classNum")
+                        }
                         "notifications" -> navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}")
                         "exams" -> {
                             val classNum = role.filter { it.isDigit() }.ifEmpty { "" }
@@ -153,7 +160,10 @@ fun AppNavigation(
                                 navController.navigate(Screen.QuizTaking.createRoute("Mixed Test", "10", name, studentId))
                             }
                         }
-                        "leaderboard" -> navController.navigate(Screen.Leaderboard.route + "?role=student")
+                        "leaderboard" -> {
+                            val classNum = role.filter { it.isDigit() }.ifEmpty { "10" }
+                            navController.navigate(Screen.Leaderboard.route + "?role=student&userClass=$classNum")
+                        }
                         "settings" -> navController.navigate(Screen.Settings.route)
                     }
                 },
@@ -198,7 +208,7 @@ fun AppNavigation(
                         "settings" -> navController.navigate(Screen.Settings.route)
                         "notifications" -> navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}")
                         "exams" -> navController.navigate(Screen.QuizQuestionUpload.route)
-                        "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher")
+                        "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher&userClass=$section")
                         "admissions" -> navController.navigate(Screen.Admissions.route)
                         "leave" -> navController.navigate(Screen.TeacherLeaveView.route)
                         "course_manager" -> navController.navigate(Screen.CourseManager.route)
@@ -238,7 +248,7 @@ fun AppNavigation(
                         "admissions" -> navController.navigate(Screen.Admissions.route)
                         "notices" -> navController.navigate(Screen.AdminCreateNotification.route)
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
-                        "reports" -> navController.navigate(Screen.Leaderboard.route + "?role=admin")
+                        "reports" -> navController.navigate(Screen.Leaderboard.route + "?role=admin&userClass=ALL")
                         "leave" -> navController.navigate(Screen.AdminLeaveManagement.route)
                         "add_staff" -> {
                             context.startActivity(android.content.Intent(context, AddStaffActivity::class.java))
@@ -346,13 +356,19 @@ fun AppNavigation(
         }
 
         composable(
-            route = Screen.Leaderboard.route + "?role={role}",
-            arguments = listOf(navArgument("role") { type = NavType.StringType; defaultValue = "student" })
+            route = Screen.Leaderboard.route + "?role={role}&userClass={userClass}",
+            arguments = listOf(
+                navArgument("role") { type = NavType.StringType; defaultValue = "student" },
+                navArgument("userClass") { type = NavType.StringType; defaultValue = "10" }
+            )
         ) { backStackEntry ->
             val role = backStackEntry.arguments?.getString("role") ?: "student"
+            val userClass = backStackEntry.arguments?.getString("userClass") ?: "10"
             LeaderboardScreen(
                 role = role,
-                onBack = { navController.popBackStack() }
+                userClass = userClass,
+                onBack = { navController.popBackStack() },
+                onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
         }
 
@@ -441,7 +457,7 @@ private fun handleBottomNav(route: String, navController: NavHostController, las
             val role = if (lastDashboardRoute.contains("admin")) "admin" 
                       else if (lastDashboardRoute.contains("teacher")) "teacher" 
                       else "student"
-            Screen.Leaderboard.route + "?role=$role"
+            Screen.Leaderboard.route + "?role=$role&userClass=ALL"
         }
         "dashboard" -> lastDashboardRoute
         else -> route

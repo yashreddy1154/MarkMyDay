@@ -78,23 +78,24 @@ fun TeacherLeaveCard(request: LeaveRequest) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(44.dp),
-                shape = CircleShape,
+                modifier = Modifier.size(52.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             ) {
                 Icon(
                     Icons.Default.Person,
                     contentDescription = null,
-                    modifier = Modifier.padding(10.dp),
+                    modifier = Modifier.padding(12.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -102,23 +103,43 @@ fun TeacherLeaveCard(request: LeaveRequest) {
             Spacer(modifier = Modifier.width(16.dp))
             
             Column(modifier = Modifier.weight(1f)) {
-                Text(request.studentName, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(
+                    request.studentName, 
+                    fontWeight = FontWeight.ExtraBold, 
+                    fontSize = 17.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 val start = request.startDate?.toDate()?.let { dateFormatter.format(it) } ?: ""
                 val end = request.endDate?.toDate()?.let { dateFormatter.format(it) } ?: ""
-                Text("$start - $end • Class: ${request.classSection}", style = MaterialTheme.typography.bodySmall)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(request.reason, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                val dateText = if (start == end) "$start 📅" else "$start - $end 📅"
+                
+                Text(
+                    text = "$dateText • Class: ${request.classSection} 🎒", 
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = request.reason, 
+                    style = MaterialTheme.typography.bodyMedium, 
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
             
+            Spacer(modifier = Modifier.width(8.dp))
+            
             Surface(
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(36.dp),
                 shape = CircleShape,
                 color = statusColor.copy(alpha = 0.15f)
             ) {
                 Icon(
                     statusIcon,
                     contentDescription = request.status,
-                    modifier = Modifier.padding(6.dp),
+                    modifier = Modifier.padding(8.dp),
                     tint = statusColor
                 )
             }

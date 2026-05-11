@@ -1,7 +1,6 @@
 package com.project.markmyday
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
@@ -10,29 +9,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.tooling.preview.Preview
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.google.firebase.messaging.FirebaseMessaging
 import android.util.Log
 import com.project.markmyday.ui.navigation.AppNavigation
 import android.Manifest
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.project.markmyday.viewmodel.AuthViewModel
 import com.project.markmyday.viewmodel.AuthResult
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -82,18 +79,28 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         when (authState) {
                             is AuthResult.Loading -> {
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(
-                                            text = "Welcome to",
-                                            style = MaterialTheme.typography.titleLarge,
-                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                        Image(
+                                            painter = painterResource(id = R.drawable.markmydayicon),
+                                            contentDescription = "App Icon",
+                                            modifier = Modifier.size(120.dp)
                                         )
+                                        Spacer(modifier = Modifier.height(24.dp))
                                         Text(
                                             text = "MarkMyDay",
-                                            style = MaterialTheme.typography.displayMedium,
+                                            style = MaterialTheme.typography.headlineMedium,
                                             color = MaterialTheme.colorScheme.primary,
                                             fontWeight = FontWeight.Bold
+                                        )
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(40.dp),
+                                            color = MaterialTheme.colorScheme.primary,
+                                            strokeWidth = 3.dp
                                         )
                                     }
                                 }

@@ -145,7 +145,11 @@ fun VideoItem(video: CourseVideo, onClick: () -> Unit) {
                     .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
             ) {
                 AsyncImage(
-                    model = "https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg",
+                    model = coil.request.ImageRequest.Builder(LocalContext.current)
+                        .data("https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg")
+                        .crossfade(true)
+                        .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                        .build(),
                     contentDescription = video.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

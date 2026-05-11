@@ -93,8 +93,8 @@ fun LeaveScreen(
                         verticalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
                         Text(
-                            "New Request", 
-                            style = MaterialTheme.typography.titleLarge, 
+                            "New Leave Request 📝", 
+                            style = MaterialTheme.typography.headlineSmall, 
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -102,29 +102,40 @@ fun LeaveScreen(
                         // Category Selection
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                "Leave Category",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                "What's the reason? ✨",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
                             )
                             Box(modifier = Modifier.fillMaxWidth()) {
                                 Surface(
                                     onClick = { showCategoryMenu = true },
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(20.dp),
-                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                                    shape = RoundedCornerShape(24.dp),
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                                    border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                                 ) {
                                     Row(
-                                        modifier = Modifier.padding(16.dp),
+                                        modifier = Modifier.padding(18.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.Category, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                                            Spacer(modifier = Modifier.width(12.dp))
-                                            Text(text = selectedCategory, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+                                            Icon(
+                                                Icons.Default.Category, 
+                                                contentDescription = null, 
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
+                                            Text(
+                                                text = selectedCategory, 
+                                                style = MaterialTheme.typography.bodyLarge, 
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
                                         }
-                                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                        Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                     }
                                 }
                                 DropdownMenu(
@@ -134,7 +145,7 @@ fun LeaveScreen(
                                 ) {
                                     categories.forEach { category ->
                                         DropdownMenuItem(
-                                            text = { Text(category, style = MaterialTheme.typography.bodyLarge) },
+                                            text = { Text(category, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium) },
                                             onClick = {
                                                 selectedCategory = category
                                                 showCategoryMenu = false
@@ -148,31 +159,38 @@ fun LeaveScreen(
                         // Date Selection
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                "Duration",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                "When are you taking leave? 📅",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
                             )
                             Surface(
                                 onClick = { showDatePicker = true },
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(20.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                                shape = RoundedCornerShape(24.dp),
+                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f),
+                                border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f))
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(16.dp),
+                                    modifier = Modifier.padding(18.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(Icons.Default.CalendarToday, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Icon(
+                                        Icons.Default.CalendarToday, 
+                                        contentDescription = null, 
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
                                     val start = dateRangePickerState.selectedStartDateMillis?.let { dateFormatter.format(Date(it)) } ?: "Start"
                                     val end = dateRangePickerState.selectedEndDateMillis?.let { dateFormatter.format(Date(it)) } ?: ""
                                     Text(
                                         text = if (dateRangePickerState.selectedStartDateMillis != null) {
-                                            if (dateRangePickerState.selectedEndDateMillis != null) "$start - $end" else "$start (Single Day)"
-                                        } else "Select Dates",
+                                            if (dateRangePickerState.selectedEndDateMillis != null) "$start - $end" else "$start (One Day)"
+                                        } else "Pick your dates!",
                                         style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                             }
@@ -180,21 +198,23 @@ fun LeaveScreen(
 
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                "Reason",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                "Tell us more! 💬",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontWeight = FontWeight.Bold
                             )
                             OutlinedTextField(
                                 value = reason,
                                 onValueChange = { reason = it },
-                                placeholder = { Text("Briefly explain your reason...") },
+                                placeholder = { Text("Write your reason here...") },
                                 modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp),
-                                shape = RoundedCornerShape(20.dp),
+                                shape = RoundedCornerShape(24.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
                                     unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    cursorColor = MaterialTheme.colorScheme.primary
                                 )
                             )
                         }
@@ -212,18 +232,19 @@ fun LeaveScreen(
                                     )
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth().height(60.dp),
+                            modifier = Modifier.fillMaxWidth().height(64.dp),
                             enabled = submissionState !is LeaveSubmissionState.Loading && dateRangePickerState.selectedStartDateMillis != null,
-                            shape = RoundedCornerShape(20.dp),
+                            shape = RoundedCornerShape(24.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                            )
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                         ) {
                             if (submissionState is LeaveSubmissionState.Loading) {
-                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(28.dp))
                             } else {
-                                Text("Submit Request", fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleMedium)
+                                Text("Send Request 🚀", fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleMedium)
                             }
                         }
 
@@ -300,24 +321,24 @@ fun DateRangePickerDialog(
 @Composable
 fun LeaveHistoryCard(request: LeaveRequest) {
     val dateFormatter = remember { SimpleDateFormat("dd MMM, yyyy", Locale.getDefault()) }
-    val statusColor = when (request.status.lowercase()) {
-        "approved" -> Color(0xFF4CAF50)
-        "rejected" -> MaterialTheme.colorScheme.error
-        else -> Color(0xFFFF9800) // Pending
+    val (statusColor, statusIcon, statusText) = when (request.status.lowercase()) {
+        "approved" -> Triple(Color(0xFF4CAF50), "✅ Approved!", "Great! Your leave is ready.")
+        "rejected" -> Triple(MaterialTheme.colorScheme.error, "❌ Rejected", "Oh no, let's try again.")
+        else -> Triple(Color(0xFFFF9800), "⏳ Pending...", "Wait for it! We're checking.") // Pending
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(2.dp, statusColor.copy(alpha = 0.2f))
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(24.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 val start = request.startDate?.toDate()?.let { dateFormatter.format(it) } ?: ""
                 val end = request.endDate?.toDate()?.let { dateFormatter.format(it) } ?: ""
@@ -326,19 +347,19 @@ fun LeaveHistoryCard(request: LeaveRequest) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = dateRange,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Surface(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            text = request.category,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                            style = MaterialTheme.typography.labelSmall,
+                            text = "🏷️ ${request.category}",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
@@ -346,49 +367,52 @@ fun LeaveHistoryCard(request: LeaveRequest) {
                 }
                 Surface(
                     color = statusColor.copy(alpha = 0.1f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
-                        text = request.status.replaceFirstChar { it.uppercase() },
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        text = statusIcon,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                         color = statusColor,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            
             Text(
-                text = request.reason,
-                style = MaterialTheme.typography.bodyMedium,
+                text = "Reason: ${request.reason}",
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 20.sp
+                lineHeight = 24.sp,
+                fontWeight = FontWeight.Medium
             )
 
             if (request.status.lowercase() == "rejected" && request.rejectionReason.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 Surface(
                     color = MaterialTheme.colorScheme.error.copy(alpha = 0.05f),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.EditNote, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(Icons.Default.EditNote, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Admin Note",
-                                style = MaterialTheme.typography.labelMedium,
+                                text = "Admin Note 📝",
+                                style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.error,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.ExtraBold
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = request.rejectionReason,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
-                            lineHeight = 18.sp
+                            lineHeight = 20.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }

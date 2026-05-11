@@ -48,6 +48,33 @@ class LeaveViewModel(
         loadUserData()
         fetchLeaveHistory()
         fetchAllLeaves() // For Admin/Teacher
+        autoDeleteOldLeaves()
+    }
+
+    private fun autoDeleteOldLeaves() {
+        viewModelScope.launch {
+            val thirtyDaysAgo = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -30)
+            }.time
+            
+            try {
+                val oldLeaves = firestore.collection("leaves")
+                    .whereLessThan("appliedAt", Timestamp(thirtyDaysAgo))
+                    .get()
+                    .await()
+                
+                if (!oldLeaves.isEmpty) {
+                    val batch = firestore.batch()
+                    for (document in oldLeaves.documents) {
+                        batch.delete(firestore.collection("leaves").document(document.id))
+                    }
+                    batch.commit().await()
+                    android.util.Log.d("LeaveViewModel", "Auto-deleted ${oldLeaves.size()} old leave requests.")
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("LeaveViewModel", "Error auto-deleting old leaves", e)
+            }
+        }
     }
 
     private fun loadUserData() {
