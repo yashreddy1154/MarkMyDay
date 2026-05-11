@@ -365,26 +365,6 @@ fun AnimatedDashboardTile(
                         modifier = Modifier.size(32.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
-                    
-                    if (tile.badgeCount != null || tile.badgeText != null) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.secondary,
-                            shape = CircleShape,
-                            modifier = Modifier
-                                .size(22.dp)
-                                .align(Alignment.TopEnd)
-                                .offset(x = 6.dp, y = (-4).dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = tile.badgeText ?: tile.badgeCount.toString(),
-                                    color = MaterialTheme.colorScheme.onSecondary,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            }
-                        }
-                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

@@ -135,7 +135,8 @@ class QuizRepository {
             
             if (className.isNotBlank()) {
                 val normalizedClass = if (!className.startsWith("Class") && className != "ALL") "Class $className" else className
-                query = query.whereEqualTo("className", normalizedClass)
+                // Use whereIn to include both class-specific and global ("ALL") questions
+                query = query.whereIn("className", listOf(normalizedClass, "ALL"))
             }
             
             if (subject.isNotBlank()) {

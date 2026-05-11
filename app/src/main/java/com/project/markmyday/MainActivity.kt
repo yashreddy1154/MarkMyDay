@@ -121,11 +121,15 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     "student" -> {
                                         val studentId = java.net.URLEncoder.encode(result.studentId ?: "N/A", "UTF-8")
-                                        "student_dashboard/$encodedName/$encodedRole/$studentId"
+                                        val displayRole = if (result.homeSection != null && result.homeSection != "N/A") "Class ${result.homeSection}" else result.role
+                                        val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
+                                        "student_dashboard/$encodedName/$encodedDisplayRole/$studentId"
                                     }
                                     else -> {
                                         val studentId = java.net.URLEncoder.encode(result.studentId ?: "N/A", "UTF-8")
-                                        "student_dashboard/$encodedName/$encodedRole/$studentId"
+                                        val displayRole = if (result.homeSection != null && result.homeSection != "N/A") "Class ${result.homeSection}" else result.role
+                                        val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
+                                        "student_dashboard/$encodedName/$encodedDisplayRole/$studentId"
                                     }
                                 }
                                 AppNavigation(
