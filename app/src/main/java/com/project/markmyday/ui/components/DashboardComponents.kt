@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -113,6 +114,19 @@ fun WelcomeSection(
     homeSection: String? = null,
     subject: String? = null
 ) {
+    val decodedName = remember(name) { 
+        try { java.net.URLDecoder.decode(name, "UTF-8") } catch (e: Exception) { name } 
+    }
+    val decodedRole = remember(role) { 
+        try { java.net.URLDecoder.decode(role, "UTF-8") } catch (e: Exception) { role } 
+    }
+    val decodedHomeSection = remember(homeSection) { 
+        homeSection?.let { try { java.net.URLDecoder.decode(it, "UTF-8") } catch (e: Exception) { it } }
+    }
+    val decodedSubject = remember(subject) { 
+        subject?.let { try { java.net.URLDecoder.decode(it, "UTF-8") } catch (e: Exception) { it } }
+    }
+
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -130,7 +144,7 @@ fun WelcomeSection(
             )
         }
         Text(
-            name, 
+            decodedName, 
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.onBackground,
@@ -152,20 +166,20 @@ fun WelcomeSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    role, 
+                    decodedRole, 
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary, 
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.5.sp
                 )
-                if (homeSection != null || subject != null) {
+                if (decodedHomeSection != null || decodedSubject != null) {
                     Text(
                         " • ",
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "${homeSection ?: ""} ${if (subject != null) "($subject)" else ""}",
+                        "${decodedHomeSection ?: ""} ${if (decodedSubject != null) "($decodedSubject)" else ""}",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Bold

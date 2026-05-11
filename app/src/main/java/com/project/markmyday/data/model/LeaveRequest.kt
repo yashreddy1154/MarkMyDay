@@ -10,6 +10,7 @@ data class LeaveRequest(
     val startDate: Timestamp? = null,
     val endDate: Timestamp? = null,
     val reason: String = "",
+    val category: String = "Personal",
     val status: String = "pending",
     val appliedAt: Timestamp? = null,
     val statusUpdateTimestamp: Timestamp? = null,

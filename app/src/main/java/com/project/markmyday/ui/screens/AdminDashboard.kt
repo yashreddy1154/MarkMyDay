@@ -1,33 +1,54 @@
 package com.project.markmyday.ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.markmyday.viewmodel.NotificationViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.markmyday.R
 import com.project.markmyday.ui.components.*
 import com.project.markmyday.ui.models.DashboardTile
-import androidx.compose.ui.tooling.preview.Preview
 import com.project.markmyday.ui.theme.MarkMyDayTheme
-import com.project.markmyday.R
+import com.project.markmyday.viewmodel.NotificationViewModel
+import com.project.markmyday.viewmodel.TeacherViewModel
+import com.project.markmyday.viewmodel.StudentViewModel
+import com.project.markmyday.viewmodel.LeaveViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboard(
     userName: String = "Principal Sharma",
@@ -36,7 +57,23 @@ fun AdminDashboard(
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
 ) {
+    val decodedName = remember(userName) { 
+        try { java.net.URLDecoder.decode(userName, "UTF-8") } catch (e: Exception) { userName } 
+    }
+    val decodedRole = remember(userRole) { 
+        try { java.net.URLDecoder.decode(userRole, "UTF-8") } catch (e: Exception) { userRole } 
+    }
+
     val notificationViewModel: NotificationViewModel = viewModel()
+    val teacherViewModel: TeacherViewModel = viewModel()
+    val studentViewModel: StudentViewModel = viewModel()
+    val leaveViewModel: LeaveViewModel = viewModel()
+
+    val notifications by notificationViewModel.notifications.collectAsState()
+    val teachers by teacherViewModel.allTeachers.collectAsState()
+    val students by studentViewModel.allStudents.collectAsState()
+    val leaves by leaveViewModel.allLeaves.collectAsState()
+
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
 
     LaunchedEffect(userRole) {
@@ -45,10 +82,22 @@ fun AdminDashboard(
 
     var searchQuery by remember { mutableStateOf("") }
 
+    val pendingLeavesCount = remember(leaves) {
+        leaves.count { it.status == "pending" }
+    }
+
+    // Dynamic stats from ViewModels
+    val stats = listOf(
+        StatItem(Icons.Outlined.Badge, stringResource(R.string.tile_staff_list), teachers.size, Color(0xFF4CAF50)),
+        StatItem(Icons.Outlined.People, stringResource(R.string.tile_students), students.size, Color(0xFF2196F3)),
+        StatItem(Icons.Outlined.HistoryEdu, stringResource(R.string.tile_manage_leaves), pendingLeavesCount, Color(0xFFFF9800)),
+        StatItem(Icons.Outlined.Campaign, stringResource(R.string.tile_notices), notifications.size, Color(0xFF9C27B0))
+    )
+
     val adminTiles = listOf(
         DashboardTile("notices", stringResource(R.string.tile_notices), Icons.Default.Campaign),
         DashboardTile("staff_management", stringResource(R.string.tile_staff_list), Icons.Default.Badge),
-        DashboardTile("attendance_overview", "Daily Overview", Icons.Default.FactCheck),
+        DashboardTile("attendance_overview", stringResource(R.string.tile_daily_overview), Icons.AutoMirrored.Filled.FactCheck),
         DashboardTile("create_timetable", stringResource(R.string.tile_create_timetable), Icons.Default.CalendarToday),
         DashboardTile("add_staff", stringResource(R.string.tile_add_staff), Icons.Default.PersonAdd),
         DashboardTile("add_student", stringResource(R.string.tile_add_student), Icons.Default.PersonAddAlt1),
@@ -59,9 +108,9 @@ fun AdminDashboard(
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings),
         DashboardTile("reports", stringResource(R.string.nav_reports), Icons.Default.Assessment),
-        DashboardTile("quiz_upload", "Upload Quiz", Icons.Default.Quiz),
-        DashboardTile("course_manager", "Course Manager", Icons.Default.VideoLibrary)
-    )
+        DashboardTile("quiz_upload", stringResource(R.string.tile_upload_quiz), Icons.Default.Quiz),
+        DashboardTile("course_manager", stringResource(R.string.tile_course_manager), Icons.Default.VideoLibrary)
+    ).filter { it.label.contains(searchQuery, ignoreCase = true) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -80,134 +129,342 @@ fun AdminDashboard(
             )
         }
     ) { padding ->
-
-        Column(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // Header Section with App Icon and Welcome
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+            // Welcome Header with Date
+            item(span = { GridItemSpan(2) }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(2.dp)
                 ) {
-                    WelcomeSection(
-                        name = userName,
-                        role = userRole
-                    )
-                    
-                    Surface(
+                    Row(
                         modifier = Modifier
-                            .size(70.dp)
-                            .clip(CircleShape),
-                        color = MaterialTheme.colorScheme.surface,
-                        shadowElevation = 4.dp
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.School,
-                            contentDescription = "App Icon",
-                            modifier = Modifier.padding(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Hello, $decodedName",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "$decodedRole • ${getCurrentDate()}",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Surface(
+                            modifier = Modifier.size(56.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.School,
+                                contentDescription = "Avatar",
+                                modifier = Modifier.padding(12.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
 
-            SearchBar(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it }
-            )
+            // Quick Stats Row
+            items(stats) { stat ->
+                Box(modifier = Modifier.padding(horizontal = if (stats.indexOf(stat) % 2 == 0) 12.dp else 0.dp, vertical = 0.dp)) {
+                    // Small adjustment to padding to match the previous separate grid
+                    StatCard(stat = stat)
+                }
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // School Theme: "Learning is Fun" Banner
-            Card(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
+            // Motivational Banner
+            item(span = { GridItemSpan(2) }) {
+                Card(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.horizontalGradient(
+                                    colors = listOf(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.secondary
+                                    )
+                                )
+                            )
+                            .padding(20.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.manage_your_school),
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = stringResource(R.string.everything_in_one_place),
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    fontSize = 13.sp
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.Default.Celebration,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Section Title + Filter
+            item(span = { GridItemSpan(2) }) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.dashboard_overview),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    IconButton(onClick = { /* Optional: extra filter action */ }) {
+                        Icon(Icons.Default.Tune, contentDescription = "Filter")
+                    }
+                }
+            }
+
+            // Enhanced Search Bar
+            item(span = { GridItemSpan(2) }) {
+                SearchBarEnhanced(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it }
+                )
+            }
+
+            // Modern Tile Grid
+            items(adminTiles, key = { it.id }) { tile ->
+                Box(modifier = Modifier.padding(horizontal = 4.dp)) {
+                    AnimatedDashboardTile(
+                        tile = tile,
+                        onClick = { onTileClick(tile.id) }
+                    )
+                }
+            }
+
+            // Decorative Footer
+            item(span = { GridItemSpan(2) }) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.secondary
-                                )
-                            )
-                        )
-                        .padding(20.dp)
+                        .padding(vertical = 32.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            stringResource(R.string.manage_your_school),
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            stringResource(R.string.everything_in_one_place),
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 13.sp
-                        )
-                        }
                         Icon(
-                            Icons.Default.Celebration,
+                            Icons.Default.Favorite,
                             contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
-                            modifier = Modifier.size(40.dp)
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.made_for_futures),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = stringResource(R.string.dashboard_overview),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            DashboardTileGrid(
-                tiles = adminTiles.filter { it.label.contains(searchQuery, ignoreCase = true) },
-                onTileClick = { onTileClick(it.id) }
-            )
-            
-            // Decorative footer for children theme
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Favorite, contentDescription = null, tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        stringResource(R.string.made_for_futures),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             }
         }
     }
 }
 
+// Helper composables for enhanced UI
+
+private data class StatItem(
+    val icon: ImageVector,
+    val label: String,
+    val count: Int,
+    val color: Color
+)
+
+@Composable
+private fun StatCard(stat: StatItem) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(90.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                modifier = Modifier.size(48.dp),
+                shape = CircleShape,
+                color = stat.color.copy(alpha = 0.12f)
+            ) {
+                Icon(
+                    imageVector = stat.icon,
+                    contentDescription = stat.label,
+                    tint = stat.color,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = stat.count.toString(),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stat.label,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SearchBarEnhanced(
+    query: String,
+    onQueryChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(30.dp)),
+        placeholder = { Text("Search modules...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Close, contentDescription = "Clear")
+                }
+            }
+        },
+        shape = RoundedCornerShape(30.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        ),
+        singleLine = true
+    )
+}
+
+@Composable
+private fun AnimatedDashboardTile(
+    tile: DashboardTile,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scale"
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .scale(scale)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true, radius = 40.dp),
+                onClick = onClick
+            )
+            .onGloballyPositioned { /* optional */ },
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 6.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = tile.icon,
+                contentDescription = tile.label,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = tile.label,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+        }
+    }
+}
+
+private fun getCurrentDate(): String {
+    val formatter = DateTimeFormatter.ofPattern("EEEE, MMM d", Locale.getDefault())
+    return LocalDate.now().format(formatter)
+}
+
+// Previews
 @Preview(showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun AdminDashboardDarkPreview() {

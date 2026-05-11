@@ -69,7 +69,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                     if (document.exists()) {
                         val name = document.getString("name") ?: "Unknown"
                         val role = document.getString("role") ?: "User"
-                        val profile = UserProfile(name, role)
+                        val id = document.getString("studentId") ?: document.getString("teacherId") ?: "N/A"
+                        val studentClass = document.getString("studentClass") ?: document.getString("home_section")
+                        val parentName = document.getString("fatherName") ?: document.getString("motherName")
+                        val email = document.getString("email")
+                        
+                        val profile = UserProfile(
+                            name = name,
+                            role = role,
+                            id = id,
+                            studentClass = studentClass,
+                            parentName = parentName,
+                            email = email
+                        )
                         _uiState.value = SettingsUiState.Success(profile)
                     } else {
                         _uiState.value = SettingsUiState.Error("User profile not found.")
@@ -88,6 +100,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
         AppCompatDelegate.setApplicationLocales(appLocale)
         _currentLanguage.value = languageCode
+        prefs.edit().putString("language_code", languageCode).apply()
     }
 
     fun toggleDarkMode(enabled: Boolean) {

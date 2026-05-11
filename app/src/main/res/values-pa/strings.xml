@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">ਮਾਰਕ ਮਾਈ ਡੇ</string>
+    <string name="settings">ਸੈਟਿੰਗਾਂ</string>
+    <string name="profile_details">ਪ੍ਰੋਫਾਈਲ ਵੇਰਵੇ</string>
+    <string name="preferences">ਤਰਜੀਹਾਂ</string>
+    <string name="language">ਭਾਸ਼ਾ</string>
+    <string name="dark_mode">ਡਾਰਕ ਮੋਡ</string>
+    <string name="notifications">ਸੂਚਨਾਵਾਂ</string>
+    <string name="more">ਹੋਰ</string>
+    <string name="terms_and_policies">ਸ਼ਰਤਾਂ ਅਤੇ ਨੀਤੀਆਂ</string>
+    <string name="about_app">ਐਪ ਬਾਰੇ</string>
+    <string name="logout">ਲੌਗਆਉਟ</string>
+    <string name="hello">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ 👋,</string>
+    <string name="nav_home">ਹੋਮ</string>
+    <string name="nav_notices">ਨੋਟਿਸ</string>
+    <string name="nav_learning">ਸਿੱਖਿਆ</string>
+    <string name="nav_reports">ਰਿਪੋਰਟਾਂ</string>
+    <string name="back">ਪਿੱਛੇ</string>
+    <string name="class_label_simple">ਕਲਾਸ: %1$s</string>
+    <string name="parent_label">ਮਾਪੇ: %1$s</string>
+    <string name="id_label_simple">ਆਈਡੀ: %1$s</string>
+    <string name="password_label">ਪਾਸਵਰਡ: ••••••••</string>
+    <string name="telugu">तेਲਗੂ</string>
+    <string name="hindi">ਹਿੰਦੀ</string>
+    <string name="english">ਅੰਗਰੇਜ਼ੀ</string>
+    <string name="punjabi">ਪੰਜਾਬੀ</string>
+    <string name="tile_staff_list">ਸਟਾਫ ਦੀ ਸੂਚੀ</string>
+    <string name="tile_daily_overview">ਰੋਜ਼ਾਨਾ ਸੰਖੇਪ</string>
+    <string name="tile_upload_quiz">ਕਵਿਜ਼ ਅਪਲੋਡ ਕਰੋ</string>
+    <string name="tile_course_manager">ਕੋਰਸ ਮੈਨੇਜਰ</string>
+    <string name="tile_students">ਵਿਦਿਆਰਥੀ</string>
+    <string name="tile_manage_leaves">ਛੁੱਟੀਆਂ ਦਾ ਪ੍ਰਬੰਧ</string>
+    <string name="tile_notices">ਨੋਟਿਸ</string>
+</resources>

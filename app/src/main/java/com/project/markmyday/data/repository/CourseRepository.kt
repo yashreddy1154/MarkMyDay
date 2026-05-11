@@ -15,7 +15,9 @@ class CourseRepository {
             val snapshot = courseCollection
                 .get()
                 .await()
-            val courses = snapshot.toObjects(CourseVideo::class.java)
+            val courses = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(CourseVideo::class.java)?.copy(id = doc.id)
+            }
             android.util.Log.d("CourseRepo", "Firestore returned ${courses.size} courses (Global)")
             emit(courses)
         } catch (e: Exception) {
@@ -41,6 +43,15 @@ class CourseRepository {
     suspend fun addCourse(video: CourseVideo): Result<Unit> {
         return try {
             courseCollection.document().set(video).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteCourse(id: String): Result<Unit> {
+        return try {
+            courseCollection.document(id).delete().await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

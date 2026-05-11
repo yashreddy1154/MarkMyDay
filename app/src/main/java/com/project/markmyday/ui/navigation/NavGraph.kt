@@ -69,7 +69,7 @@ fun AppNavigation(
     }
     
     // Track the last dashboard route to know where "Home" should go
-    var lastDashboardRoute by rememberSaveable { mutableStateOf("") }
+    var lastDashboardRoute by rememberSaveable { mutableStateOf(initialDashboardRoute ?: "") }
 
     NavHost(navController = navController, startDestination = Screen.Authentication.route) {
         composable(Screen.Authentication.route) {
@@ -137,12 +137,12 @@ fun AppNavigation(
             StudentDashboard(
                 userName = name,
                 userRole = role,
-                onNotificationClick = { navController.navigate("notifications/$role") },
+                onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "results" -> navController.navigate(Screen.Leaderboard.route + "?role=student")
-                        "notifications" -> navController.navigate("notifications/$role")
+                        "notifications" -> navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}")
                         "exams" -> {
                             val classNum = role.filter { it.isDigit() }.ifEmpty { "" }
                             if (classNum.isNotEmpty()) {
@@ -190,12 +190,12 @@ fun AppNavigation(
                 userRole = role,
                 homeSection = section,
                 subject = subject,
-                onNotificationClick = { navController.navigate("notifications/$role") },
+                onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
-                        "notifications" -> navController.navigate("notifications/$role")
+                        "notifications" -> navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}")
                         "exams" -> navController.navigate(Screen.QuizQuestionUpload.route)
                         "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher")
                         "admissions" -> navController.navigate(Screen.Admissions.route)
@@ -231,7 +231,7 @@ fun AppNavigation(
             AdminDashboard(
                 userName = name,
                 userRole = role,
-                onNotificationClick = { navController.navigate("notifications/$role") },
+                onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
                 onTileClick = { id -> 
                     when (id) {
                         "admissions" -> navController.navigate(Screen.Admissions.route)
@@ -379,14 +379,25 @@ fun AppNavigation(
             
             CourseLibraryScreen(
                 userRole = roleInfo,
-                onNotificationClick = { navController.navigate(Screen.Notifications.route) },
+                onNotificationClick = { 
+                    val encodedRole = java.net.URLEncoder.encode(roleInfo, "UTF-8")
+                    navController.navigate("notifications/$encodedRole") 
+                },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
         }
 
         composable(Screen.Reports.route) {
+            val authState by authViewModel.authState.collectAsState()
+            val roleInfo = remember(authState) {
+                if (authState is AuthResult.Success) (authState as AuthResult.Success).role else "Student"
+            }
+            
             ReportsScreen(
-                onNotificationClick = { navController.navigate(Screen.Notifications.route) },
+                onNotificationClick = { 
+                    val encodedRole = java.net.URLEncoder.encode(roleInfo, "UTF-8")
+                    navController.navigate("notifications/$encodedRole") 
+                },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
         }

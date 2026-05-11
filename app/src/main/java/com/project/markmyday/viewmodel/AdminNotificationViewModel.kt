@@ -3,6 +3,9 @@ package com.project.markmyday.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.project.markmyday.data.model.NotificationData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +35,39 @@ class AdminNotificationViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<NotificationUiState>(NotificationUiState.Idle)
     val uiState = _uiState.asStateFlow()
+
+    private val _notifications = MutableStateFlow<List<NotificationData>>(emptyList())
+    val notifications = _notifications.asStateFlow()
+
+    init {
+        fetchHistory()
+    }
+
+    private fun fetchHistory() {
+        database.orderByChild("timestamp").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = mutableListOf<NotificationData>()
+                for (doc in snapshot.children) {
+                    try {
+                        // CRITICAL FIX: Check if data is an object before parsing
+                        if (doc.value is String) {
+                            Log.e("AdminNotificationVM", "Invalid data type (String) at key: ${doc.key}. Skipping.")
+                            continue
+                        }
+                        
+                        doc.getValue(NotificationData::class.java)?.let { list.add(it) }
+                    } catch (e: Exception) {
+                        Log.e("AdminNotificationVM", "Error parsing history item: ${doc.key}", e)
+                    }
+                }
+                _notifications.value = list.sortedByDescending { it.timestamp }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("AdminNotificationVM", "History fetch cancelled", error.toException())
+            }
+        })
+    }
 
     fun onHeadingChange(newValue: String) {
         _heading.value = newValue
@@ -98,6 +134,16 @@ class AdminNotificationViewModel : ViewModel() {
                 // 5. Debug Log: Error
                 Log.e("AdminNotificationVM", "Failed to save notification", e)
                 _uiState.value = NotificationUiState.Error(e.localizedMessage ?: "Unknown error occurred")
+            }
+    }
+
+    fun deleteNotification(id: String) {
+        database.child(id).removeValue()
+            .addOnSuccessListener {
+                Log.d("AdminNotificationVM", "Notification deleted: $id")
+            }
+            .addOnFailureListener { e ->
+                Log.e("AdminNotificationVM", "Delete failed", e)
             }
     }
 

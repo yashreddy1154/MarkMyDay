@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.project.markmyday.data.repository.EngagementRepository
@@ -96,6 +97,16 @@ class VideoPlayerActivity : AppCompatActivity() {
                 }
             }
         }, iFramePlayerOptions)
+
+        binding.youtubePlayerView.addFullscreenListener(object : FullscreenListener {
+            override fun onEnterFullscreen(fullscreenView: android.view.View, exitFullscreen: () -> Unit) {
+                // We're not handling a custom fullscreen view here, so just pop a toast or handle it if needed
+                // Most basic implementation is just registering the listener to avoid the crash
+            }
+
+            override fun onExitFullscreen() {
+            }
+        })
 
         handler.post(timerRunnable)
     }

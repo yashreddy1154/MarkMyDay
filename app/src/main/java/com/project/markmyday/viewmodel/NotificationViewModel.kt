@@ -35,10 +35,12 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
         set(value) = prefs.edit().putLong("last_read_timestamp", value).apply()
 
     fun fetchNotifications(role: String) {
+        val decodedRole = try { java.net.URLDecoder.decode(role, "UTF-8") } catch (e: Exception) { role }
+        
         // Remove old listener if exists
         listener?.let { database.removeEventListener(it) }
 
-        Log.d("NotificationVM", "Fetching notifications for role: $role")
+        Log.d("NotificationVM", "Fetching notifications for role: $decodedRole")
 
         listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -46,11 +48,17 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
                 val fetchedNotifications = mutableListOf<NotificationData>()
                 for (doc in snapshot.children) {
                     try {
+                        // CRITICAL FIX: Check if data is an object before parsing
+                        if (doc.value is String) {
+                            Log.e("NotificationVM", "Invalid data type (String) at key: ${doc.key}. Skipping.")
+                            continue
+                        }
+                        
                         val item = doc.getValue(NotificationData::class.java)
                         if (item != null) {
                             val audienceOriginal = item.audience
                             val audienceLower = audienceOriginal.lowercase()
-                            val userRole = role.lowercase()
+                            val userRole = decodedRole.lowercase()
                             val currentUid = auth.currentUser?.uid
                             
                             // Client-side filtering

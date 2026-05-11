@@ -63,13 +63,15 @@ class LeaveViewModel(
         val uid = auth.currentUser?.uid ?: return
         firestore.collection("leaves")
             .whereEqualTo("studentId", uid)
-            .orderBy("appliedAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
+                if (error != null) {
+                    android.util.Log.e("LeaveViewModel", "Error fetching history", error)
+                    return@addSnapshotListener
+                }
                 if (snapshot != null) {
                     val history = snapshot.documents.mapNotNull { doc ->
                         doc.toObject(LeaveRequest::class.java)?.copy(id = doc.id)
-                    }
+                    }.sortedByDescending { it.appliedAt }
                     _leaveHistory.value = history
                 }
             }
@@ -89,7 +91,7 @@ class LeaveViewModel(
             }
     }
 
-    fun applyLeave(startDate: Date, endDate: Date, reason: String) {
+    fun applyLeave(startDate: Date, endDate: Date?, reason: String, category: String) {
         if (reason.isBlank()) {
             _submissionState.value = LeaveSubmissionState.Error("Please provide a reason")
             return
@@ -100,13 +102,17 @@ class LeaveViewModel(
         viewModelScope.launch {
             _submissionState.value = LeaveSubmissionState.Loading
             try {
+                // If endDate is null, it's a single day leave
+                val actualEndDate = endDate ?: startDate
+                
                 val leaveRequest = LeaveRequest(
                     studentId = uid,
                     studentName = studentName,
                     classSection = studentClassSection,
                     startDate = Timestamp(startDate),
-                    endDate = Timestamp(endDate),
+                    endDate = Timestamp(actualEndDate),
                     reason = reason,
+                    category = category,
                     status = "pending",
                     appliedAt = Timestamp.now()
                 )

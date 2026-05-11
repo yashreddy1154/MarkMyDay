@@ -18,6 +18,10 @@
     <string name="android_dev">ఆండ్రాయిడ్ దేవ్</string>
     <string name="error_profile">లోపం: %1$s</string>
     <string name="back">వెనుకకు</string>
+    <string name="telugu">తెలుగు</string>
+    <string name="hindi">హిందీ</string>
+    <string name="english">ఇంగ్లీష్</string>
+    <string name="punjabi">పంజాబీ</string>
     <string name="news_image">వార్తా చిత్రం</string>
     <string name="no_title">శీర్షిక లేదు</string>
     <string name="no_description">వివరణ లేదు</string>
@@ -71,6 +75,9 @@
     <string name="dashboard_overview">డాష్‌బోర్డ్ అవలోకనం</string>
     <string name="made_for_futures">ఉజ్వల భవిష్యత్తు కోసం రూపొందించబడింది</string>
     <string name="tile_staff_list">సిబ్బంది జాబితా</string>
+    <string name="tile_daily_overview">రోజువారీ అవలోకనం</string>
+    <string name="tile_upload_quiz">క్విజ్ అప్‌లోడ్ చేయండి</string>
+    <string name="tile_course_manager">కోర్సు మేనేజర్</string>
     <string name="tile_timetables">టైమ్‌టేబుల్స్</string>
     <string name="tile_students">విద్యార్థులు</string>
 
@@ -86,6 +93,8 @@
     <string name="students_list_title">విద్యార్థుల జాబితా</string>
     <string name="admission_no_label">అడ్మిషన్ నంబర్: %1$s</string>
     <string name="parent_label">తల్లిదండ్రులు: %1$s</string>
+    <string name="class_label_simple">తరగతి: %1$s</string>
+    <string name="password_label">పాస్‌వర్డ్: ••••••••</string>
     <string name="student_list_count">విద్యార్థుల జాబితా (%1$d)</string>
     <string name="no_admissions_yet">ఇంకా ప్రవేశాలు జోడించబడలేదు.</string>
     <string name="class_prefix">తరగతి: %1$s</string>

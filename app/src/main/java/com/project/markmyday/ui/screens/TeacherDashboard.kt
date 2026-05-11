@@ -69,7 +69,7 @@ fun TeacherDashboard(
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
         DashboardTile("notifications", stringResource(R.string.tile_notices), Icons.Default.Notifications, badgeCount = if (hasUnread) 1 else 0),
         DashboardTile("admissions", stringResource(R.string.tile_new_admission), Icons.Default.School),
-        DashboardTile("course_manager", "Course Manager", Icons.Default.VideoLibrary),
+        DashboardTile("course_manager", stringResource(R.string.tile_course_manager), Icons.Default.VideoLibrary),
         DashboardTile("messages", stringResource(R.string.tile_messages), Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     )

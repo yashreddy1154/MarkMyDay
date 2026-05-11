@@ -60,9 +60,21 @@ class CourseViewModel : ViewModel() {
             val result = repository.addCourse(video)
             if (result.isSuccess) {
                 _uploadStatus.value = CourseUploadStatus.Success(1)
+                fetchAllCourses() // Refresh history
             } else {
                 _uploadStatus.value = CourseUploadStatus.Error(result.exceptionOrNull()?.message ?: "Unknown error")
             }
+        }
+    }
+
+    fun deleteCourse(id: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = repository.deleteCourse(id)
+            if (result.isSuccess) {
+                fetchAllCourses() // Refresh history
+            }
+            _isLoading.value = false
         }
     }
 

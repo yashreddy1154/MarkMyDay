@@ -18,6 +18,10 @@
     <string name="android_dev">एंड्रॉइड डेवलपर</string>
     <string name="error_profile">त्रुटि: %1$s</string>
     <string name="back">पीछे</string>
+    <string name="telugu">तेलुगु</string>
+    <string name="hindi">हिंदी</string>
+    <string name="english">अंग्रेजी</string>
+    <string name="punjabi">पंजाबी</string>
     <string name="news_image">समाचार चित्र</string>
     <string name="no_title">कोई शीर्षक नहीं</string>
     <string name="no_description">कोई विवरण नहीं</string>
@@ -71,6 +75,9 @@
     <string name="dashboard_overview">डैशबोर्ड अवलोकन</string>
     <string name="made_for_futures">उज्ज्वल भविष्य के लिए बनाया गया</string>
     <string name="tile_staff_list">कर्मचारी सूची</string>
+    <string name="tile_daily_overview">दैनिक अवलोकन</string>
+    <string name="tile_upload_quiz">क्विज़ अपलोड करें</string>
+    <string name="tile_course_manager">कोर्स मैनेजर</string>
     <string name="tile_timetables">समय सारणी</string>
     <string name="tile_students">छात्र</string>
 
@@ -86,6 +93,8 @@
     <string name="students_list_title">छात्रों की सूची</string>
     <string name="admission_no_label">प्रवेश संख्या: %1$s</string>
     <string name="parent_label">अभिभावक: %1$s</string>
+    <string name="class_label_simple">कक्षा: %1$s</string>
+    <string name="password_label">पासवर्ड: ••••••••</string>
     <string name="student_list_count">छात्र सूची (%1$d)</string>
     <string name="no_admissions_yet">अभी तक कोई प्रवेश नहीं जोड़ा गया है।</string>
     <string name="class_prefix">कक्षा: %1$s</string>

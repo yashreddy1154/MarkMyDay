@@ -121,30 +121,53 @@ fun SettingsScreen(
                         }
                     }
                     is SettingsUiState.Success -> {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .size(60.dp)
-                                    .clip(CircleShape)
+                                    .size(80.dp)
+                                    .clip(RoundedCornerShape(16.dp))
                                     .background(MaterialTheme.colorScheme.primaryContainer),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = state.profile.name.take(1).uppercase(),
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(40.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
                             Spacer(modifier = Modifier.width(16.dp))
-                            Column {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = state.profile.name,
                                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                                 )
+                                if (state.profile.studentClass != null) {
+                                    Text(
+                                        text = stringResource(R.string.class_label_simple, state.profile.studentClass),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (state.profile.parentName != null) {
+                                    Text(
+                                        text = stringResource(R.string.parent_label, state.profile.parentName),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Text(
-                                    text = state.profile.role.replaceFirstChar { it.uppercase() },
+                                    text = stringResource(R.string.id_label_simple, state.profile.id),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.secondary
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = stringResource(R.string.password_label),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -157,32 +180,67 @@ fun SettingsScreen(
 
             // 2. Preferences Section
             SettingsSection(
-                title = stringResource(R.string.preferences),
-                icon = Icons.Default.Settings
+                title = stringResource(R.string.language),
+                icon = Icons.Default.Language
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Language Toggle
-                    val languages = listOf(
-                        "English" to "en",
-                        "Hindi" to "hi",
-                        "Telugu" to "te"
-                    )
+                val languages = listOf(
+                    stringResource(R.string.telugu) to "te",
+                    stringResource(R.string.english) to "en",
+                    stringResource(R.string.hindi) to "hi",
+                    stringResource(R.string.punjabi) to "pa"
+                )
 
-                    Column {
-                        Text(stringResource(R.string.language), style = MaterialTheme.typography.labelLarge)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            languages.forEach { (name, code) ->
-                                FilterChip(
-                                    selected = currentLanguage.contains(code),
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    languages.chunked(2).forEach { rowLanguages ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            rowLanguages.forEach { (name, code) ->
+                                OutlinedCard(
                                     onClick = { viewModel.setLanguage(code) },
-                                    label = { Text(name) },
-                                    shape = RoundedCornerShape(12.dp)
-                                )
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(50.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = CardDefaults.outlinedCardColors(
+                                        containerColor = if (currentLanguage == code) 
+                                            MaterialTheme.colorScheme.primaryContainer 
+                                        else 
+                                            Color.Transparent
+                                    ),
+                                    border = androidx.compose.foundation.BorderStroke(
+                                        1.dp, 
+                                        if (currentLanguage == code) 
+                                            MaterialTheme.colorScheme.primary 
+                                        else 
+                                            MaterialTheme.colorScheme.outline
+                                    )
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = name,
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = if (currentLanguage == code) FontWeight.Bold else FontWeight.Medium,
+                                                color = if (currentLanguage == code) 
+                                                    MaterialTheme.colorScheme.onPrimaryContainer 
+                                                else 
+                                                    MaterialTheme.colorScheme.onSurface
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                            if (rowLanguages.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
                     HorizontalDivider(modifier = Modifier.alpha(0.5f))
 
                     // Dark Mode Toggle

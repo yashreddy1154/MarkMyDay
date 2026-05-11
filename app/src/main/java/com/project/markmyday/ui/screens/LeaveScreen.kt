@@ -8,6 +8,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,8 +36,11 @@ fun LeaveScreen(
     
     val dateRangePickerState = rememberDateRangePickerState()
     var reason by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("Personal") }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showCategoryMenu by remember { mutableStateOf(false) }
 
+    val categories = listOf("Personal", "Emergency", "Hospital/Medical", "Function/Marriage", "Others")
     val dateFormatter = remember { SimpleDateFormat("dd MMM", Locale.getDefault()) }
 
     LaunchedEffect(submissionState) {
@@ -85,6 +90,42 @@ fun LeaveScreen(
                     ) {
                         Text("New Request", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         
+                        // Category Selection
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedCard(
+                                onClick = { showCategoryMenu = true },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Category, contentDescription = null)
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(text = selectedCategory, style = MaterialTheme.typography.bodyLarge)
+                                    }
+                                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                }
+                            }
+                            DropdownMenu(
+                                expanded = showCategoryMenu,
+                                onDismissRequest = { showCategoryMenu = false },
+                                modifier = Modifier.fillMaxWidth(0.9f)
+                            ) {
+                                categories.forEach { category ->
+                                    DropdownMenuItem(
+                                        text = { Text(category) },
+                                        onClick = {
+                                            selectedCategory = category
+                                            showCategoryMenu = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
                         // Date Selection
                         OutlinedCard(
                             onClick = { showDatePicker = true },
@@ -97,9 +138,11 @@ fun LeaveScreen(
                                 Icon(Icons.Default.CalendarToday, contentDescription = null)
                                 Spacer(modifier = Modifier.width(12.dp))
                                 val start = dateRangePickerState.selectedStartDateMillis?.let { dateFormatter.format(Date(it)) } ?: "Start"
-                                val end = dateRangePickerState.selectedEndDateMillis?.let { dateFormatter.format(Date(it)) } ?: "End"
+                                val end = dateRangePickerState.selectedEndDateMillis?.let { dateFormatter.format(Date(it)) } ?: ""
                                 Text(
-                                    text = if (dateRangePickerState.selectedStartDateMillis != null) "$start - $end" else "Select Date Range",
+                                    text = if (dateRangePickerState.selectedStartDateMillis != null) {
+                                        if (dateRangePickerState.selectedEndDateMillis != null) "$start - $end" else "$start (Single Day)"
+                                    } else "Select Date Range",
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -117,8 +160,13 @@ fun LeaveScreen(
                             onClick = {
                                 val start = dateRangePickerState.selectedStartDateMillis
                                 val end = dateRangePickerState.selectedEndDateMillis
-                                if (start != null && end != null) {
-                                    viewModel.applyLeave(Date(start), Date(end), reason)
+                                if (start != null) {
+                                    viewModel.applyLeave(
+                                        startDate = Date(start),
+                                        endDate = end?.let { Date(it) },
+                                        reason = reason,
+                                        category = selectedCategory
+                                    )
                                 }
                             },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -214,11 +262,21 @@ fun LeaveHistoryCard(request: LeaveRequest) {
             ) {
                 val start = request.startDate?.toDate()?.let { dateFormatter.format(it) } ?: ""
                 val end = request.endDate?.toDate()?.let { dateFormatter.format(it) } ?: ""
-                Text(
-                    text = "$start - $end",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                val dateRange = if (start == end) start else "$start - $end"
+                
+                Column {
+                    Text(
+                        text = dateRange,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = request.category,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
                 Surface(
                     color = statusColor.copy(alpha = 0.1f),
                     shape = MaterialTheme.shapes.small

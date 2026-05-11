@@ -18,6 +18,10 @@
     <string name="android_dev">Android Dev</string>
     <string name="error_profile">Error: %1$s</string>
     <string name="back">Back</string>
+    <string name="telugu">Telugu</string>
+    <string name="hindi">Hindi</string>
+    <string name="english">English</string>
+    <string name="punjabi">Punjabi</string>
     <string name="news_image">News Image</string>
     <string name="no_title">No Title</string>
     <string name="no_description">No Description</string>
@@ -71,6 +75,9 @@
     <string name="dashboard_overview">Dashboard Overview</string>
     <string name="made_for_futures">Made for bright futures</string>
     <string name="tile_staff_list">Staff List</string>
+    <string name="tile_daily_overview">Daily Overview</string>
+    <string name="tile_upload_quiz">Upload Quiz</string>
+    <string name="tile_course_manager">Course Manager</string>
     <string name="tile_timetables">Timetables</string>
     <string name="tile_students">Students</string>
 
@@ -86,6 +93,9 @@
     <string name="students_list_title">Students List</string>
     <string name="admission_no_label">Admission No: %1$s</string>
     <string name="parent_label">Parent: %1$s</string>
+    <string name="class_label_simple">Class: %1$s</string>
+    <string name="id_label_simple">ID: %1$s</string>
+    <string name="password_label">Password: ••••••••</string>
     <string name="student_list_count">Student List (%1$d)</string>
     <string name="no_admissions_yet">No admissions added yet.</string>
     <string name="class_prefix">Class: %1$s</string>
