@@ -12,8 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -72,20 +71,23 @@ fun AboutScreen(onBack: () -> Unit) {
 
 @Composable
 fun CreatorsSection() {
-    val creators = listOf(
-        Creator("Tarak", stringResource(R.string.android_dev), R.drawable.tarak),
-        Creator("Teja Reddy", stringResource(R.string.android_dev), R.drawable.teja),
-        Creator("Yash", stringResource(R.string.android_dev), R.drawable.yash)
-    )
-    val pagerState = rememberPagerState { creators.size }
+    val creators = remember {
+        listOf(
+            Creator("Tarak", "Android Developer", R.drawable.tarak),
+            Creator("Teja Reddy", "Android Developer", R.drawable.teja),
+            Creator("Yash", "Android Developer", R.drawable.yash)
+        )
+    }
+    val pagerState = rememberPagerState(pageCount = { creators.size })
 
-    // Auto-scroll logic
-    LaunchedEffect(creators) {
+    // Auto-scroll logic: Move one by one every 2 seconds
+    LaunchedEffect(Unit) {
         while (true) {
-            yield()
-            delay(3000)
-            val nextPage = (pagerState.currentPage + 1) % creators.size
-            pagerState.animateScrollToPage(nextPage)
+            delay(2000)
+            if (creators.isNotEmpty()) {
+                val nextPageIndex = (pagerState.currentPage + 1) % creators.size
+                pagerState.animateScrollToPage(nextPageIndex)
+            }
         }
     }
 
@@ -104,8 +106,9 @@ fun CreatorsSection() {
 
         HorizontalPager(
             state = pagerState,
-            contentPadding = PaddingValues(horizontal = 40.dp), // Adjusted padding for about screen
-            modifier = Modifier.height(380.dp)
+            contentPadding = PaddingValues(horizontal = 48.dp),
+            pageSpacing = 16.dp,
+            modifier = Modifier.height(400.dp)
         ) { page ->
             val creator = creators[page]
             
@@ -117,33 +120,25 @@ fun CreatorsSection() {
                                 .currentPageOffsetFraction
                             ).absoluteValue
                         
-                        // 3D rotation effect
-                        rotationY = lerp(
-                            start = 0f,
-                            stop = 40f,
-                            fraction = pageOffset.coerceIn(0f, 1f)
-                        ) * (if (pagerState.currentPage > page) 1f else -1f)
-
-                        // Scale effect
+                        // Subtle scale and alpha effect
                         val scale = lerp(
                             start = 1f,
-                            stop = 0.85f,
+                            stop = 0.9f,
                             fraction = pageOffset.coerceIn(0f, 1f)
                         )
                         scaleX = scale
                         scaleY = scale
                         
-                        // Transparency effect
                         alpha = lerp(
                             start = 1f,
-                            stop = 0.5f,
+                            stop = 0.6f,
                             fraction = pageOffset.coerceIn(0f, 1f)
                         )
                     }
                     .fillMaxWidth()
                     .aspectRatio(0.8f),
                 shape = RoundedCornerShape(24.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Image(
@@ -159,8 +154,8 @@ fun CreatorsSection() {
                             .fillMaxSize()
                             .background(
                                 Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
-                                    startY = 300f
+                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                                    startY = 400f
                                 )
                             )
                     )
@@ -168,19 +163,19 @@ fun CreatorsSection() {
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
-                            .padding(16.dp)
+                            .padding(20.dp)
                     ) {
                         Text(
                             text = creator.name,
                             style = MaterialTheme.typography.titleLarge.copy(
                                 color = Color.White,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.ExtraBold
                             )
                         )
                         Text(
                             text = creator.role,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = Color.White.copy(alpha = 0.9f)
                             )
                         )
                     }
