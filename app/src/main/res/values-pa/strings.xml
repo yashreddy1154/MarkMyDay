@@ -31,4 +31,6 @@
     <string name="tile_students">ਵਿਦਿਆਰਥੀ</string>
     <string name="tile_manage_leaves">ਛੁੱਟੀਆਂ ਦਾ ਪ੍ਰਬੰਧ</string>
     <string name="tile_notices">ਨੋਟਿਸ</string>
+    <string name="add_teacher">ਅਧਿਆਪਕ ਜੋੜੋ</string>
+    <string name="edit_teacher">ਅਧਿਆਪਕ ਨੂੰ ਸੰਪਾਦਿਤ ਕਰੋ</string>
 </resources>

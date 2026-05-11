@@ -188,6 +188,8 @@
     <string name="step_3_name">టైమ్‌టేబుల్‌ను సవరించండి</string>
     <string name="next">తరువాత</string>
     <string name="select_teacher">టీచర్‌ను ఎంచుకోండి</string>
+    <string name="add_teacher">ఉపాధ్యాయుడిని చేర్చండి</string>
+    <string name="edit_teacher">ఉపాధ్యాయుడిని సవరించండి</string>
     <string name="teacher_name_label">పేరు: %1$s</string>
     <string name="primary_subject_label">ప్రైమరీ సబ్జెక్ట్: %1$s</string>
     <string name="category_label_simple">వర్గం: %1$s</string>
