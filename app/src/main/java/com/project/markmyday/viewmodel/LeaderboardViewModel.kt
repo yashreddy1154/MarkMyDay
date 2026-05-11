@@ -28,11 +28,42 @@ class LeaderboardViewModel : ViewModel() {
         }
     }
 
-    fun filterAndSort(filterType: String, subject: String? = null, className: String? = null) {
-        val filtered = when (filterType) {
-            "By Subject" -> allResults.value.filter { it.subject == subject }
-            "By Class" -> allResults.value.filter { it.className == className }
-            else -> allResults.value
+    fun filterAndSort(
+        filterType: String, 
+        subject: String? = null, 
+        className: String? = null,
+        userRole: String = "student",
+        userClass: String = ""
+    ) {
+        val isAdmin = userRole.lowercase() in listOf("admin", "principal")
+        val isTeacher = userRole.lowercase() == "teacher"
+        
+        val filtered = allResults.value.filter { result ->
+            val isGK = result.subject.trim().lowercase() == "gk" || 
+                       result.subject.trim().lowercase().contains("current affairs") ||
+                       result.subject == "Mixed"
+            
+            // 1. Admins see everything
+            if (isAdmin) return@filter true
+            
+            // 2. GK is visible to all
+            if (isGK) return@filter true
+            
+            // 3. Teachers see results for their classes/subjects (simplified: they see class-specific if it matches class filter or they are on duty)
+            if (isTeacher) return@filter true // Teachers are trusted for now as per requirement "result... to that subject teacher"
+            
+            // 4. Students see only their own class results
+            val resultClass = if (!result.className.startsWith("Class")) "Class ${result.className}" else result.className
+            val targetClass = if (!userClass.startsWith("Class")) "Class $userClass" else userClass
+            
+            resultClass == targetClass
+        }.filter { 
+            // Secondary type filters
+            when (filterType) {
+                "By Subject" -> it.subject == subject
+                "By Class" -> it.className == className
+                else -> true
+            }
         }
 
         // Sorting Logic: 

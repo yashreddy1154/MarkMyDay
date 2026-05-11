@@ -308,7 +308,7 @@ fun QuizContent(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)),
+                .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)),
             color = Color.White
         ) {
             Column(
@@ -317,21 +317,37 @@ fun QuizContent(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Subject Tag
+                Surface(
+                    color = purpleTheme.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Text(
+                        text = currentQuestion.subject,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        color = purpleTheme,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+
                 // Question Text in its own card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(1.dp, Color(0xFFEEEEEE))
+                    border = BorderStroke(1.dp, Color(0xFFE2E8F0))
                 ) {
                     Text(
                         text = currentQuestion.text,
                         modifier = Modifier.padding(24.dp),
                         textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color(0xFF2D3748)
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        color = Color(0xFF1A202C),
+                        lineHeight = 30.sp
                     )
                 }
 

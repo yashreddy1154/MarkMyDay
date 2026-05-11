@@ -40,6 +40,19 @@ class QuizTakingViewModel(application: Application) : AndroidViewModel(applicati
 
     private var timer: CountDownTimer? = null
 
+    private val _availableQuizzes = MutableStateFlow<List<Pair<String, String>>>(emptyList())
+    val availableQuizzes: StateFlow<List<Pair<String, String>>> = _availableQuizzes
+
+    fun loadAvailableQuizzes(className: String) {
+        viewModelScope.launch {
+            _quizState.value = QuizState.Loading
+            quizRepository.getAvailableSubjectsForClass(className).collect { subjects ->
+                _availableQuizzes.value = subjects
+                _quizState.value = QuizState.Idle
+            }
+        }
+    }
+
     fun startQuiz(className: String, studentName: String = "Student", studentId: String = "") {
         this.studentName = studentName
         this.className = className

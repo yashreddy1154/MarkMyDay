@@ -154,14 +154,34 @@ class QuizRepository {
         try {
             val normalizedClass = if (!className.startsWith("Class") && className != "ALL") "Class $className" else className
             
-            // Query by className only to get mixed subjects
+            // Query by className or "ALL" for mixed subjects
             val query = questionCollection
-                .whereEqualTo("className", normalizedClass)
+                .whereIn("className", listOf(normalizedClass, "ALL"))
                 .get()
                 .await()
             
             val questions = query.toObjects(Question::class.java)
             emit(questions)
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+    }
+
+    fun getAvailableSubjectsForClass(className: String): Flow<List<Pair<String, String>>> = flow {
+        try {
+            val normalizedClass = if (!className.startsWith("Class") && className != "ALL") "Class $className" else className
+            val query = questionCollection
+                .whereIn("className", listOf(normalizedClass, "ALL"))
+                .get()
+                .await()
+            
+            val subjects = query.documents.map { doc ->
+                val sub = doc.getString("subject") ?: "General"
+                val cls = doc.getString("className") ?: "ALL"
+                sub to cls
+            }.distinct()
+            
+            emit(subjects)
         } catch (e: Exception) {
             emit(emptyList())
         }

@@ -30,13 +30,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
 import com.project.markmyday.data.model.QuizResult
+import com.project.markmyday.ui.components.DashboardBottomBar
 import com.project.markmyday.viewmodel.LeaderboardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen(
     role: String = "student",
-    onBack: () -> Unit
+    userClass: String = "10", // Should be passed from dashboard
+    onBack: () -> Unit,
+    onNavigate: (String) -> Unit = {}
 ) {
     val viewModel: LeaderboardViewModel = viewModel()
     val filteredResults by viewModel.filteredResults.collectAsState()
@@ -44,6 +47,10 @@ fun LeaderboardScreen(
     
     val isAdmin = role.lowercase() == "admin" || role.lowercase() == "principal"
     val purpleTheme = Color(0xFF917BFF)
+
+    LaunchedEffect(Unit) {
+        viewModel.filterAndSort("Overall", userRole = role, userClass = userClass)
+    }
 
     Scaffold(
         containerColor = purpleTheme,
@@ -81,6 +88,9 @@ fun LeaderboardScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
+        },
+        bottomBar = {
+            DashboardBottomBar(currentRoute = "marks", onNavigate = onNavigate)
         }
     ) { padding ->
         Column(
@@ -177,6 +187,9 @@ fun PodiumItem(result: QuizResult?, rank: Int, avatarSize: androidx.compose.ui.u
             }
             Spacer(Modifier.height(8.dp))
             Text(result.studentName, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            if (result.className.isNotEmpty()) {
+                Text("Class ${result.className}", color = Color.White.copy(alpha = 0.8f), fontSize = 11.sp)
+            }
             Spacer(Modifier.height(4.dp))
             Surface(
                 color = if (rank == 1) Color(0xFFFFD154) else Color.White.copy(alpha = 0.2f),
@@ -225,7 +238,12 @@ fun RemainingLeaderboardItem(rank: Int, result: QuizResult) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(result.studentName, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF2D3748))
-            Text("@${result.studentId}", fontSize = 12.sp, color = Color.Gray)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("@${result.studentId}", fontSize = 12.sp, color = Color.Gray)
+                if (result.className.isNotEmpty()) {
+                    Text(" • Class ${result.className}", fontSize = 12.sp, color = Color.Gray)
+                }
+            }
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {

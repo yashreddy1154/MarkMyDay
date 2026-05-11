@@ -1,10 +1,10 @@
 package com.project.markmyday.ui.screens
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -38,7 +38,6 @@ fun QuizQuestionUploadScreen(
     val scrollState = rememberScrollState()
 
     var subject by remember { mutableStateOf("") }
-    var className by remember { mutableStateOf("") }
     var questionText by remember { mutableStateOf("") }
     var optA by remember { mutableStateOf("") }
     var optB by remember { mutableStateOf("") }
@@ -53,6 +52,22 @@ fun QuizQuestionUploadScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { viewModel.uploadCsv(context, it) }
+    }
+
+    // Handle Toast messages
+    LaunchedEffect(uploadStatus) {
+        when (uploadStatus) {
+            is UploadStatus.Success -> {
+                Toast.makeText(context, "Saved successfully! ✨", Toast.LENGTH_SHORT).show()
+                questionText = ""; optA = ""; optB = ""; optC = ""; optD = ""; subject = ""
+                viewModel.resetStatus()
+            }
+            is UploadStatus.Error -> {
+                Toast.makeText(context, "Error: ${(uploadStatus as UploadStatus.Error).message}", Toast.LENGTH_LONG).show()
+                viewModel.resetStatus()
+            }
+            else -> {}
+        }
     }
 
     Scaffold(
@@ -98,53 +113,45 @@ fun QuizQuestionUploadScreen(
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text("Upload CSV File", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                    Text("Class-specific questions from file", fontSize = 12.sp, color = Color.Gray)
+                    Text("Upload CSV/Excel File", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                    Text("Format: Subject | Class | Question | Options | Correct", fontSize = 11.sp, color = Color.Gray)
                 }
             }
 
-            Divider(color = Color.LightGray.copy(alpha = 0.5f))
+            Divider(color = Color.LightGray.copy(alpha = 0.3f))
 
             // 2. Manual Entry Section
-            Text("Manual Entry", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
+            Text("Manual Entry 📝", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+            Text("Note: Manual entries are added to ALL classes.", fontSize = 12.sp, color = Color.Gray)
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Subject and Class row
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(
-                        value = subject,
-                        onValueChange = { subject = it },
-                        label = { Text("Subject (e.g. GK)") },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    OutlinedTextField(
-                        value = className,
-                        onValueChange = { className = it },
-                        label = { Text("Class (e.g. 10)") },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                }
+                OutlinedTextField(
+                    value = subject,
+                    onValueChange = { subject = it },
+                    label = { Text("Subject (e.g. GK)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    placeholder = { Text("Enter subject name") }
+                )
 
-                // Question Box
                 OutlinedTextField(
                     value = questionText,
                     onValueChange = { questionText = it },
                     label = { Text("Enter Question Text") },
-                    modifier = Modifier.fillMaxWidth().height(100.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    placeholder = { Text("Type the question here...") }
                 )
 
                 // Options Grid (A, B, C, D)
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        OutlinedTextField(value = optA, onValueChange = { optA = it }, label = { Text("Option A") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
-                        OutlinedTextField(value = optB, onValueChange = { optB = it }, label = { Text("Option B") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+                        OutlinedTextField(value = optA, onValueChange = { optA = it }, label = { Text("Option A") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp))
+                        OutlinedTextField(value = optB, onValueChange = { optB = it }, label = { Text("Option B") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        OutlinedTextField(value = optC, onValueChange = { optC = it }, label = { Text("Option C") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
-                        OutlinedTextField(value = optD, onValueChange = { optD = it }, label = { Text("Option D") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+                        OutlinedTextField(value = optC, onValueChange = { optC = it }, label = { Text("Option C") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp))
+                        OutlinedTextField(value = optD, onValueChange = { optD = it }, label = { Text("Option D") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp))
                     }
                 }
 
@@ -157,10 +164,10 @@ fun QuizQuestionUploadScreen(
                         value = selectedCorrectOption,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Correct Option") },
+                        label = { Text("Select Correct Option") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier.fillMaxWidth().menuAnchor(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -181,14 +188,13 @@ fun QuizQuestionUploadScreen(
                 // Save Button
                 Button(
                     onClick = {
-                        if (questionText.isNotEmpty() && subject.isNotEmpty() && className.isNotEmpty()) {
+                        if (questionText.isNotEmpty() && subject.isNotEmpty()) {
                             val correctValue = when(selectedCorrectOption) {
                                 "Option A" -> optA
                                 "Option B" -> optB
                                 "Option C" -> optC
                                 else -> optD
                             }
-                            val normalizedClass = if (!className.startsWith("Class")) "Class $className" else className
                             
                             viewModel.saveManualQuestion(
                                 Question(
@@ -196,33 +202,24 @@ fun QuizQuestionUploadScreen(
                                     options = listOf(optA, optB, optC, optD),
                                     correctAnswer = correctValue,
                                     subject = subject,
-                                    className = normalizedClass
+                                    className = "ALL" // Requirement: manual always ALL
                                 )
                             )
+                        } else {
+                            Toast.makeText(context, "Please fill Subject and Question", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    enabled = uploadStatus !is UploadStatus.Loading
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    enabled = uploadStatus !is UploadStatus.Loading,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Add to Question Bank", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-
-            // Status Indication
-            when (uploadStatus) {
-                is UploadStatus.Loading -> LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                is UploadStatus.Success -> {
-                    Text("Saved successfully!", color = Color(0xFF4CAF50), fontWeight = FontWeight.Bold)
-                    // Reset fields on success
-                    LaunchedEffect(Unit) {
-                        questionText = ""; optA = ""; optB = ""; optC = ""; optD = ""
-                        kotlinx.coroutines.delay(2000)
-                        viewModel.resetStatus()
+                    if (uploadStatus is UploadStatus.Loading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text("Save to Question Bank ✨", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 }
-                is UploadStatus.Error -> Text("Error: ${(uploadStatus as UploadStatus.Error).message}", color = Color.Red)
-                else -> {}
             }
         }
     }
