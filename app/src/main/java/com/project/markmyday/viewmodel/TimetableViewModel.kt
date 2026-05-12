@@ -328,6 +328,20 @@ class TimetableViewModel(
         }
     }
 
+    fun saveWeeklySchedule(className: String, schedule: Map<String, com.project.markmyday.data.model.DaySchedule>) {
+        viewModelScope.launch {
+            _state.value = TimetableState.Loading
+            try {
+                val currentTimetable = _allTimetables.value.find { it.className == className } ?: Timetable(className = className)
+                val updatedTimetable = currentTimetable.copy(weeklySchedule = schedule)
+                timetableRepository.updateTimetable(updatedTimetable)
+                _state.value = TimetableState.Success
+            } catch (e: Exception) {
+                _state.value = TimetableState.Error(e.localizedMessage ?: "Failed to save schedule")
+            }
+        }
+    }
+
     fun previousStep() {
         if (_currentStep.value > 1) {
             _currentStep.value -= 1
