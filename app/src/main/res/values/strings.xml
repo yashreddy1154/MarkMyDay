@@ -322,4 +322,5 @@
     <string name="teacher_conflict_error">Teacher %1$s is already assigned to %2$s at this time</string>
     <string name="select_subject_dialog_title">Select Subject</string>
     <string name="no_quota_left">No quota left!</string>
+    <string name="assign_teachers_error">Please assign teachers to all subjects in the Weekly Quota first.</string>
 </resources>

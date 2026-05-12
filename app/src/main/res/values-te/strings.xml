@@ -321,4 +321,5 @@
     <string name="teacher_conflict_error">టీచర్ %1$s ఈ సమయంలో ఇప్పటికే %2$s కి కేటాయించబడ్డారు</string>
     <string name="select_subject_dialog_title">సబ్జెక్టును ఎంచుకోండి</string>
     <string name="no_quota_left">కోటా ఏమీ లేదు!</string>
+    <string name="assign_teachers_error">దయచేసి మొదట వారపు కోటాలోని అన్ని సబ్జెక్టులకు టీచర్లను కేటాయించండి.</string>
 </resources>

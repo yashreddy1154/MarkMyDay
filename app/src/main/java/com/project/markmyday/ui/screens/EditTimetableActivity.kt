@@ -364,17 +364,18 @@ fun SCard(
 ) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
-    val color = if (period != null) getSubjectColorForGrid(period.subject) else Color.DarkGray
+    val isLeisure = period == null || period.subject.isEmpty()
+    val color = if (!isLeisure && period != null) getSubjectColorForGrid(period.subject) else Color.DarkGray
 
     Card(
         modifier = Modifier
             .size(width = 120.dp, height = 80.dp)
             .clickable { showMenu = true },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = if (period != null) color.copy(alpha = 0.1f) else color.copy(alpha = 0.05f)),
-        border = BorderStroke(1.dp, if (period != null) color.copy(alpha = 0.5f) else color.copy(alpha = 0.2f))
+        colors = CardDefaults.cardColors(containerColor = if (!isLeisure) color.copy(alpha = 0.1f) else color.copy(alpha = 0.05f)),
+        border = BorderStroke(1.dp, if (!isLeisure) color.copy(alpha = 0.5f) else color.copy(alpha = 0.2f))
     ) {
-        if (period != null) {
+        if (!isLeisure && period != null) {
             Box(modifier = Modifier.padding(10.dp).fillMaxSize()) {
                 Text(
                     text = period.subject,
@@ -411,14 +412,45 @@ fun SCard(
             title = { Text(stringResource(R.string.select_subject_dialog_title)) },
             text = {
                 val filterQuotas = availableQuotas.filter { it.classCount > 0 }
-                if (filterQuotas.isEmpty()) {
-                    Text(stringResource(R.string.no_quota_left))
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.heightIn(max = 400.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(vertical = 8.dp)
-                    ) {
+                LazyColumn(
+                    modifier = Modifier.heightIn(max = 400.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    // Leisure Option
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { 
+                                    onSubjectSelected(SubjectQuota(subject = "", teacherId = "", teacherName = ""))
+                                    showMenu = false 
+                                },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.DarkGray.copy(alpha = 0.1f)),
+                            border = BorderStroke(1.dp, Color.DarkGray.copy(alpha = 0.4f))
+                        ) {
+                            Box(modifier = Modifier.padding(12.dp).fillMaxSize()) {
+                                Text(
+                                    text = stringResource(R.string.leisure_period),
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 16.sp,
+                                    color = Color.DarkGray,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                        }
+                    }
+
+                    if (filterQuotas.isEmpty()) {
+                        item {
+                            Text(
+                                stringResource(R.string.no_quota_left),
+                                modifier = Modifier.padding(16.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
                         items(filterQuotas) { quota ->
                             Card(
                                 modifier = Modifier

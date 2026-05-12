@@ -321,4 +321,5 @@
     <string name="teacher_conflict_error">शिक्षक %1$s इस समय पहले से ही %2$s में नियुक्त हैं</string>
     <string name="select_subject_dialog_title">विषय चुनें</string>
     <string name="no_quota_left">कोई कोटा शेष नहीं है!</string>
+    <string name="assign_teachers_error">कृपया पहले साप्ताहिक कोटा में सभी विषयों के लिए शिक्षक नियुक्त करें।</string>
 </resources>

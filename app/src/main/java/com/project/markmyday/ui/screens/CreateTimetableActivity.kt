@@ -87,6 +87,7 @@ fun CreateTimetableScreen(
     val studentAssignments by viewModel.classStudentAssignments.collectAsState()
     val teachers by viewModel.allTeachers.collectAsState()
     val students by viewModel.allStudents.collectAsState()
+    val allTimetables by viewModel.allTimetables.collectAsState()
 
     LaunchedEffect(currentStep) {
         viewModel.resetState()
@@ -162,7 +163,7 @@ fun CreateTimetableScreen(
                     when (step) {
                         1 -> Step1Content(teachers, assignments, onAssign = { cls, t -> viewModel.assignTeacherToClass(cls, t) })
                         2 -> Step2Content(students, assignments, studentAssignments, onUpdateStudents = { cls, ids -> viewModel.updateClassStudents(cls, ids) })
-                        3 -> Step3Content(assignments, studentAssignments)
+                        3 -> Step3Content(assignments, studentAssignments, allTimetables)
                     }
                 }
             }
@@ -778,7 +779,8 @@ fun InfoPill(text: String, color: Color) {
 @Composable
 fun Step3Content(
     teacherAssignments: Map<String, Teacher?>,
-    studentAssignments: Map<String, List<String>>
+    studentAssignments: Map<String, List<String>>,
+    allTimetables: List<Timetable>
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     
@@ -797,10 +799,17 @@ fun Step3Content(
                     context.startActivity(intent)
                 },
                 onEditTimetableClick = {
-                    val intent = android.content.Intent(context, EditTimetableActivity::class.java).apply {
-                        putExtra("className", className)
+                    val timetable = allTimetables.find { it.className == className }
+                    val allTeachersAssigned = timetable?.weeklyQuota?.values?.all { it.teacherId.isNotEmpty() } ?: false
+                    
+                    if (allTeachersAssigned) {
+                        val intent = android.content.Intent(context, EditTimetableActivity::class.java).apply {
+                            putExtra("className", className)
+                        }
+                        context.startActivity(intent)
+                    } else {
+                        android.widget.Toast.makeText(context, context.getString(R.string.assign_teachers_error), android.widget.Toast.LENGTH_LONG).show()
                     }
-                    context.startActivity(intent)
                 }
             )
         }
