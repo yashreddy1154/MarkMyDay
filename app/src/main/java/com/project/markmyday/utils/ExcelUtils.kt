@@ -12,6 +12,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object ExcelUtils {
+    data class StudentAttendanceRecord(
+        val studentName: String,
+        val studentId: String,
+        val className: String,
+        val date: String,
+        val status: String,
+        val subject: String
+    )
+
     fun exportAttendanceToExcel(context: Context, presentList: List<TeacherAttendanceStatus>, absentList: List<TeacherAttendanceStatus>) {
         val workbook = XSSFWorkbook()
         val sheet = workbook.createSheet("Attendance")
@@ -67,5 +76,44 @@ object ExcelUtils {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(Intent.createChooser(intent, "Share Attendance Spreadsheet"))
+    }
+
+    fun exportStudentAttendanceToExcel(context: Context, records: List<StudentAttendanceRecord>) {
+        val workbook = XSSFWorkbook()
+        val sheet = workbook.createSheet("Student Attendance")
+
+        // Create Header Row
+        val headerRow = sheet.createRow(0)
+        headerRow.createCell(0).setCellValue("Date")
+        headerRow.createCell(1).setCellValue("Student Name")
+        headerRow.createCell(2).setCellValue("Student ID")
+        headerRow.createCell(3).setCellValue("Class")
+        headerRow.createCell(4).setCellValue("Subject")
+        headerRow.createCell(5).setCellValue("Status")
+
+        records.forEachIndexed { index, record ->
+            val row = sheet.createRow(index + 1)
+            row.createCell(0).setCellValue(record.date)
+            row.createCell(1).setCellValue(record.studentName)
+            row.createCell(2).setCellValue(record.studentId)
+            row.createCell(3).setCellValue(record.className)
+            row.createCell(4).setCellValue(record.subject)
+            row.createCell(5).setCellValue(record.status)
+        }
+
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val fileName = "Student_Attendance_Log_$today.xlsx"
+        val file = File(context.getExternalFilesDir(null), fileName)
+
+        try {
+            val fileOut = FileOutputStream(file)
+            workbook.write(fileOut)
+            fileOut.close()
+            workbook.close()
+
+            shareExcelFile(context, file)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

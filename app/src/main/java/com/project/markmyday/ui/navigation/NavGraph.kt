@@ -26,6 +26,8 @@ sealed class Screen(val route: String) {
     object Notifications : Screen("notifications/{role}")
     object Admissions : Screen("admissions")
     object StaffManagement : Screen("staff_management")
+    object AdminAttendanceReport : Screen("admin_attendance_report")
+    object AttendanceMarking : Screen("attendance_marking")
     object StudentManagement : Screen("student_management")
     object AdminLeaveManagement : Screen("admin_leave_management")
     object TeacherLeaveView : Screen("teacher_leave_view")
@@ -211,6 +213,7 @@ fun AppNavigation(
                         "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher&userClass=$section")
                         "admissions" -> navController.navigate(Screen.Admissions.route)
                         "leave" -> navController.navigate(Screen.TeacherLeaveView.route)
+                        "attendance" -> navController.navigate(Screen.AttendanceMarking.route)
                         "course_manager" -> navController.navigate(Screen.CourseManager.route)
                         // Add more routing as screens are implemented
                     }
@@ -260,6 +263,7 @@ fun AppNavigation(
                             context.startActivity(android.content.Intent(context, CreateTimetableActivity::class.java))
                         }
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
+                        "attendance_reports" -> navController.navigate(Screen.AdminAttendanceReport.route)
                         "attendance_overview" -> {
                             context.startActivity(android.content.Intent(context, AdminAttendanceOverviewActivity::class.java))
                         }
@@ -284,6 +288,14 @@ fun AppNavigation(
                 onDeleteTeacher = { teacherViewModel.deleteTeacher(it.teacherId) },
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable(Screen.AdminAttendanceReport.route) {
+            AdminAttendanceReportScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.AttendanceMarking.route) {
+            AttendanceScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Screen.StudentManagement.route) {

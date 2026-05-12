@@ -30,8 +30,11 @@ fun AttendanceScreen(
     val assignedClasses by viewModel.assignedClasses.collectAsState()
     val studentsByClass by viewModel.studentsByClass.collectAsState()
     val submissionState by viewModel.submissionState.collectAsState()
+    val presentStudentsList by viewModel.presentStudentsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
+
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val selectedClass = if (assignedClasses.isNotEmpty() && selectedTabIndex < assignedClasses.size) {
@@ -42,7 +45,7 @@ fun AttendanceScreen(
     LaunchedEffect(submissionState) {
         when (submissionState) {
             is AttendanceSubmissionState.Success -> {
-                Toast.makeText(context, context.getString(R.string.attendance_success), Toast.LENGTH_SHORT).show()
+                showSuccessDialog = true
                 viewModel.resetSubmissionState()
             }
             is AttendanceSubmissionState.Error -> {
@@ -98,6 +101,29 @@ fun AttendanceScreen(
             }
         }
     ) { padding ->
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false },
+                title = { Text(stringResource(R.string.attendance_success), fontWeight = FontWeight.Bold) },
+                text = {
+                    Column {
+                        Text("Present Students (${presentStudentsList.size}):", fontWeight = FontWeight.SemiBold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+                            items(presentStudentsList) { name ->
+                                Text("• $name", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = { showSuccessDialog = false }) {
+                        Text(stringResource(R.string.ok))
+                    }
+                }
+            )
+        }
+
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

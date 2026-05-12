@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 sealed class AttendanceSubmissionState {
@@ -41,6 +42,12 @@ class AttendanceViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isHomeTeacher = MutableStateFlow(false)
+    val isHomeTeacher: StateFlow<Boolean> = _isHomeTeacher.asStateFlow()
+
+    private val _presentStudentsList = MutableStateFlow<List<String>>(emptyList())
+    val presentStudentsList: StateFlow<List<String>> = _presentStudentsList.asStateFlow()
+
     init {
         loadTeacherData()
     }
@@ -51,23 +58,13 @@ class AttendanceViewModel(
             _isLoading.value = true
             try {
                 val teacherDoc = firestore.collection("users").document(uid).get().await()
-                val rawAssignments = teacherDoc.get("teaching_assignments")
-                val assignments = when (rawAssignments) {
-                    is List<*> -> rawAssignments.filterIsInstance<String>()
-                    else -> emptyList()
-                }
-                val subject = teacherDoc.getString("subject") ?: ""
                 val teacherId = teacherDoc.getString("teacherId") ?: ""
+                val subject = teacherDoc.getString("subject") ?: ""
 
-                _assignedClasses.value = assignments
                 _teacherSubject.value = subject
                 _teacherId.value = teacherId
 
-                if (assignments.isNotEmpty()) {
-                    fetchStudents(assignments)
-                } else {
-                    _isLoading.value = false
-                }
+                checkHomeTeacherStatus(teacherId)
             } catch (e: Exception) {
                 _isLoading.value = false
                 _submissionState.value = AttendanceSubmissionState.Error(e.localizedMessage ?: "Failed to load teacher data")
@@ -75,34 +72,88 @@ class AttendanceViewModel(
         }
     }
 
+    private suspend fun checkHomeTeacherStatus(teacherId: String) {
+        val dayOfWeek = LocalDate.now().dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
+        // Note: The timetable collection is indexed by className
+        val timetables = firestore.collection("timetable").get().await()
+        val assignedClasses = mutableListOf<String>()
+
+        timetables.documents.forEach { doc ->
+            val timetable = doc.toObject(com.project.markmyday.data.model.Timetable::class.java)
+            if (timetable != null) {
+                val todaySchedule = timetable.weeklySchedule[dayOfWeek]
+                // Rule 1: First period teacher is Home Teacher for that day
+                val firstPeriod = todaySchedule?.periods?.find { it.periodNumber == 1 }
+                if (firstPeriod?.teacherId == teacherId) {
+                    assignedClasses.add(timetable.className)
+                }
+            }
+        }
+
+        _assignedClasses.value = assignedClasses
+        _isHomeTeacher.value = assignedClasses.isNotEmpty()
+
+        if (assignedClasses.isNotEmpty()) {
+            fetchStudents(assignedClasses)
+        } else {
+            _isLoading.value = false
+        }
+    }
+
     private fun fetchStudents(assignments: List<String>) {
-        firestore.collection("users")
-            .whereEqualTo("role", "student")
-            .whereIn("class_section", assignments)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    _isLoading.value = false
-                    return@addSnapshotListener
-                }
-                if (snapshot != null) {
-                    val students = snapshot.documents.map { doc ->
-                        Student(
-                            uid = doc.getString("uid") ?: "",
-                            studentId = doc.getString("studentId") ?: "",
-                            name = doc.getString("name") ?: "",
-                            studentClass = doc.getString("studentClass") ?: "",
-                        )
-                    }
-                    
-                    // Initialize attendance states for all students as true (Present)
-                    students.forEach { student ->
-                        if (!attendanceStates.containsKey(student.uid)) {
-                            attendanceStates[student.uid] = true
+        val normalizedAssignments = assignments.map { it.replace("Class ", "").trim() }
+        
+        viewModelScope.launch {
+            try {
+                // Fetch approved leaves for today
+                val today = com.google.firebase.Timestamp.now()
+                val leavesSnapshot = firestore.collection("leaves")
+                    .whereEqualTo("status", "approved")
+                    .get()
+                    .await()
+
+                val studentsOnLeave = leavesSnapshot.documents.filter { doc ->
+                    val start = doc.getTimestamp("startDate")
+                    val end = doc.getTimestamp("endDate")
+                    start != null && end != null && today >= start && today <= end
+                }.mapNotNull { it.getString("studentId") }.toSet()
+
+                firestore.collection("users")
+                    .whereEqualTo("role", "student")
+                    .whereIn("studentClass", normalizedAssignments)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            _isLoading.value = false
+                            return@addSnapshotListener
                         }
+                        if (snapshot != null) {
+                            val students = snapshot.documents.map { doc ->
+                                Student(
+                                    uid = doc.getString("uid") ?: "",
+                                    studentId = doc.getString("studentId") ?: "",
+                                    name = doc.getString("name") ?: "",
+                                    studentClass = doc.getString("studentClass") ?: "",
+                                )
+                            }
+
+                            val grouped = students.groupBy { student ->
+                                assignments.find { it.contains(student.studentClass) } ?: student.studentClass
+                            }
+                            _studentsByClass.value = grouped
+                            
+                            students.forEach { student ->
+                                if (!attendanceStates.containsKey(student.uid)) {
+                                    // Default to false if student is on leave, else true
+                                    attendanceStates[student.uid] = !studentsOnLeave.contains(student.uid)
+                                }
+                            }
+                        }
+                        _isLoading.value = false
                     }
-                }
+            } catch (e: Exception) {
                 _isLoading.value = false
             }
+        }
     }
 
     fun toggleAttendance(studentId: String, isPresent: Boolean) {
@@ -115,30 +166,38 @@ class AttendanceViewModel(
         val subject = _teacherSubject.value
         val docId = "${dateStr}_${classSection.replace(" ", "_")}_$subject"
 
-        val presentStudents = mutableListOf<String>()
-        val absentStudents = mutableListOf<String>()
+        val presentStudentsUids = mutableListOf<String>()
+        val absentStudentsUids = mutableListOf<String>()
+        val presentStudentsNames = mutableListOf<String>()
 
         studentsInClass.forEach { student ->
             if (attendanceStates[student.uid] == true) {
-                presentStudents.add(student.uid)
+                presentStudentsUids.add(student.uid)
+                presentStudentsNames.add(student.name)
             } else {
-                absentStudents.add(student.uid)
+                absentStudentsUids.add(student.uid)
             }
         }
 
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 30)
+        val expiryDate = calendar.time
+
         val attendanceData = hashMapOf(
             "date" to com.google.firebase.Timestamp.now(),
+            "expiry_date" to com.google.firebase.Timestamp(expiryDate),
             "class_section" to classSection,
             "subject" to subject,
             "teacher_id" to _teacherId.value,
-            "present_students" to presentStudents,
-            "absent_students" to absentStudents
+            "present_students" to presentStudentsUids,
+            "absent_students" to absentStudentsUids
         )
 
         viewModelScope.launch {
             _submissionState.value = AttendanceSubmissionState.Loading
             try {
                 firestore.collection("attendance").document(docId).set(attendanceData).await()
+                _presentStudentsList.value = presentStudentsNames
                 _submissionState.value = AttendanceSubmissionState.Success
             } catch (e: Exception) {
                 _submissionState.value = AttendanceSubmissionState.Error(e.localizedMessage ?: "Submission failed")

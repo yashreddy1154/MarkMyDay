@@ -98,6 +98,7 @@ fun AdminDashboard(
         DashboardTile("notices", stringResource(R.string.tile_notices), Icons.Default.Campaign),
         DashboardTile("staff_management", stringResource(R.string.tile_staff_list), Icons.Default.Badge),
         DashboardTile("attendance_overview", stringResource(R.string.tile_daily_overview), Icons.AutoMirrored.Filled.FactCheck),
+        DashboardTile("attendance_reports", "Attendance Reports", Icons.Default.Assessment),
         DashboardTile("create_timetable", stringResource(R.string.tile_create_timetable), Icons.Default.CalendarToday),
         DashboardTile("add_staff", stringResource(R.string.tile_add_staff), Icons.Default.PersonAdd),
         DashboardTile("add_student", stringResource(R.string.tile_add_student), Icons.Default.PersonAddAlt1),
