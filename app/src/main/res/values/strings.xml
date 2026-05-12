@@ -36,7 +36,7 @@
     <string name="view_all">View All</string>
     <string name="my_dashboard">My Dashboard</string>
     <string name="faculty_portal">Faculty Portal</string>
-    <string name="search_anything">Search anything...</string>
+    <string name="search_anything">Search anything…</string>
     <string name="keep_learning">Keep Learning! 🚀</string>
     <string name="assignments_due">You have 3 assignments due soon.</string>
     <string name="class_in_session">Class In Session 👩‍🏫</string>
@@ -323,4 +323,5 @@
     <string name="select_subject_dialog_title">Select Subject</string>
     <string name="no_quota_left">No quota left!</string>
     <string name="assign_teachers_error">Please assign teachers to all subjects in the Weekly Quota first.</string>
+    <string name="logo_motto" translatable="false">LEARN • GROW • SUCCEED</string>
 </resources>

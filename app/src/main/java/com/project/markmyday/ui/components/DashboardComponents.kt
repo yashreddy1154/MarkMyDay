@@ -16,7 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,9 +33,48 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.unit.Dp
 import com.project.markmyday.R
 import com.project.markmyday.ui.models.DashboardTile
 import com.project.markmyday.ui.models.TimetableEntry
+
+@Composable
+fun ProfileInitialsIcon(
+    name: String,
+    modifier: Modifier = Modifier,
+    size: Dp = 60.dp,
+    shape: Shape = RoundedCornerShape(20.dp),
+    textStyle: TextStyle = MaterialTheme.typography.titleLarge
+) {
+    val initials = remember(name) {
+        val decoded = try { java.net.URLDecoder.decode(name, "UTF-8") } catch (e: Exception) { name }
+        decoded.split(" ")
+            .filter { it.isNotBlank() }
+            .take(2)
+            .map { it.first().uppercase() }
+            .joinToString("")
+    }
+
+    Surface(
+        modifier = modifier.size(size),
+        shape = shape,
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = initials,
+                style = textStyle.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +84,8 @@ fun DashboardTopBar(
     notificationCount: Int = 0,
     icon: ImageVector? = null,
     onBackClick: (() -> Unit)? = null,
-    onProfileClick: (() -> Unit)? = null
+    onProfileClick: (() -> Unit)? = null,
+    isBoldBackIcon: Boolean = false
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -54,11 +94,28 @@ fun DashboardTopBar(
         navigationIcon = {
             if (onBackClick != null) {
                 IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    if (isBoldBackIcon) {
+                        Surface(
+                            modifier = Modifier.size(40.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             } else if (onProfileClick != null) {
                 IconButton(onClick = onProfileClick) {
@@ -144,7 +201,7 @@ fun WelcomeSection(
     name: String,
     role: String,
     date: String? = null,
-    icon: ImageVector = Icons.Default.Person
+    icon: ImageVector? = null
 ) {
     val decodedName = remember(name) { 
         try { java.net.URLDecoder.decode(name, "UTF-8") } catch (e: Exception) { name } 
@@ -168,40 +225,48 @@ fun WelcomeSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Hello, $decodedName! 👋",
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp).padding(end = 8.dp)
+                        )
+                    }
+                    Text(
+                        text = "Hello, $decodedName! 👋",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     )
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = buildString {
-                        append(decodedRole)
-                        if (date != null) {
-                            append(" • ")
-                            append(date)
-                        }
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
-            }
-            Surface(
-                modifier = Modifier.size(60.dp),
-                shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(30.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = buildString {
+                            append(decodedRole)
+                            if (date != null) {
+                                append(" • ")
+                                append(date)
+                            }
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
+            ProfileInitialsIcon(
+                name = decodedName,
+                size = 60.dp,
+                shape = RoundedCornerShape(20.dp)
+            )
         }
     }
 }

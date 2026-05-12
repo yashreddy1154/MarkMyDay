@@ -2,7 +2,16 @@ package com.project.markmyday.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -11,8 +20,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -26,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import com.project.markmyday.R
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,8 +92,8 @@ fun CreatorsSection() {
     val creators = remember {
         listOf(
             Creator("Tarak", "Android Developer", R.drawable.tarak),
-            Creator("Teja Reddy", "Android Developer", R.drawable.teja),
-            Creator("Yash", "Android Developer", R.drawable.yash)
+            Creator("Yash", "Android Developer", R.drawable.yash),
+            Creator("Teja Reddy", "Android Developer", R.drawable.teja)
         )
     }
     val pagerState = rememberPagerState(pageCount = { creators.size })
@@ -136,7 +154,7 @@ fun CreatorsSection() {
                         )
                     }
                     .fillMaxWidth()
-                    .aspectRatio(0.8f),
+                    .aspectRatio(0.9f),
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {

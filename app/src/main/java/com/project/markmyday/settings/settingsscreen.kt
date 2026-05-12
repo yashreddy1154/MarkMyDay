@@ -1,35 +1,65 @@
 package com.project.markmyday.settings
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SupportAgent
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
+import com.project.markmyday.ui.components.DashboardTopBar
+import com.project.markmyday.ui.components.ProfileInitialsIcon
 import com.project.markmyday.viewmodel.SettingsUiState
 import com.project.markmyday.viewmodel.SettingsViewModel
-import com.project.markmyday.viewmodel.LocalSettingsViewModel
-import com.project.markmyday.ui.components.DashboardTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +89,9 @@ fun SettingsScreen(
             DashboardTopBar(
                 title = stringResource(R.string.settings),
                 onNotificationClick = { /* Handled by caller */ },
-                icon = Icons.Default.Settings
+                icon = Icons.Default.Settings,
+                onBackClick = onBack,
+                isBoldBackIcon = true
             )
         },
         bottomBar = {
@@ -113,41 +145,37 @@ fun SettingsScreen(
                     }
                     is SettingsUiState.Success -> {
                         val profile = state.profile
-                        var showPassword by remember { mutableStateOf(false) }
 
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            // Profile Header
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Surface(
-                                    modifier = Modifier.size(72.dp),
-                                    shape = RoundedCornerShape(24.dp),
-                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            imageVector = Icons.Default.Person,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(32.dp),
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                }
+                                ProfileInitialsIcon(
+                                    name = profile.name,
+                                    size = 72.dp,
+                                    shape = RoundedCornerShape(24.dp)
+                                )
                                 Spacer(modifier = Modifier.width(20.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = profile.name,
-                                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+                                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold),
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
-                                    Text(
-                                        text = profile.role.replaceFirstChar { it.uppercase() },
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text(
+                                            text = profile.role.replaceFirstChar { it.uppercase() },
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                        )
+                                    }
                                 }
                             }
 
@@ -155,25 +183,9 @@ fun SettingsScreen(
 
                             // Details Grid
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                // ID and Password
+                                // ID
                                 DetailItem(label = "User ID", value = profile.id, icon = Icons.Default.Badge)
                                 
-                                DetailItem(
-                                    label = "Password",
-                                    value = if (showPassword) (profile.password ?: "N/A") else "••••••••",
-                                    icon = Icons.Default.Lock,
-                                    trailingIcon = {
-                                        IconButton(onClick = { showPassword = !showPassword }) {
-                                            Icon(
-                                                imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                                contentDescription = "Toggle Password Visibility",
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                    }
-                                )
-
                                 // Academic Info
                                 if (profile.role.lowercase() == "teacher") {
                                     DetailItem(label = "Subject", value = profile.subject ?: "N/A", icon = Icons.Default.Book)
