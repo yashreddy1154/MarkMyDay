@@ -1,6 +1,7 @@
 package com.project.markmyday.ui.screens
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -156,10 +157,15 @@ fun WeeklyQuotaContent(
             )
         },
         bottomBar = {
+            val localContext = androidx.compose.ui.platform.LocalContext.current
             Button(
                 onClick = { 
-                    viewModel.saveWeeklyQuota(className, localQuotas, currentTotal)
-                    onBack()
+                    if (currentTotal <= maxClasses) {
+                        viewModel.saveWeeklyQuota(className, localQuotas, currentTotal)
+                        onBack()
+                    } else {
+                        Toast.makeText(localContext, localContext.getString(R.string.quota_limit_error), Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -377,7 +383,7 @@ fun SubjectQuotaCard(
                                         onQuotaChange(quota.copy(teacherId = teacher.teacherId, teacherName = teacher.name))
                                         showTeacherDialog = false
                                     } else {
-                                        android.widget.Toast.makeText(context, context.getString(R.string.home_teacher_error), android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.home_teacher_error), Toast.LENGTH_SHORT).show()
                                     }
                                 },
                                 isHomeTeacher = isHomeTeacher

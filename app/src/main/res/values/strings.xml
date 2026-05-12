@@ -94,7 +94,7 @@
     <string name="admission_no_label">Admission No: %1$s</string>
     <string name="parent_label">Parent: %1$s</string>
     <string name="class_label_simple">Class: %1$s</string>
-    <string name="id_label_simple">ID: %1$s</string>
+    <string name="id_label_simple" translatable="false">ID: %1$s</string>
     <string name="password_label">Password: ••••••••</string>
     <string name="student_list_count">Student List (%1$d)</string>
     <string name="no_admissions_yet">No admissions added yet.</string>
@@ -317,4 +317,9 @@
     <string name="leaderboard_title">Leaderboard</string>
     <string name="privacy_placeholder">---</string>
     <string name="score_format">%1$d/%2$d</string>
+    <string name="leisure_period">Leisure period</string>
+    <string name="quota_limit_error">Cannot exceed max limit</string>
+    <string name="teacher_conflict_error">Teacher %1$s is already assigned to %2$s at this time</string>
+    <string name="select_subject_dialog_title">Select Subject</string>
+    <string name="no_quota_left">No quota left!</string>
 </resources>

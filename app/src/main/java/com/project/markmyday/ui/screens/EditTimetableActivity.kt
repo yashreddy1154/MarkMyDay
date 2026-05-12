@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -199,7 +200,7 @@ fun EditTimetableContent(
                 ) {
                     Text(
                         text = "Time Table For $className",
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center
@@ -251,6 +252,10 @@ fun EditTimetableContent(
                                     SCard(
                                         period = currentPeriod,
                                         availableQuotas = remainingQuotas.values.toList(),
+                                        day = day,
+                                        periodNumber = periodNumber,
+                                        currentClassName = className,
+                                        viewModel = viewModel,
                                         onSubjectSelected = { selectedQuota ->
                                             val newSchedule = localSchedule.toMutableMap()
                                             val daySched = newSchedule[day] ?: DaySchedule()
@@ -351,18 +356,23 @@ fun PCard(periodNumber: Int) {
 fun SCard(
     period: Period?,
     availableQuotas: List<SubjectQuota>,
+    day: String,
+    periodNumber: Int,
+    currentClassName: String,
+    viewModel: TimetableViewModel,
     onSubjectSelected: (SubjectQuota) -> Unit
 ) {
+    val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
-    val color = if (period != null) getSubjectColorForGrid(period.subject) else MaterialTheme.colorScheme.surface
+    val color = if (period != null) getSubjectColorForGrid(period.subject) else Color.DarkGray
 
     Card(
         modifier = Modifier
             .size(width = 120.dp, height = 80.dp)
             .clickable { showMenu = true },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = if (period != null) 0.1f else 1f)),
-        border = BorderStroke(1.dp, if (period != null) color.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        colors = CardDefaults.cardColors(containerColor = if (period != null) color.copy(alpha = 0.1f) else color.copy(alpha = 0.05f)),
+        border = BorderStroke(1.dp, if (period != null) color.copy(alpha = 0.5f) else color.copy(alpha = 0.2f))
     ) {
         if (period != null) {
             Box(modifier = Modifier.padding(10.dp).fillMaxSize()) {
@@ -384,7 +394,13 @@ fun SCard(
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("S", fontWeight = FontWeight.Bold, fontSize = 28.sp, color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                Text(
+                    stringResource(R.string.leisure_period), 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 12.sp, 
+                    color = color.copy(alpha = 0.6f),
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -392,20 +408,35 @@ fun SCard(
     if (showMenu) {
         AlertDialog(
             onDismissRequest = { showMenu = false },
-            title = { Text("Select Subject") },
+            title = { Text(stringResource(R.string.select_subject_dialog_title)) },
             text = {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val filterQuotas = availableQuotas.filter { it.classCount > 0 }
-                    if (filterQuotas.isEmpty()) {
-                        item { Text("No quota left!") }
-                    } else {
+                val filterQuotas = availableQuotas.filter { it.classCount > 0 }
+                if (filterQuotas.isEmpty()) {
+                    Text(stringResource(R.string.no_quota_left))
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 300.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         items(filterQuotas) { quota ->
                             Card(
                                 modifier = Modifier
-                                    .size(width = 100.dp, height = 60.dp)
+                                    .fillMaxWidth()
+                                    .height(60.dp)
                                     .clickable { 
-                                        onSubjectSelected(quota)
-                                        showMenu = false 
+                                        val conflictClass = viewModel.getTeacherConflict(
+                                            quota.teacherId, day, periodNumber, currentClassName
+                                        )
+                                        if (conflictClass == null) {
+                                            onSubjectSelected(quota)
+                                            showMenu = false 
+                                        } else {
+                                            Toast.makeText(
+                                                context, 
+                                                context.getString(R.string.teacher_conflict_error, quota.teacherName, conflictClass), 
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
                                     },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(containerColor = getSubjectColorForGrid(quota.subject).copy(alpha = 0.1f)),

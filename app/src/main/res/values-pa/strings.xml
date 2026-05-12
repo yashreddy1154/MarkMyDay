@@ -94,7 +94,6 @@
     <string name="admission_no_label">ਦਾਖਲਾ ਨੰਬਰ: %1$s</string>
     <string name="parent_label">ਮਾਪੇ: %1$s</string>
     <string name="class_label_simple">ਕਲਾਸ: %1$s</string>
-    <string name="id_label_simple">ਆਈਡੀ: %1$s</string>
     <string name="password_label">ਪਾਸਵਰਡ: ••••••••</string>
     <string name="student_list_count">ਵਿਦਿਆਰਥੀ ਸੂਚੀ (%1$d)</string>
     <string name="no_admissions_yet">ਅਜੇ ਤੱਕ ਕੋਈ ਦਾਖਲਾ ਨਹੀਂ ਜੋੜਿਆ ਗਿਆ।</string>

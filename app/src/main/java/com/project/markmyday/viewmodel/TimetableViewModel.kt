@@ -311,6 +311,13 @@ class TimetableViewModel(
         }
     }
 
+    fun getTeacherConflict(teacherId: String, day: String, periodNumber: Int, currentClassName: String): String? {
+        return _allTimetables.value.find { timetable ->
+            timetable.className != currentClassName &&
+            timetable.weeklySchedule[day]?.periods?.any { it.periodNumber == periodNumber && it.teacherId == teacherId } == true
+        }?.className
+    }
+
     fun saveWeeklyQuota(className: String, quotaMap: Map<String, com.project.markmyday.data.model.SubjectQuota>, total: Int) {
         viewModelScope.launch {
             _state.value = TimetableState.Loading
