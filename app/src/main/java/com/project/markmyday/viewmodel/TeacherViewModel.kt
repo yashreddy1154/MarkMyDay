@@ -51,6 +51,42 @@ class TeacherViewModel(
             initialValue = emptyList()
         )
 
+    private val _homeSectionStudents = MutableStateFlow<List<com.project.markmyday.data.model.Student>>(emptyList())
+    val homeSectionStudents: StateFlow<List<com.project.markmyday.data.model.Student>> = _homeSectionStudents.asStateFlow()
+
+    fun fetchHomeSectionStudents(homeSection: String) {
+        if (homeSection == "N/A") return
+        
+        viewModelScope.launch {
+            try {
+                val normalizedClass = homeSection.replace("Class ", "").trim()
+                firestore.collection("users")
+                    .whereEqualTo("role", "student")
+                    .whereEqualTo("studentClass", normalizedClass)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) return@addSnapshotListener
+                        if (snapshot != null) {
+                            val students = snapshot.documents.map { doc ->
+                                com.project.markmyday.data.model.Student(
+                                    uid = doc.getString("uid") ?: "",
+                                    studentId = doc.getString("studentId") ?: "",
+                                    name = doc.getString("name") ?: "",
+                                    studentClass = doc.getString("studentClass") ?: "",
+                                    motherName = doc.getString("motherName") ?: "",
+                                    fatherName = doc.getString("fatherName") ?: "",
+                                    motherPhone = doc.getString("motherPhone") ?: "",
+                                    fatherPhone = doc.getString("fatherPhone") ?: ""
+                                )
+                            }
+                            _homeSectionStudents.value = students
+                        }
+                    }
+            } catch (e: Exception) {
+                Log.e("TeacherViewModel", "Error fetching home students: ${e.message}")
+            }
+        }
+    }
+
     fun resetRegistrationState() {
         _registrationState.value = TeacherRegistrationState.Idle
     }

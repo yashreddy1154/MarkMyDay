@@ -38,6 +38,7 @@ import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.R
 import com.project.markmyday.viewmodel.TimetableViewModel
 import com.project.markmyday.data.model.Timetable
+import com.project.markmyday.viewmodel.DigitalDiaryViewModel
 
 
 import androidx.compose.runtime.LaunchedEffect
@@ -121,7 +122,10 @@ fun StudentDashboard(
                         }
                     )
                 }
-                "attendance" -> StudentAttendanceDashboardScreen(onBack = { currentSubScreen = "home" })
+                "attendance" -> StudentAttendanceDashboardScreen(
+                    uid = (viewModel<com.project.markmyday.viewmodel.AuthViewModel>().authState.collectAsState().value as? com.project.markmyday.viewmodel.AuthResult.Success)?.uid ?: "",
+                    onBack = { currentSubScreen = "home" }
+                )
                 "leave" -> LeaveScreen(onBack = { currentSubScreen = "home" })
             }
         }
@@ -134,16 +138,24 @@ fun StudentDashboardHomeContent(
     userRole: String,
     searchQuery: String = "",
     onTileClick: (String) -> Unit,
-    viewModel: TimetableViewModel = viewModel()
+    viewModel: TimetableViewModel = viewModel(),
+    diaryViewModel: DigitalDiaryViewModel = viewModel()
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val timetables by viewModel.allTimetables.collectAsState()
+    val homeworkBySubject by diaryViewModel.latestHomeworkBySubject.collectAsState()
     
     // Decode userRole first, then parse class name from role (e.g., "Class 10 - A" -> "Class 10")
     val className = remember(userRole) {
         val decoded = try { java.net.URLDecoder.decode(userRole, "UTF-8") } catch (e: Exception) { userRole }
         val parts = decoded.split("-")
         if (parts.isNotEmpty()) parts[0].trim() else ""
+    }
+
+    LaunchedEffect(className) {
+        if (className.isNotEmpty()) {
+            diaryViewModel.fetchEntriesForClass(className)
+        }
     }
 
     val currentTimetable = timetables.find { it.className.equals(className, ignoreCase = true) }
@@ -261,6 +273,11 @@ fun StudentDashboardHomeContent(
                     context.startActivity(intent)
                 }
             )
+        }
+
+        // 3.5 Homework Section
+        item(span = { GridItemSpan(2) }) {
+            HomeworkSection(homeworkBySubject = homeworkBySubject)
         }
 
         // 4. Section Title

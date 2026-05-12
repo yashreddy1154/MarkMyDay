@@ -20,6 +20,7 @@ sealed class AuthResult {
     object Idle : AuthResult()
     object Loading : AuthResult()
     data class Success(
+        val uid: String,
         val name: String,
         val role: String,
         val studentId: String? = null,
@@ -129,7 +130,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
                 subscribeUserToTopics(role)
 
-                val successResult = AuthResult.Success(name, role, studentId, homeSection, subject)
+                val successResult = AuthResult.Success(uid, name, role, studentId, homeSection, subject)
                 
                 // Save to cache for next time
                 saveUserToCache(successResult)

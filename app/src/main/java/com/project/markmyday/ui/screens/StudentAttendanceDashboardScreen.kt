@@ -22,14 +22,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.ui.theme.*
+import com.project.markmyday.viewmodel.StudentAttendanceViewModel
+import com.project.markmyday.viewmodel.AttendanceRecord
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentAttendanceDashboardScreen(
-    onBack: () -> Unit
+    uid: String,
+    onBack: () -> Unit,
+    viewModel: StudentAttendanceViewModel = viewModel()
 ) {
+    val summary by viewModel.summary.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    LaunchedEffect(uid) {
+        if (uid.isNotEmpty()) {
+            viewModel.fetchStudentAttendance(uid)
+        }
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -38,13 +51,13 @@ fun StudentAttendanceDashboardScreen(
                 title = { 
                     Column {
                         Text(
-                            "Hello, teja! 👋", 
+                            "Hello, ${summary.studentName}! 👋", 
                             style = MaterialTheme.typography.titleLarge, 
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            "Ready to mark your attendance today?",
+                            "Ready to check your attendance today?",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -56,20 +69,25 @@ fun StudentAttendanceDashboardScreen(
                     }
                 },
                 actions = {
+                    val isPresentToday = summary.recentLogs.firstOrNull()?.let { 
+                        val todayStr = SimpleDateFormat("EEEE, MMM d", Locale.getDefault()).format(Date())
+                        it.date == todayStr && it.isPresent
+                    } ?: false
+
                     Surface(
                         modifier = Modifier.padding(end = 16.dp),
                         shape = RoundedCornerShape(20.dp),
-                        color = PastelGreen
+                        color = if (isPresentToday) PastelGreen else PastelYellow.copy(alpha = 0.5f)
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Today: Present ✅", 
+                                if (isPresentToday) "Today: Present ✅" else "Today: Marked Absent ❌", 
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = SuccessGreen
+                                color = if (isPresentToday) SuccessGreen else Color.Red.copy(alpha = 0.7f)
                             )
                         }
                     }
@@ -77,76 +95,84 @@ fun StudentAttendanceDashboardScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            // 1. Featured Punch Card
-            item {
-                AttendancePunchCard()
-            }
-
-            // 2. Stats Row
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    QuickStatCard(
-                        modifier = Modifier.weight(1f),
-                        value = "94%",
-                        label = "Overall Attendance",
-                        valueColor = MaterialTheme.colorScheme.primary
-                    )
-                    QuickStatCard(
-                        modifier = Modifier.weight(1f),
-                        value = "2 / 5",
-                        label = "Leaves Taken",
-                        valueColor = MaterialTheme.colorScheme.onSurface
-                    )
+        if (isLoading && summary.studentName == "Student") {
+             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                 CircularProgressIndicator()
+             }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                // 1. Featured Punch Card (Now just a Clock/Status Card as students don't punch in themselves based on requirement 1 "remove old static page and add a new dynamic real time page")
+                item {
+                    AttendanceStatusCard(summary.overallAttendance)
                 }
-            }
 
-            // 3. Recent Logs
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "Recent Logs", 
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    TextButton(onClick = { /* View All */ }) {
-                        Text("View All", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                // 2. Stats Row
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        QuickStatCard(
+                            modifier = Modifier.weight(1f),
+                            value = String.format("%.0f%%", summary.overallAttendance),
+                            label = "Overall Attendance",
+                            valueColor = MaterialTheme.colorScheme.primary
+                        )
+                        QuickStatCard(
+                            modifier = Modifier.weight(1f),
+                            value = "${summary.leavesTaken} / ${summary.totalWorkingDays}",
+                            label = "Leaves / Total Days",
+                            valueColor = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
-            }
 
-            val logs = listOf(
-                AttendanceLogItem("Monday, May 11", "09:00 AM", "05:00 PM", "On Time"),
-                AttendanceLogItem("Friday, May 8", "09:05 AM", "05:10 PM", "Late"),
-                AttendanceLogItem("Thursday, May 7", "08:58 AM", "04:55 PM", "On Time")
-            )
+                // 3. Recent Logs
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Recent Logs", 
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                }
 
-            items(logs) { log ->
-                LogItemRow(log)
+                if (summary.recentLogs.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(100.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No records found", color = Color.Gray)
+                        }
+                    }
+                } else {
+                    items(summary.recentLogs) { log ->
+                        LogItemRow(log)
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun AttendancePunchCard() {
+fun AttendanceStatusCard(percentage: Float) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp),
+            .height(180.dp),
         shape = RoundedCornerShape(32.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
@@ -164,47 +190,30 @@ fun AttendancePunchCard() {
                     .fillMaxSize()
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "SHIFT / CLASS ATTENDANCE",
+                    "ACADEMIC ATTENDANCE SCORE",
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.White.copy(alpha = 0.8f),
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
 
-                // Digital Clock
-                val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
-                    currentTime,
+                    String.format("%.1f%%", percentage),
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Black,
                     color = Color.White
                 )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = { /* Punch In */ },
-                        modifier = Modifier.weight(1f).height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text("PUNCH IN", fontWeight = FontWeight.ExtraBold, color = TextCharcoal)
-                    }
-                    OutlinedButton(
-                        onClick = { /* Punch Out */ },
-                        modifier = Modifier.weight(1f).height(56.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text("PUNCH OUT", fontWeight = FontWeight.Bold)
-                    }
-                }
+                
+                Text(
+                    if (percentage >= 75) "Great job! Keep it up." else "Try to attend more classes.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
             }
         }
     }
@@ -243,15 +252,8 @@ fun QuickStatCard(
     }
 }
 
-data class AttendanceLogItem(
-    val date: String,
-    val inTime: String,
-    val outTime: String,
-    val status: String
-)
-
 @Composable
-fun LogItemRow(log: AttendanceLogItem) {
+fun LogItemRow(log: AttendanceRecord) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -265,34 +267,34 @@ fun LogItemRow(log: AttendanceLogItem) {
             Surface(
                 modifier = Modifier.size(48.dp),
                 shape = CircleShape,
-                color = if (log.status == "On Time") PastelGreen else PastelYellow
+                color = if (log.isPresent) PastelGreen else Color.Red.copy(alpha = 0.1f)
             ) {
                 Icon(
-                    imageVector = if (log.status == "On Time") Icons.Default.CheckCircle else Icons.Default.AccessTime,
+                    imageVector = if (log.isPresent) Icons.Default.CheckCircle else Icons.Default.Cancel,
                     contentDescription = null,
                     modifier = Modifier.padding(12.dp),
-                    tint = if (log.status == "On Time") SuccessGreen else Color(0xFFF5B316)
+                    tint = if (log.isPresent) SuccessGreen else Color.Red.copy(alpha = 0.7f)
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(log.date, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
                 Text(
-                    "In: ${log.inTime} | Out: ${log.outTime}",
+                    "Subject: ${log.subject}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                color = if (log.status == "On Time") SuccessGreen.copy(alpha = 0.1f) else Color(0xFFF5B316).copy(alpha = 0.1f)
+                color = if (log.isPresent) SuccessGreen.copy(alpha = 0.1f) else Color.Red.copy(alpha = 0.1f)
             ) {
                 Text(
-                    log.status,
+                    if (log.isPresent) "Present" else "Absent",
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (log.status == "On Time") SuccessGreen else Color(0xFFF5B316)
+                    color = if (log.isPresent) SuccessGreen else Color.Red.copy(alpha = 0.7f)
                 )
             }
         }

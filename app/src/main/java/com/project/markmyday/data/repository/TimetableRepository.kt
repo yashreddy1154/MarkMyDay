@@ -15,7 +15,7 @@ class TimetableRepository(
     fun getAllTimetables(): Flow<List<Timetable>> = callbackFlow {
         val subscription = timetableCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                trySend(emptyList())
                 return@addSnapshotListener
             }
             if (snapshot != null) {

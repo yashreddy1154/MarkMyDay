@@ -27,6 +27,9 @@ sealed class Screen(val route: String) {
     object Admissions : Screen("admissions")
     object StaffManagement : Screen("staff_management")
     object AdminAttendanceReport : Screen("admin_attendance_report")
+    object StudentAttendanceReport : Screen("student_attendance_report/{uid}") {
+        fun createRoute(uid: String) = "student_attendance_report/$uid"
+    }
     object AttendanceMarking : Screen("attendance_marking")
     object StudentManagement : Screen("student_management")
     object AdminLeaveManagement : Screen("admin_leave_management")
@@ -292,6 +295,17 @@ fun AppNavigation(
 
         composable(Screen.AdminAttendanceReport.route) {
             AdminAttendanceReportScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(
+            route = Screen.StudentAttendanceReport.route,
+            arguments = listOf(navArgument("uid") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val uid = backStackEntry.arguments?.getString("uid") ?: ""
+            StudentAttendanceReportScreen(
+                studentUid = uid,
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable(Screen.AttendanceMarking.route) {

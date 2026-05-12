@@ -323,5 +323,18 @@
     <string name="select_subject_dialog_title">Select Subject</string>
     <string name="no_quota_left">No quota left!</string>
     <string name="assign_teachers_error">Please assign teachers to all subjects in the Weekly Quota first.</string>
-    <string name="logo_motto" translatable="false">LEARN • GROW • SUCCEED</string>
+
+    <!-- Digital Diary -->
+    <string name="digital_diary">Digital Diary</string>
+    <string name="homework_section">Homework Section</string>
+    <string name="no_homework_yet">No homework added yet.</string>
+    <string name="taught_label">Taught: %1$s</string>
+    <string name="homework_label">Homework: %1$s</string>
+    <string name="what_was_taught">What was taught?</string>
+    <string name="homework_for_tomorrow">Homework for tomorrow</string>
+    <string name="post_to_diary">Post to Diary</string>
+    <string name="diary_post_success">Diary entry posted successfully!</string>
+
+    <!-- School Info -->
+    <string name="logo_motto">Excellence in Education</string>
 </resources>
