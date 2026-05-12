@@ -55,8 +55,13 @@ fun TeacherDashboard(
 ) {
     val notificationViewModel: NotificationViewModel = viewModel()
     val engagementViewModel: EngagementViewModel = viewModel()
+    val timetableViewModel: com.project.markmyday.viewmodel.TimetableViewModel = viewModel()
+    
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
     val engagementSummaries by engagementViewModel.engagementSummaries.collectAsState()
+    val timetables by timetableViewModel.allTimetables.collectAsState()
+    val allTeachers by timetableViewModel.allTeachers.collectAsState()
+    
     val context = LocalContext.current
 
     LaunchedEffect(userRole, homeSection) {
@@ -66,7 +71,46 @@ fun TeacherDashboard(
         }
     }
 
-    var searchQuery by remember { androidx.compose.runtime.mutableStateOf("") }
+    // Identify current teacher ID
+    val teacherId = remember(allTeachers, userName) {
+        allTeachers.find { it.name.equals(userName, ignoreCase = true) }?.teacherId ?: ""
+    }
+
+    // Get today's classes for this teacher
+    val today = remember {
+        val calendar = java.util.Calendar.getInstance()
+        when (calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+            java.util.Calendar.MONDAY -> "Monday"
+            java.util.Calendar.TUESDAY -> "Tuesday"
+            java.util.Calendar.WEDNESDAY -> "Wednesday"
+            java.util.Calendar.THURSDAY -> "Thursday"
+            java.util.Calendar.FRIDAY -> "Friday"
+            java.util.Calendar.SATURDAY -> "Saturday"
+            else -> ""
+        }
+    }
+
+    val teacherTodayEntries = remember(timetables, teacherId, today) {
+        val entries = mutableListOf<TimetableEntry>()
+        if (teacherId.isNotEmpty()) {
+            timetables.forEach { timetable ->
+                val daySched = timetable.weeklySchedule[today]
+                daySched?.periods?.filter { it.teacherId == teacherId }?.forEach { period ->
+                    entries.add(
+                        TimetableEntry(
+                            subject = period.subject,
+                            code = "P${period.periodNumber}",
+                            time = "${period.startTime} - ${period.endTime}",
+                            room = timetable.className // Use class name as "room" for teacher
+                        )
+                    )
+                }
+            }
+        }
+        entries.sortedBy { it.code }
+    }
+
+    var searchQuery by remember { mutableStateOf("") }
 
     val teacherTiles = listOf(
         DashboardTile("attendance", stringResource(R.string.tile_mark_attendance), Icons.Default.Checklist, badgeText = "80%"),
@@ -81,12 +125,6 @@ fun TeacherDashboard(
         DashboardTile("messages", stringResource(R.string.tile_messages), Icons.AutoMirrored.Filled.Chat, badgeCount = 5),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     ).filter { it.label.contains(searchQuery, ignoreCase = true) }
-
-    val timetable = listOf(
-        TimetableEntry("Mobile Dev", "CS402", "09:00 - 10:00 AM", "Room 302"),
-        TimetableEntry("UI/UX Design", "DS101", "10:30 - 11:30 AM", "Lab 1"),
-        TimetableEntry("Data Science", "CS505", "01:00 - 02:00 PM", "Room 105")
-    )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -176,14 +214,12 @@ fun TeacherDashboard(
             // 3. Timetable Section
             item(span = { GridItemSpan(2) }) {
                 TimetableSection(
-                    entries = timetable,
+                    entries = teacherTodayEntries,
                     onViewAllClick = {
-                        if (homeSection != "N/A") {
-                            val intent = Intent(context, StudentTimetableActivity::class.java).apply {
-                                putExtra("className", homeSection)
-                            }
-                            context.startActivity(intent)
+                        val intent = Intent(context, TeacherTimetableActivity::class.java).apply {
+                            putExtra("teacherName", userName)
                         }
+                        context.startActivity(intent)
                     }
                 )
             }
