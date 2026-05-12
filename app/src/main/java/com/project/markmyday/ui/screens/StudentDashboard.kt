@@ -36,6 +36,8 @@ import com.project.markmyday.ui.models.TimetableEntry
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.R
+import com.project.markmyday.viewmodel.TimetableViewModel
+import com.project.markmyday.data.model.Timetable
 
 
 import androidx.compose.runtime.LaunchedEffect
@@ -131,8 +133,47 @@ fun StudentDashboardHomeContent(
     userName: String,
     userRole: String,
     searchQuery: String = "",
-    onTileClick: (String) -> Unit
+    onTileClick: (String) -> Unit,
+    viewModel: TimetableViewModel = viewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val timetables by viewModel.allTimetables.collectAsState()
+    
+    // Decode userRole first, then parse class name from role (e.g., "Class 10 - A" -> "Class 10")
+    val className = remember(userRole) {
+        val decoded = try { java.net.URLDecoder.decode(userRole, "UTF-8") } catch (e: Exception) { userRole }
+        val parts = decoded.split("-")
+        if (parts.isNotEmpty()) parts[0].trim() else ""
+    }
+
+    val currentTimetable = timetables.find { it.className.equals(className, ignoreCase = true) }
+    
+    // Get today's classes
+    val today = remember {
+        val calendar = java.util.Calendar.getInstance()
+        when (calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+            java.util.Calendar.MONDAY -> "Monday"
+            java.util.Calendar.TUESDAY -> "Tuesday"
+            java.util.Calendar.WEDNESDAY -> "Wednesday"
+            java.util.Calendar.THURSDAY -> "Thursday"
+            java.util.Calendar.FRIDAY -> "Friday"
+            java.util.Calendar.SATURDAY -> "Saturday"
+            else -> ""
+        }
+    }
+
+    val todayEntries = remember(currentTimetable, today) {
+        val daySchedule = currentTimetable?.weeklySchedule?.get(today)
+        daySchedule?.periods?.filter { it.subject.isNotEmpty() }?.map { period ->
+            TimetableEntry(
+                subject = period.subject,
+                code = "P${period.periodNumber}",
+                time = "${period.startTime} - ${period.endTime}",
+                room = period.teacherName
+            )
+        } ?: emptyList()
+    }
+
     val studentTiles = listOf(
         DashboardTile("attendance", stringResource(R.string.tile_attendance), Icons.Default.CalendarMonth, badgeText = "85%"),
         DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.Default.Task, badgeCount = 3),
@@ -144,13 +185,6 @@ fun StudentDashboardHomeContent(
         DashboardTile("fees", stringResource(R.string.tile_fees), Icons.Default.Payments),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
     ).filter { it.label.contains(searchQuery, ignoreCase = true) }
-
-    val timetable = listOf(
-        TimetableEntry("Mathematics", "MA101", "09:00 - 10:00 AM", "Room 101"),
-        TimetableEntry("Physics", "PH102", "11:00 - 12:00 PM", "Lab 2"),
-        TimetableEntry("English", "EN103", "02:00 - 03:00 PM", "Room 205"),
-        TimetableEntry("Telugu", "TU101", "04:00 - 05:00 PM", "Room 10")
-    )
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -218,7 +252,15 @@ fun StudentDashboardHomeContent(
 
         // 3. Timetable Section
         item(span = { GridItemSpan(2) }) {
-            TimetableSection(entries = timetable)
+            TimetableSection(
+                entries = todayEntries,
+                onViewAllClick = {
+                    val intent = android.content.Intent(context, StudentTimetableActivity::class.java).apply {
+                        putExtra("className", className)
+                    }
+                    context.startActivity(intent)
+                }
+            )
         }
 
         // 4. Section Title

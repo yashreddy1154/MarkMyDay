@@ -207,7 +207,7 @@ fun WelcomeSection(
 }
 
 @Composable
-fun TimetableSection(entries: List<TimetableEntry>) {
+fun TimetableSection(entries: List<TimetableEntry>, onViewAllClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -215,14 +215,30 @@ fun TimetableSection(entries: List<TimetableEntry>) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(stringResource(id = R.string.school_schedule), fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            TextButton(onClick = { /* TODO */ }) {
+            TextButton(onClick = onViewAllClick) {
                 Text(stringResource(id = R.string.view_all), color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(entries) { entry ->
-                TimetableCard(entry)
+        if (entries.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(24.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No classes scheduled for today.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                items(entries) { entry ->
+                    TimetableCard(entry)
+                }
             }
         }
     }
@@ -269,7 +285,7 @@ fun TimetableCard(entry: TimetableEntry) {
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Room, contentDescription = null, tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Person, contentDescription = null, tint = Color.White.copy(alpha = 0.9f), modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(entry.room, color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
                     }

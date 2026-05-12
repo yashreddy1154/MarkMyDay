@@ -104,6 +104,12 @@
             android:theme="@style/Theme.MarkMyDay" />
 
         <activity
+            android:name=".ui.screens.StudentTimetableActivity"
+            android:exported="false"
+            android:label="@string/tile_timetables"
+            android:theme="@style/Theme.MarkMyDay" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

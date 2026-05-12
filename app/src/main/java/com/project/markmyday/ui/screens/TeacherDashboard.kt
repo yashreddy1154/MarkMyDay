@@ -175,7 +175,17 @@ fun TeacherDashboard(
 
             // 3. Timetable Section
             item(span = { GridItemSpan(2) }) {
-                TimetableSection(entries = timetable)
+                TimetableSection(
+                    entries = timetable,
+                    onViewAllClick = {
+                        if (homeSection != "N/A") {
+                            val intent = Intent(context, StudentTimetableActivity::class.java).apply {
+                                putExtra("className", homeSection)
+                            }
+                            context.startActivity(intent)
+                        }
+                    }
+                )
             }
 
             // 4. Scan Card
