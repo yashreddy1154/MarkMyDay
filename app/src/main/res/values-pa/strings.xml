@@ -316,4 +316,9 @@
     <string name="leaderboard_title">ਲੀਡਰਬੋਰਡ</string>
     <string name="privacy_placeholder">---</string>
     <string name="score_format">%1$d/%2$d</string>
+    <string name="leisure_period">ਵੇਹਲਾ ਪੀਰੀਅਡ</string>
+    <string name="quota_limit_error">ਵੱਧ ਤੋਂ ਵੱਧ ਸੀਮਾ ਤੋਂ ਵੱਧ ਨਹੀਂ ਹੋ ਸਕਦਾ</string>
+    <string name="teacher_conflict_error">ਅਧਿਆਪਕ %1$s ਪਹਿਲਾਂ ਹੀ ਇਸ ਸਮੇਂ %2$s ਵਿੱਚ ਨਿਯੁਕਤ ਹਨ</string>
+    <string name="select_subject_dialog_title">ਵਿਸ਼ਾ ਚੁਣੋ</string>
+    <string name="no_quota_left">ਕੋਈ ਕੋਟਾ ਨਹੀਂ ਬਚਿਆ!</string>
 </resources>

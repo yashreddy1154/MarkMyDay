@@ -415,14 +415,14 @@ fun SCard(
                     Text(stringResource(R.string.no_quota_left))
                 } else {
                     LazyColumn(
-                        modifier = Modifier.heightIn(max = 300.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.heightIn(max = 400.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
                         items(filterQuotas) { quota ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(60.dp)
                                     .clickable { 
                                         val conflictClass = viewModel.getTeacherConflict(
                                             quota.teacherId, day, periodNumber, currentClassName
@@ -438,12 +438,25 @@ fun SCard(
                                             ).show()
                                         }
                                     },
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(containerColor = getSubjectColorForGrid(quota.subject).copy(alpha = 0.1f)),
                                 border = BorderStroke(1.dp, getSubjectColorForGrid(quota.subject).copy(alpha = 0.4f))
                             ) {
-                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                                    Text(quota.subject, fontWeight = FontWeight.Bold, color = getSubjectColorForGrid(quota.subject))
+                                Box(modifier = Modifier.padding(12.dp).fillMaxSize()) {
+                                    Text(
+                                        text = quota.subject,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 16.sp,
+                                        color = getSubjectColorForGrid(quota.subject),
+                                        modifier = Modifier.align(Alignment.TopStart)
+                                    )
+                                    Text(
+                                        text = quota.teacherName,
+                                        fontSize = 12.sp,
+                                        color = getSubjectColorForGrid(quota.subject).copy(alpha = 0.8f),
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.align(Alignment.BottomEnd)
+                                    )
                                 }
                             }
                         }
