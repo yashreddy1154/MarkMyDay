@@ -51,6 +51,8 @@ import com.project.markmyday.viewmodel.NotificationViewModel
 fun StudentDashboard(
     userName: String = "Rahul Kumar",
     userRole: String = "Class 1 - A",
+    studentId: String = "",
+    uid: String = "",
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
@@ -112,6 +114,8 @@ fun StudentDashboard(
                     StudentDashboardHomeContent(
                         userName = userName,
                         userRole = userRole,
+                        studentId = studentId,
+                        uid = uid,
                         searchQuery = searchQuery,
                         onTileClick = { id ->
                             when (id) {
@@ -123,7 +127,7 @@ fun StudentDashboard(
                     )
                 }
                 "attendance" -> StudentAttendanceDashboardScreen(
-                    uid = (viewModel<com.project.markmyday.viewmodel.AuthViewModel>().authState.collectAsState().value as? com.project.markmyday.viewmodel.AuthResult.Success)?.uid ?: "",
+                    uid = uid,
                     onBack = { currentSubScreen = "home" }
                 )
                 "leave" -> LeaveScreen(onBack = { currentSubScreen = "home" })
@@ -136,14 +140,20 @@ fun StudentDashboard(
 fun StudentDashboardHomeContent(
     userName: String,
     userRole: String,
+    studentId: String = "",
+    uid: String = "",
     searchQuery: String = "",
     onTileClick: (String) -> Unit,
     viewModel: TimetableViewModel = viewModel(),
-    diaryViewModel: DigitalDiaryViewModel = viewModel()
+    diaryViewModel: DigitalDiaryViewModel = viewModel(),
+    attendanceViewModel: com.project.markmyday.viewmodel.StudentAttendanceViewModel = viewModel(),
+    quizViewModel: com.project.markmyday.viewmodel.QuizTakingViewModel = viewModel()
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val timetables by viewModel.allTimetables.collectAsState()
     val homeworkBySubject by diaryViewModel.latestHomeworkBySubject.collectAsState()
+    val attendanceSummary by attendanceViewModel.summary.collectAsState()
+    val availableQuizzes by quizViewModel.availableQuizzes.collectAsState()
     
     // Decode userRole first, then parse class name from role (e.g., "Class 10 - A" -> "Class 10")
     val className = remember(userRole) {
@@ -152,9 +162,13 @@ fun StudentDashboardHomeContent(
         if (parts.isNotEmpty()) parts[0].trim() else ""
     }
 
-    LaunchedEffect(className) {
+    LaunchedEffect(className, uid) {
         if (className.isNotEmpty()) {
             diaryViewModel.fetchEntriesForClass(className)
+            quizViewModel.loadAvailableQuizzes(className)
+        }
+        if (uid.isNotEmpty()) {
+            attendanceViewModel.fetchStudentAttendance(uid)
         }
     }
 
@@ -187,12 +201,17 @@ fun StudentDashboardHomeContent(
     }
 
     val studentTiles = listOf(
-        DashboardTile("attendance", stringResource(R.string.tile_attendance), Icons.Default.CalendarMonth, badgeText = "85%"),
-        DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.Default.Task, badgeCount = 3),
+        DashboardTile(
+            "attendance", 
+            stringResource(R.string.tile_attendance), 
+            Icons.Default.CalendarMonth, 
+            badgeText = if (attendanceSummary.totalWorkingDays > 0) "${attendanceSummary.overallAttendance.toInt()}%" else "N/A"
+        ),
+        DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.Default.Task, badgeCount = homeworkBySubject.size),
         DashboardTile("results", stringResource(R.string.tile_results), Icons.Default.Grade),
-        DashboardTile("leave", stringResource(R.string.tile_leave), Icons.Default.HistoryEdu),
+        DashboardTile("leave", stringResource(R.string.tile_leave), Icons.Default.HistoryEdu, badgeCount = if (attendanceSummary.leavesTaken > 0) attendanceSummary.leavesTaken else 0),
         DashboardTile("updates", stringResource(R.string.tile_updates), Icons.Default.Update),
-        DashboardTile("exams", stringResource(R.string.tile_exams), Icons.Default.Quiz, badgeCount = 1),
+        DashboardTile("exams", stringResource(R.string.tile_exams), Icons.Default.Quiz, badgeCount = if (availableQuizzes.isNotEmpty()) availableQuizzes.size else 0),
         DashboardTile("leaderboard", stringResource(R.string.leaderboard_title), Icons.Default.Leaderboard),
         DashboardTile("fees", stringResource(R.string.tile_fees), Icons.Default.Payments),
         DashboardTile("settings", stringResource(R.string.settings), Icons.Default.Settings)
@@ -238,7 +257,9 @@ fun StudentDashboardHomeContent(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                stringResource(R.string.assignments_due),
+                                if (homeworkBySubject.isNotEmpty()) 
+                                    "${homeworkBySubject.size} assignments pending" 
+                                else stringResource(R.string.all_caught_up),
                                 color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f),
                                 style = MaterialTheme.typography.bodyMedium
                             )

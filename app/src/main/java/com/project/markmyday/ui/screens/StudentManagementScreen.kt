@@ -1,7 +1,13 @@
 package com.project.markmyday.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +15,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -22,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.project.markmyday.R
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.ui.components.DashboardTopBar
@@ -29,7 +38,7 @@ import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.viewmodel.StudentRegistrationState
 
 /**
- * Screen for managing students, featuring a search bar and a list of students.
+ * Screen for managing students, organized by class.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +61,11 @@ fun StudentManagementScreen(
         }
     }
 
+    val studentsByClass = remember(filteredStudents) {
+        filteredStudents.groupBy { it.studentClass }
+            .toSortedMap(compareBy { it.filter { char -> char.isDigit() }.toIntOrNull() ?: 0 })
+    }
+
     var studentToEdit by remember { mutableStateOf<Student?>(null) }
     var studentToDelete by remember { mutableStateOf<Student?>(null) }
 
@@ -59,7 +73,6 @@ fun StudentManagementScreen(
         AlertDialog(
             onDismissRequest = { studentToDelete = null },
             title = { Text(stringResource(R.string.delete_confirmation, studentToDelete?.name ?: "")) },
-            text = { Text(stringResource(R.string.delete_confirmation, studentToDelete?.name ?: "")) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -137,7 +150,8 @@ fun StudentManagementScreen(
             DashboardTopBar(
                 title = stringResource(R.string.students_list_title),
                 onNotificationClick = { /* TODO */ },
-                icon = Icons.Outlined.People
+                icon = Icons.Outlined.People,
+                onBackClick = onBack
             )
         }
     ) { padding ->
@@ -156,15 +170,18 @@ fun StudentManagementScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(filteredStudents, key = { it.studentId }) { student ->
-                    StudentListItem(
-                        student = student,
-                        onEdit = { studentToEdit = student },
-                        onDelete = { studentToDelete = student }
-                    )
+                studentsByClass.forEach { (className, studentsInClass) ->
+                    item(key = className) {
+                        ClassGroupCard(
+                            className = className,
+                            students = studentsInClass,
+                            onEdit = { studentToEdit = it },
+                            onDelete = { studentToDelete = it }
+                        )
+                    }
                 }
                 
-                if (filteredStudents.isEmpty()) {
+                if (studentsByClass.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier
@@ -185,171 +202,170 @@ fun StudentManagementScreen(
     }
 }
 
-/**
- * A list item representing a single student.
- */
 @Composable
-fun StudentListItem(
+fun ClassGroupCard(
+    className: String,
+    students: List<Student>,
+    onEdit: (Student) -> Unit,
+    onDelete: (Student) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val displayClassName = if (className.contains("Class")) className else "Class $className"
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        modifier = Modifier.size(48.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = className.filter { it.isDigit() }.ifEmpty { "?" },
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = displayClassName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = "${students.size} Students",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                
+                Icon(
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    students.forEach { student ->
+                        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        StudentDetailItem(
+                            student = student,
+                            onEdit = { onEdit(student) },
+                            onDelete = { onDelete(student) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StudentDetailItem(
     student: Student,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val initials = student.name.split(" ").mapNotNull { it.firstOrNull() }.joinToString("").take(2).uppercase()
     val parentName = if (student.motherName.isNotBlank()) student.motherName else student.fatherName
     val phone = if (student.motherPhone.isNotBlank()) student.motherPhone else student.fatherPhone
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(32.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Header: Avatar, Name, and Actions
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Circular Avatar with Initials
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = initials,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = student.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = stringResource(R.string.class_format, student.studentClass.toIntOrNull() ?: 0),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-
-                Row {
-                    IconButton(
-                        onClick = onEdit,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = stringResource(R.string.edit),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    IconButton(
-                        onClick = onDelete,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription = stringResource(R.string.delete),
-                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Info Section: ID and Category Tags
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                InfoTag(
-                    icon = Icons.Outlined.Badge,
-                    text = student.studentId,
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = student.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                
-                val color = when (student.category.lowercase()) {
-                    "primary" -> Color(0xFF4CAF50).copy(alpha = 0.15f)
-                    "secondary" -> Color(0xFF2196F3).copy(alpha = 0.15f)
-                    "high school" -> Color(0xFFFF9800).copy(alpha = 0.15f)
-                    else -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
+                Text(
+                    text = "ID: ${student.studentId}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            Row {
+                IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Outlined.Edit, contentDescription = "Edit", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                 }
-                val textColor = when (student.category.lowercase()) {
-                    "primary" -> Color(0xFF2E7D32)
-                    "secondary" -> Color(0xFF1565C0)
-                    "high school" -> Color(0xFFEF6C00)
-                    else -> MaterialTheme.colorScheme.onSecondaryContainer
-                }
-
-                Surface(
-                    color = color,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = student.category,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = textColor
-                    )
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Outlined.Delete, contentDescription = "Delete", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Footer: Contact and Personal Info
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Outlined.Phone,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = phone,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Outlined.Person, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(parentName, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                 }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(R.string.parent_label, parentName),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
+            }
+            
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Outlined.Phone, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(phone, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                 }
             }
         }

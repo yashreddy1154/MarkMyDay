@@ -20,7 +20,7 @@ import com.project.markmyday.viewmodel.LocalSettingsViewModel
 sealed class Screen(val route: String) {
     object Authentication : Screen("auth")
     object RoleSelector : Screen("role_selector")
-    object StudentDashboard : Screen("student_dashboard/{name}/{role}/{studentId}")
+    object StudentDashboard : Screen("student_dashboard/{name}/{role}/{studentId}/{uid}")
     object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}/{section}/{subject}")
     object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
     object Notifications : Screen("notifications/{role}")
@@ -83,7 +83,7 @@ fun AppNavigation(
 
     NavHost(navController = navController, startDestination = Screen.Authentication.route) {
         composable(Screen.Authentication.route) {
-            AuthenticationScreen(onLoginSuccess = { name, role, studentId, section, subject ->
+            AuthenticationScreen(onLoginSuccess = { name, role, studentId, section, subject, uid ->
                 // Routing logic based on user role
                 val encodedName = java.net.URLEncoder.encode(name, "UTF-8")
                 val encodedRole = java.net.URLEncoder.encode(role, "UTF-8")
@@ -97,9 +97,9 @@ fun AppNavigation(
                     "student" -> {
                         val displayRole = if (section != null && section != "N/A") "Class $section" else role
                         val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
-                        "student_dashboard/$encodedName/$encodedDisplayRole/$encodedStudentId"
+                        "student_dashboard/$encodedName/$encodedDisplayRole/$encodedStudentId/$uid"
                     }
-                    else -> "student_dashboard/$encodedName/$encodedRole/$encodedStudentId" 
+                    else -> "student_dashboard/$encodedName/$encodedRole/$encodedStudentId/$uid"
                 }
 
                 if (lastDashboardRoute.isEmpty()) {
@@ -127,18 +127,21 @@ fun AppNavigation(
             arguments = listOf(
                 navArgument("name") { type = NavType.StringType },
                 navArgument("role") { type = NavType.StringType },
-                navArgument("studentId") { type = NavType.StringType }
+                navArgument("studentId") { type = NavType.StringType },
+                navArgument("uid") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name") ?: "Student"
             val role = backStackEntry.arguments?.getString("role") ?: "Student"
             val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
+            val uid = backStackEntry.arguments?.getString("uid") ?: ""
             
             // Sync lastDashboardRoute if it's empty (e.g. on direct navigation)
             val currentRoute = Screen.StudentDashboard.route
                 .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
                 .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
                 .replace("{studentId}", java.net.URLEncoder.encode(studentId, "UTF-8"))
+                .replace("{uid}", uid)
             
             if (lastDashboardRoute != currentRoute) {
                 lastDashboardRoute = currentRoute
@@ -147,6 +150,8 @@ fun AppNavigation(
             StudentDashboard(
                 userName = name,
                 userRole = role,
+                studentId = studentId,
+                uid = uid,
                 onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
                 onTileClick = { id ->
                     when (id) {

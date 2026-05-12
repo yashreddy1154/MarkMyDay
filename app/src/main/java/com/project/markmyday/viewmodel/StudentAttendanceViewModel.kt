@@ -43,35 +43,37 @@ class StudentAttendanceViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     fun fetchStudentAttendance(uid: String) {
+        android.util.Log.d("AttendanceVM", "Fetching attendance for UID: $uid")
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 // 1. Fetch Student Details
                 val userDoc = firestore.collection("users").document(uid).get().await()
-                val name = userDoc.getString("name") ?: "Student"
-                val studentClass = userDoc.getString("studentClass") ?: "N/A"
-                val motherName = userDoc.getString("motherName") ?: ""
-                val fatherName = userDoc.getString("fatherName") ?: ""
-                val motherPhone = userDoc.getString("motherPhone") ?: ""
-                val fatherPhone = userDoc.getString("fatherPhone") ?: ""
+                if (!userDoc.exists()) {
+                    android.util.Log.e("AttendanceVM", "User document not found for UID: $uid")
+                    _isLoading.value = false
+                    return@launch
+                }
                 
-                val parentName = if (motherName.isNotBlank()) motherName else fatherName
-                val phone = if (motherPhone.isNotBlank()) motherPhone else fatherPhone
+                val name = userDoc.getString("name") ?: "Student"
+                val studentClass = userDoc.getString("studentClass") ?: userDoc.getString("homeSection") ?: "N/A"
+                android.util.Log.d("AttendanceVM", "Found user: $name, Class: $studentClass")
 
-                // 2. Fetch Attendance Logs (Last 30 days)
-                val attendanceSnapshot = firestore.collection("attendance")
-                    .whereArrayContainsAny("present_students", listOf(uid))
-                    .orderBy("date", Query.Direction.DESCENDING)
+                // 2. Fetch Attendance Logs
+                // Note: Based on DB image, present_students and absent_students contain UIDs
+                val presentSnapshot = firestore.collection("attendance")
+                    .whereArrayContains("present_students", uid)
                     .get()
                     .await()
                 
                 val absentSnapshot = firestore.collection("attendance")
-                    .whereArrayContainsAny("absent_students", listOf(uid))
-                    .orderBy("date", Query.Direction.DESCENDING)
+                    .whereArrayContains("absent_students", uid)
                     .get()
                     .await()
 
-                val presentLogs = attendanceSnapshot.documents.map { doc ->
+                android.util.Log.d("AttendanceVM", "Present logs: ${presentSnapshot.size()}, Absent logs: ${absentSnapshot.size()}")
+
+                val presentLogs = presentSnapshot.documents.map { doc ->
                     AttendanceRecord(
                         date = formatDate(doc.getTimestamp("date")),
                         isPresent = true,
@@ -104,6 +106,14 @@ class StudentAttendanceViewModel(
                 val totalDays = allLogs.size
                 val presentDays = allLogs.count { it.isPresent }
                 val percentage = if (totalDays > 0) (presentDays.toFloat() / totalDays) * 100 else 0f
+
+                val motherName = userDoc.getString("motherName") ?: ""
+                val fatherName = userDoc.getString("fatherName") ?: ""
+                val motherPhone = userDoc.getString("motherPhone") ?: ""
+                val fatherPhone = userDoc.getString("fatherPhone") ?: ""
+                
+                val parentName = if (motherName.isNotBlank()) motherName else fatherName
+                val phone = if (motherPhone.isNotBlank()) motherPhone else fatherPhone
 
                 _summary.value = StudentAttendanceSummary(
                     studentName = name,

@@ -92,8 +92,11 @@ fun TeacherDashboard(
     val engagementViewModel: EngagementViewModel = viewModel()
     val timetableViewModel: com.project.markmyday.viewmodel.TimetableViewModel = viewModel()
     
+    val teacherViewModel: com.project.markmyday.viewmodel.TeacherViewModel = viewModel()
+    
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
     val engagementSummaries by engagementViewModel.engagementSummaries.collectAsState()
+    val homeStudents by teacherViewModel.homeSectionStudents.collectAsState()
     val timetables by timetableViewModel.allTimetables.collectAsState()
     val allTeachers by timetableViewModel.allTeachers.collectAsState()
     
@@ -103,6 +106,7 @@ fun TeacherDashboard(
         notificationViewModel.fetchNotifications(userRole)
         if (homeSection != "N/A") {
             engagementViewModel.fetchEngagement(homeSection)
+            teacherViewModel.fetchHomeSectionStudents(homeSection)
         }
     }
 
@@ -272,6 +276,14 @@ fun TeacherDashboard(
             // 5. Watchlist Card
             if (homeSection != "N/A") {
                 item(span = { GridItemSpan(2) }) {
+                    HomeStudentsCard(
+                        section = homeSection,
+                        students = homeStudents,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+                
+                item(span = { GridItemSpan(2) }) {
                     WatchlistCard(
                         summaries = engagementSummaries,
                         onExport = { engagementViewModel.exportReport(context) },
@@ -303,6 +315,109 @@ fun TeacherDashboard(
 
             item(span = { GridItemSpan(2) }) {
                 Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeStudentsCard(
+    section: String,
+    students: List<com.project.markmyday.data.model.Student>,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)),
+        elevation = CardDefaults.cardElevation(0.dp)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "My Home Students",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        text = section,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                    )
+                }
+                
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f)
+                ) {
+                    Text(
+                        text = "${students.size}",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            if (students.isEmpty()) {
+                Text(
+                    "No students found in your section.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
+                )
+            } else {
+                students.take(3).forEach { student ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            modifier = Modifier.size(40.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    student.name.take(1),
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                student.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                "ID: ${student.studentId}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                }
+                
+                if (students.size > 3) {
+                    Text(
+                        "and ${students.size - 3} more students",
+                        modifier = Modifier.padding(top = 8.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
+                    )
+                }
             }
         }
     }

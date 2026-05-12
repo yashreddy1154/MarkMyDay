@@ -41,7 +41,7 @@ enum class AuthState {
 }
 
 @Composable
-fun AuthenticationScreen(onLoginSuccess: (String, String, String?, String?, String?) -> Unit) {
+fun AuthenticationScreen(onLoginSuccess: (String, String, String?, String?, String?, String) -> Unit) {
     var authState by remember { mutableStateOf(AuthState.PRE_LOGIN) }
 
     AnimatedContent(
@@ -131,7 +131,7 @@ fun PreLoginContent(onStart: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginContent(
-    onLogin: (String, String, String?, String?, String?) -> Unit,
+    onLogin: (String, String, String?, String?, String?, String) -> Unit,
     onBack: () -> Unit
 ) {
     val viewModel: AuthViewModel = viewModel()
@@ -148,7 +148,7 @@ fun LoginContent(
         when (authResult) {
             is AuthResult.Success -> {
                 val result = authResult as AuthResult.Success
-                onLogin(result.name, result.role, result.studentId, result.homeSection, result.subject)
+                onLogin(result.name, result.role, result.studentId, result.homeSection, result.subject, result.uid)
             }
             is AuthResult.Error -> {
                 val errorKey = (authResult as AuthResult.Error).message
