@@ -213,7 +213,7 @@ fun TeacherDashboard(
 
             // 3. Timetable Section
             item(span = { GridItemSpan(2) }) {
-                TimetableSection(
+                TeacherTimetableSection(
                     entries = teacherTodayEntries,
                     onViewAllClick = {
                         val intent = Intent(context, TeacherTimetableActivity::class.java).apply {

@@ -9,11 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.data.repository.StudentRepository
 import com.project.markmyday.ui.screens.AddStudentFormState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -55,6 +51,9 @@ class StudentViewModel(
      * Exposes all students from the repository as a StateFlow.
      */
     val allStudents: StateFlow<List<Student>> = repository.getAllStudents()
+        .catch { e ->
+            Log.e("StudentViewModel", "Error fetching students: ${e.message}")
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

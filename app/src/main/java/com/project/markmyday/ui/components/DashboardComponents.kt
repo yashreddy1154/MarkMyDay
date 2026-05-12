@@ -245,6 +245,116 @@ fun TimetableSection(entries: List<TimetableEntry>, onViewAllClick: () -> Unit) 
 }
 
 @Composable
+fun TeacherTimetableSection(entries: List<TimetableEntry>, onViewAllClick: () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(id = R.string.school_schedule), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            TextButton(onClick = onViewAllClick) {
+                Text(stringResource(id = R.string.view_all), color = MaterialTheme.colorScheme.primary, fontSize = 14.sp)
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        if (entries.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(24.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No classes scheduled for today.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                items(entries) { entry ->
+                    TeacherDashboardTimetableCard(entry)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TeacherDashboardTimetableCard(entry: TimetableEntry) {
+    val sectionColor = com.project.markmyday.ui.utils.TeacherUtils.getClassColor(entry.room)
+    
+    Card(
+        modifier = Modifier.width(260.dp),
+        shape = RoundedCornerShape(32.dp),
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(sectionColor, sectionColor.copy(alpha = 0.8f))
+                        )
+                    )
+                    .padding(20.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            entry.room, // This holds the class name for teachers
+                            color = Color.White, 
+                            fontWeight = FontWeight.ExtraBold, 
+                            fontSize = 24.sp
+                        )
+                        Surface(
+                            color = Color.White.copy(alpha = 0.2f),
+                            shape = CircleShape
+                        ) {
+                            Text(
+                                entry.code, 
+                                color = Color.White, 
+                                fontSize = 12.sp, 
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        entry.subject, 
+                        color = Color.White.copy(alpha = 0.9f), 
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(sectionColor.copy(alpha = 0.05f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.AccessTime, contentDescription = null, tint = sectionColor, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(entry.time, color = sectionColor, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun TimetableCard(entry: TimetableEntry) {
     Card(
         modifier = Modifier.width(260.dp),

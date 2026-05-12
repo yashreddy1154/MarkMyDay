@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,32 +29,6 @@ import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.viewmodel.TimetableViewModel
 import kotlinx.coroutines.launch
 import java.util.*
-
-@Composable
-fun getSubjectColorForTeacher(subject: String): Color {
-    val telugu = stringResource(R.string.subject_telugu_label).lowercase()
-    val hindi = stringResource(R.string.subject_hindi_label).lowercase()
-    val english = stringResource(R.string.subject_english_label).lowercase()
-    val math = stringResource(R.string.subject_math_label).lowercase()
-    val physics = stringResource(R.string.subject_physics_label).lowercase()
-    val biology = stringResource(R.string.subject_biology_label).lowercase()
-    val science = stringResource(R.string.subject_science_label).lowercase()
-    val social = stringResource(R.string.subject_social_label).lowercase()
-    val computer = stringResource(R.string.subject_computer_label).lowercase()
-
-    return when (subject.lowercase()) {
-        telugu -> Color(0xFF1E88E5) // Blue
-        math -> Color(0xFF9E9E9E) // Grey
-        physics -> Color(0xFF03A9F4) // Light Blue
-        biology -> Color(0xFF4CAF50) // Green
-        science -> Color(0xFF26A69A) // Mix of Blue and Green (Teal)
-        social -> Color(0xFFFF9800) // Orange
-        hindi -> Color(0xFFE91E63) // Pink/Custom
-        english -> Color(0xFF673AB7) // Deep Purple/Custom
-        computer -> Color(0xFF212121) // Black
-        else -> Color(0xFF6200EE) // Default Purple
-    }
-}
 
 class TeacherTimetableActivity : AppCompatActivity() {
 
@@ -178,16 +153,16 @@ fun TeacherTimetableContent(
 
 @Composable
 fun TeacherPeriodCard(className: String, period: Period) {
-    val subjectColor = getSubjectColorForTeacher(period.subject)
+    val sectionColor = com.project.markmyday.ui.utils.TeacherUtils.getClassColor(className)
     
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, subjectColor.copy(alpha = 0.3f))
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        border = BorderStroke(1.dp, sectionColor.copy(alpha = 0.4f))
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -195,41 +170,51 @@ fun TeacherPeriodCard(className: String, period: Period) {
             ) {
                 Column {
                     Text(
-                        text = period.subject,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = subjectColor
-                    )
-                    Text(
                         text = className,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = sectionColor
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = period.subject,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         fontWeight = FontWeight.Bold
                     )
                 }
                 
                 Surface(
-                    color = subjectColor.copy(alpha = 0.1f),
-                    shape = RoundedCornerShape(8.dp)
+                    color = sectionColor.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = "P${period.periodNumber}",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = subjectColor
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = sectionColor
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            Text(
-                text = "${period.startTime} - ${period.endTime}",
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold,
-                color = subjectColor
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.AccessTime, 
+                    contentDescription = null, 
+                    tint = sectionColor,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "${period.startTime} - ${period.endTime}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = sectionColor.copy(alpha = 0.9f)
+                )
+            }
         }
     }
 }

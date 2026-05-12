@@ -1,5 +1,6 @@
 package com.project.markmyday.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
@@ -67,51 +68,66 @@ class TimetableViewModel(
 
     private fun fetchTeachers() {
         viewModelScope.launch {
-            teacherRepository.getAllTeachers().collect { teachers ->
-                _allTeachers.value = teachers
-            }
+            teacherRepository.getAllTeachers()
+                .catch { e ->
+                    Log.e("TimetableViewModel", "Error fetching teachers: ${e.message}")
+                    _state.value = TimetableState.Error(e.localizedMessage ?: "Permission Denied")
+                }
+                .collect { teachers ->
+                    _allTeachers.value = teachers
+                }
         }
     }
 
     private fun fetchStudents() {
         viewModelScope.launch {
-            studentRepository.getAllStudents().collect { students ->
-                _allStudents.value = students
-                
-                // Initialize students for each class if not already loaded from Firestore
-                val currentAssignments = _classStudentAssignments.value.toMutableMap()
-                (1..10).forEach { i ->
-                    val className = "Class $i"
-                    if (currentAssignments[className].isNullOrEmpty()) {
-                        val classStudents = students.filter { it.studentClass == i.toString() }
-                        currentAssignments[className] = classStudents.map { it.studentId }
-                    }
+            studentRepository.getAllStudents()
+                .catch { e ->
+                    Log.e("TimetableViewModel", "Error fetching students: ${e.message}")
+                    _state.value = TimetableState.Error(e.localizedMessage ?: "Permission Denied")
                 }
-                _classStudentAssignments.value = currentAssignments
-            }
+                .collect { students ->
+                    _allStudents.value = students
+                    
+                    // Initialize students for each class if not already loaded from Firestore
+                    val currentAssignments = _classStudentAssignments.value.toMutableMap()
+                    (1..10).forEach { i ->
+                        val className = "Class $i"
+                        if (currentAssignments[className].isNullOrEmpty()) {
+                            val classStudents = students.filter { it.studentClass == i.toString() }
+                            currentAssignments[className] = classStudents.map { it.studentId }
+                        }
+                    }
+                    _classStudentAssignments.value = currentAssignments
+                }
         }
     }
 
     private fun fetchTimetables() {
         viewModelScope.launch {
-            timetableRepository.getAllTimetables().collect { timetables ->
-                _allTimetables.value = timetables
-                
-                val currentTeacherAssignments = _classTeacherAssignments.value.toMutableMap()
-                val currentStudentAssignments = _classStudentAssignments.value.toMutableMap()
-                
-                timetables.forEach { timetable ->
-                    val teacher = _allTeachers.value.find { it.teacherId == timetable.homeTeacherId }
-                    if (teacher != null) {
-                        currentTeacherAssignments[timetable.className] = teacher
-                    }
-                    if (timetable.studentList.isNotEmpty()) {
-                        currentStudentAssignments[timetable.className] = timetable.studentList
-                    }
+            timetableRepository.getAllTimetables()
+                .catch { e ->
+                    Log.e("TimetableViewModel", "Error fetching timetables: ${e.message}")
+                    _state.value = TimetableState.Error(e.localizedMessage ?: "Permission Denied")
                 }
-                _classTeacherAssignments.value = currentTeacherAssignments
-                _classStudentAssignments.value = currentStudentAssignments
-            }
+                .collect { timetables ->
+                    _allTimetables.value = timetables
+                    
+                    val currentTeacherAssignments = _classTeacherAssignments.value.toMutableMap()
+                    val currentStudentAssignments = _classStudentAssignments.value.toMutableMap()
+                    
+                    timetables.forEach { timetable ->
+                        val teacher = _allTeachers.value.find { it.teacherId == timetable.homeTeacherId }
+                        if (teacher != null) {
+                            currentTeacherAssignments[timetable.className] = teacher
+                        }
+                        if (timetable.studentList.isNotEmpty()) {
+                            currentStudentAssignments[timetable.className] = timetable.studentList
+                        }
+                    }
+                    _classTeacherAssignments.value = currentTeacherAssignments
+                    _classStudentAssignments.value = currentStudentAssignments
+                }
         }
     }
 

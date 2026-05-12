@@ -1,5 +1,6 @@
 package com.project.markmyday.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.FirebaseApp
@@ -8,11 +9,7 @@ import com.project.markmyday.data.model.Teacher
 import com.project.markmyday.data.repository.TeacherRepository
 import com.project.markmyday.ui.screens.AddStaffFormState
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -45,6 +42,9 @@ class TeacherViewModel(
     val registrationState: StateFlow<TeacherRegistrationState> = _registrationState.asStateFlow()
 
     val allTeachers: StateFlow<List<Teacher>> = repository.getAllTeachers()
+        .catch { e ->
+            Log.e("TeacherViewModel", "Error fetching teachers: ${e.message}")
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
