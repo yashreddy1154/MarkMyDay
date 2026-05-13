@@ -3,23 +3,28 @@ package com.project.markmyday.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.viewmodel.TeacherHomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherHomeSectionScreen(
+    onBack: () -> Unit = {},
     viewModel: TeacherHomeViewModel = viewModel()
 ) {
     val students by viewModel.students.collectAsState()
@@ -30,7 +35,12 @@ fun TeacherHomeSectionScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text("Home Section Students", fontWeight = FontWeight.Bold) }
+                    title = { Text("Home Section Students", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
                 )
                 TextField(
                     value = searchQuery,
@@ -83,9 +93,16 @@ fun TeacherHomeSectionScreen(
 
 @Composable
 fun StudentCard(student: Student) {
+    val parentName = student.motherName.ifBlank { student.fatherName }.ifBlank { "N/A" }
+    val contact = student.motherPhone.ifBlank { student.fatherPhone }.ifBlank { "N/A" }
+
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.elevatedCardElevation(4.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.elevatedCardElevation(2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -94,30 +111,42 @@ fun StudentCard(student: Student) {
         ) {
             Text(
                 text = student.name,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFF673AB7) // Matching the purple/violet color from image
             )
             Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            Spacer(modifier = Modifier.height(12.dp))
             
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Parent:",
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.width(80.dp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(80.dp),
+                    color = Color.Black
                 )
-                Text(text = student.motherName)
+                Text(
+                    text = parentName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
             }
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Contact:",
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.width(80.dp)
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(80.dp),
+                    color = Color.Black
                 )
-                Text(text = student.motherPhone)
+                Text(
+                    text = contact,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
             }
         }
     }

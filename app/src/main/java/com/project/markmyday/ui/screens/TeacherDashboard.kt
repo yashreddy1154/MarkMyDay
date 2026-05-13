@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.CastForEducation
 import androidx.compose.material.icons.filled.CenterFocusStrong
@@ -89,13 +90,11 @@ fun TeacherDashboard(
     onNavigate: (String) -> Unit,
 ) {
     val notificationViewModel: NotificationViewModel = viewModel()
-    val engagementViewModel: EngagementViewModel = viewModel()
     val timetableViewModel: com.project.markmyday.viewmodel.TimetableViewModel = viewModel()
     
     val teacherViewModel: com.project.markmyday.viewmodel.TeacherViewModel = viewModel()
     
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
-    val engagementSummaries by engagementViewModel.engagementSummaries.collectAsState()
     val homeStudents by teacherViewModel.homeSectionStudents.collectAsState()
     val timetables by timetableViewModel.allTimetables.collectAsState()
     val allTeachers by timetableViewModel.allTeachers.collectAsState()
@@ -105,7 +104,6 @@ fun TeacherDashboard(
     LaunchedEffect(userRole, homeSection) {
         notificationViewModel.fetchNotifications(userRole)
         if (homeSection != "N/A") {
-            engagementViewModel.fetchEngagement(homeSection)
             teacherViewModel.fetchHomeSectionStudents(homeSection)
         }
     }
@@ -193,7 +191,7 @@ fun TeacherDashboard(
             item(span = { GridItemSpan(2) }) {
                 WelcomeSection(
                     name = userName,
-                    role = "$homeSection • $subject",
+                    role = "${homeSection.replace("+", " ")} • ${subject.replace("+", " ")}",
                     icon = Icons.Default.CastForEducation
                 )
             }
@@ -279,15 +277,8 @@ fun TeacherDashboard(
                     HomeStudentsCard(
                         section = homeSection,
                         students = homeStudents,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
-                
-                item(span = { GridItemSpan(2) }) {
-                    WatchlistCard(
-                        summaries = engagementSummaries,
-                        onExport = { engagementViewModel.exportReport(context) },
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onViewAllClick = { onNavigate("teacher_home_section") }
                     )
                 }
             }
@@ -324,13 +315,18 @@ fun TeacherDashboard(
 fun HomeStudentsCard(
     section: String,
     students: List<com.project.markmyday.data.model.Student>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onViewAllClick: () -> Unit
 ) {
+    val displaySection = remember(section) {
+        section.replace("+", " ")
+    }
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)),
-        elevation = CardDefaults.cardElevation(0.dp)
+        elevation = CardDefaults.cardElevation(0.dp),
+        onClick = onViewAllClick
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Row(
@@ -346,23 +342,41 @@ fun HomeStudentsCard(
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Text(
-                        text = section,
+                        text = displaySection,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                     )
                 }
                 
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f)
-                ) {
-                    Text(
-                        text = "${students.size}",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f)
+                    ) {
+                        Text(
+                            text = "${students.size}",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    IconButton(
+                        onClick = onViewAllClick,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "View All",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
             
@@ -418,115 +432,6 @@ fun HomeStudentsCard(
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun WatchlistCard(
-    summaries: List<com.project.markmyday.data.model.StudentEngagementSummary>,
-    onExport: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Student Watchlist",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                IconButton(
-                    onClick = onExport,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
-                ) {
-                    Icon(Icons.Default.Download, contentDescription = "Export Report", tint = MaterialTheme.colorScheme.primary)
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            if (summaries.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "No activity detected today.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else {
-                summaries.take(5).forEach { summary ->
-                    val totalSeconds = summary.videoStats.values.sumOf { it.timeSpentSeconds }
-                    val hours = totalSeconds / 3600.0
-                    
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(
-                            modifier = Modifier.size(8.dp),
-                            shape = CircleShape,
-                            color = if (hours > 2) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-                        ) {}
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            summary.studentName, 
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            String.format("%.2f hrs", hours),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant)
-                }
-                
-                if (summaries.size > 5) {
-                    Text(
-                        "and ${summaries.size - 5} more students...",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            Button(
-                onClick = onExport,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Icon(Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("View Detailed Insights", fontWeight = FontWeight.Bold)
             }
         }
     }

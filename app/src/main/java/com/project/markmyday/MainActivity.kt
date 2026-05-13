@@ -1,5 +1,6 @@
 package com.project.markmyday
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -107,28 +108,27 @@ class MainActivity : AppCompatActivity() {
                             }
                             is AuthResult.Success -> {
                                 val result = authState as AuthResult.Success
-                                // Use the session UID or a stable ID for the route if available, 
-                                // but for now we follow the existing pattern with URL encoding to prevent crashes
-                                val encodedName = java.net.URLEncoder.encode(result.name, "UTF-8")
-                                val encodedRole = java.net.URLEncoder.encode(result.role, "UTF-8")
+                                // Use Uri.encode instead of URLEncoder to handle spaces as %20 (which Compose Nav decodes automatically)
+                                val encodedName = Uri.encode(result.name)
+                                val encodedRole = Uri.encode(result.role)
                                 
                                 val initialDashboardRoute = when (result.role.lowercase()) {
                                     "principal", "headmaster", "admin" -> "admin_dashboard/$encodedName/$encodedRole"
                                     "teacher" -> {
-                                        val section = java.net.URLEncoder.encode(result.homeSection ?: "N/A", "UTF-8")
-                                        val subject = java.net.URLEncoder.encode(result.subject ?: "N/A", "UTF-8")
+                                        val section = Uri.encode(result.homeSection ?: "N/A")
+                                        val subject = Uri.encode(result.subject ?: "N/A")
                                         "teacher_dashboard/$encodedName/$encodedRole/$section/$subject"
                                     }
                                     "student" -> {
-                                        val studentId = java.net.URLEncoder.encode(result.studentId ?: "N/A", "UTF-8")
+                                        val studentId = Uri.encode(result.studentId ?: "N/A")
                                         val displayRole = if (result.homeSection != null && result.homeSection != "N/A") "Class ${result.homeSection}" else result.role
-                                        val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
+                                        val encodedDisplayRole = Uri.encode(displayRole)
                                         "student_dashboard/$encodedName/$encodedDisplayRole/$studentId"
                                     }
                                     else -> {
-                                        val studentId = java.net.URLEncoder.encode(result.studentId ?: "N/A", "UTF-8")
+                                        val studentId = Uri.encode(result.studentId ?: "N/A")
                                         val displayRole = if (result.homeSection != null && result.homeSection != "N/A") "Class ${result.homeSection}" else result.role
-                                        val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
+                                        val encodedDisplayRole = Uri.encode(displayRole)
                                         "student_dashboard/$encodedName/$encodedDisplayRole/$studentId"
                                     }
                                 }

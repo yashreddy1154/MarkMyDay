@@ -49,10 +49,13 @@ class TeacherHomeViewModel(
                 val homeSection = teacherDoc.getString("home_section")
                 
                 if (homeSection != null) {
+                    // Normalize homeSection for query
+                    val normalizedClass = homeSection.replace("Class ", "").replace("+", " ").trim()
+                    
                     // 2. Query students in that section
                     firestore.collection("users")
                         .whereEqualTo("role", "student")
-                        .whereEqualTo("class_section", homeSection)
+                        .whereEqualTo("studentClass", normalizedClass)
                         .addSnapshotListener { snapshot, error ->
                             if (error != null) {
                                 // Handle error
@@ -65,7 +68,11 @@ class TeacherHomeViewModel(
                                         studentId = doc.getString("studentId") ?: "",
                                         name = doc.getString("name") ?: "",
                                         studentClass = doc.getString("studentClass") ?: "",
-                                        email = doc.getString("email") ?: ""
+                                        email = doc.getString("email") ?: "",
+                                        motherName = doc.getString("motherName") ?: "",
+                                        fatherName = doc.getString("fatherName") ?: "",
+                                        motherPhone = doc.getString("motherPhone") ?: "",
+                                        fatherPhone = doc.getString("fatherPhone") ?: ""
                                     )
                                 }
                                 _allStudents.value = studentList

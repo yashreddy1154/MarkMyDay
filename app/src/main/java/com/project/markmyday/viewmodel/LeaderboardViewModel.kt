@@ -54,7 +54,11 @@ class LeaderboardViewModel : ViewModel() {
             
             // 4. Students see only their own class results
             val resultClass = if (!result.className.startsWith("Class")) "Class ${result.className}" else result.className
-            val targetClass = if (!userClass.startsWith("Class")) "Class $userClass" else userClass
+            val targetClass = if (!userClass.startsWith("Class")) {
+                "Class ${userClass.replace("+", " ").trim()}"
+            } else {
+                userClass.replace("+", " ").trim()
+            }
             
             resultClass == targetClass
         }.filter { 

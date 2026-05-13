@@ -59,7 +59,13 @@ class TeacherViewModel(
         
         viewModelScope.launch {
             try {
-                val normalizedClass = homeSection.replace("Class ", "").trim()
+                // Normalize class: remove "Class ", replace "+" with " ", and trim
+                val normalizedClass = homeSection.replace("Class ", "")
+                    .replace("+", " ")
+                    .trim()
+                
+                Log.d("TeacherViewModel", "Fetching students for class: '$normalizedClass' (from '$homeSection')")
+
                 firestore.collection("users")
                     .whereEqualTo("role", "student")
                     .whereEqualTo("studentClass", normalizedClass)

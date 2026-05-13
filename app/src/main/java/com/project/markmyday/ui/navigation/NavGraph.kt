@@ -1,5 +1,6 @@
 package com.project.markmyday.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavHostController
@@ -32,6 +33,7 @@ sealed class Screen(val route: String) {
     }
     object AttendanceMarking : Screen("attendance_marking")
     object StudentManagement : Screen("student_management")
+    object TeacherHomeSection : Screen("teacher_home_section")
     object AdminLeaveManagement : Screen("admin_leave_management")
     object TeacherLeaveView : Screen("teacher_leave_view")
     object AdminCreateNotification : Screen("admin_create_notification")
@@ -39,11 +41,11 @@ sealed class Screen(val route: String) {
     object CourseManager : Screen("course_manager")
     object QuizTaking : Screen("quiz_taking/{subject}/{className}/{userName}/{studentId}") {
         fun createRoute(subject: String, className: String, userName: String, studentId: String) = 
-            "quiz_taking/$subject/$className/${java.net.URLEncoder.encode(userName, "UTF-8")}/$studentId"
+            "quiz_taking/$subject/$className/${Uri.encode(userName)}/$studentId"
     }
     object QuizList : Screen("quiz_list/{className}/{userName}/{studentId}") {
         fun createRoute(className: String, userName: String, studentId: String) = 
-            "quiz_list/$className/${java.net.URLEncoder.encode(userName, "UTF-8")}/$studentId"
+            "quiz_list/$className/${Uri.encode(userName)}/$studentId"
     }
     object Leaderboard : Screen("leaderboard")
     
@@ -85,18 +87,18 @@ fun AppNavigation(
         composable(Screen.Authentication.route) {
             AuthenticationScreen(onLoginSuccess = { name, role, studentId, section, subject, uid ->
                 // Routing logic based on user role
-                val encodedName = java.net.URLEncoder.encode(name, "UTF-8")
-                val encodedRole = java.net.URLEncoder.encode(role, "UTF-8")
-                val encodedSection = java.net.URLEncoder.encode(section ?: "N/A", "UTF-8")
-                val encodedSubject = java.net.URLEncoder.encode(subject ?: "N/A", "UTF-8")
-                val encodedStudentId = java.net.URLEncoder.encode(studentId ?: "N/A", "UTF-8")
+                val encodedName = Uri.encode(name)
+                val encodedRole = Uri.encode(role)
+                val encodedSection = Uri.encode(section ?: "N/A")
+                val encodedSubject = Uri.encode(subject ?: "N/A")
+                val encodedStudentId = Uri.encode(studentId ?: "N/A")
 
                 val destination = when (role.lowercase()) {
                     "principal", "headmaster", "admin" -> "admin_dashboard/$encodedName/$encodedRole"
                     "teacher" -> "teacher_dashboard/$encodedName/$encodedRole/$encodedSection/$encodedSubject"
                     "student" -> {
                         val displayRole = if (section != null && section != "N/A") "Class $section" else role
-                        val encodedDisplayRole = java.net.URLEncoder.encode(displayRole, "UTF-8")
+                        val encodedDisplayRole = Uri.encode(displayRole)
                         "student_dashboard/$encodedName/$encodedDisplayRole/$encodedStudentId/$uid"
                     }
                     else -> "student_dashboard/$encodedName/$encodedRole/$encodedStudentId/$uid"
@@ -138,9 +140,9 @@ fun AppNavigation(
             
             // Sync lastDashboardRoute if it's empty (e.g. on direct navigation)
             val currentRoute = Screen.StudentDashboard.route
-                .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
-                .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
-                .replace("{studentId}", java.net.URLEncoder.encode(studentId, "UTF-8"))
+                .replace("{name}", Uri.encode(name))
+                .replace("{role}", Uri.encode(role))
+                .replace("{studentId}", Uri.encode(studentId))
                 .replace("{uid}", uid)
             
             if (lastDashboardRoute != currentRoute) {
@@ -152,7 +154,7 @@ fun AppNavigation(
                 userRole = role,
                 studentId = studentId,
                 uid = uid,
-                onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
+                onNotificationClick = { navController.navigate("notifications/${Uri.encode(role)}") },
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
@@ -160,7 +162,7 @@ fun AppNavigation(
                             val classNum = role.filter { it.isDigit() }.ifEmpty { "10" }
                             navController.navigate(Screen.Leaderboard.route + "?role=student&userClass=$classNum")
                         }
-                        "notifications" -> navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}")
+                        "notifications" -> navController.navigate("notifications/${Uri.encode(role)}")
                         "exams" -> {
                             val classNum = role.filter { it.isDigit() }.ifEmpty { "" }
                             if (classNum.isNotEmpty()) {
@@ -197,10 +199,10 @@ fun AppNavigation(
 
             // Sync lastDashboardRoute
             val currentRoute = Screen.TeacherDashboard.route
-                .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
-                .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
-                .replace("{section}", java.net.URLEncoder.encode(section, "UTF-8"))
-                .replace("{subject}", java.net.URLEncoder.encode(subject, "UTF-8"))
+                .replace("{name}", Uri.encode(name))
+                .replace("{role}", Uri.encode(role))
+                .replace("{section}", Uri.encode(section))
+                .replace("{subject}", Uri.encode(subject))
 
             if (lastDashboardRoute != currentRoute) {
                 lastDashboardRoute = currentRoute
@@ -211,12 +213,12 @@ fun AppNavigation(
                 userRole = role,
                 homeSection = section,
                 subject = subject,
-                onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
+                onNotificationClick = { navController.navigate("notifications/${Uri.encode(role)}") },
                 onTileClick = { id ->
                     when (id) {
                         "updates" -> navController.navigate(Screen.GlobalUpdates.route)
                         "settings" -> navController.navigate(Screen.Settings.route)
-                        "notifications" -> navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}")
+                        "notifications" -> navController.navigate("notifications/${Uri.encode(role)}")
                         "exams" -> navController.navigate(Screen.QuizQuestionUpload.route)
                         "results" -> navController.navigate(Screen.Leaderboard.route + "?role=teacher&userClass=$section")
                         "admissions" -> navController.navigate(Screen.Admissions.route)
@@ -243,8 +245,8 @@ fun AppNavigation(
 
             // Sync lastDashboardRoute
             val currentRoute = Screen.AdminDashboard.route
-                .replace("{name}", java.net.URLEncoder.encode(name, "UTF-8"))
-                .replace("{role}", java.net.URLEncoder.encode(role, "UTF-8"))
+                .replace("{name}", Uri.encode(name))
+                .replace("{role}", Uri.encode(role))
 
             if (lastDashboardRoute != currentRoute) {
                 lastDashboardRoute = currentRoute
@@ -253,7 +255,7 @@ fun AppNavigation(
             AdminDashboard(
                 userName = name,
                 userRole = role,
-                onNotificationClick = { navController.navigate("notifications/${java.net.URLEncoder.encode(role, "UTF-8")}") },
+                onNotificationClick = { navController.navigate("notifications/${Uri.encode(role)}") },
                 onTileClick = { id -> 
                     when (id) {
                         "admissions" -> navController.navigate(Screen.Admissions.route)
@@ -315,6 +317,10 @@ fun AppNavigation(
 
         composable(Screen.AttendanceMarking.route) {
             AttendanceScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.TeacherHomeSection.route) {
+            TeacherHomeSectionScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Screen.StudentManagement.route) {
@@ -448,8 +454,7 @@ fun AppNavigation(
             CourseLibraryScreen(
                 userRole = roleInfo,
                 onNotificationClick = { 
-                    val encodedRole = java.net.URLEncoder.encode(roleInfo, "UTF-8")
-                    navController.navigate("notifications/$encodedRole") 
+                    navController.navigate("notifications/${Uri.encode(roleInfo)}") 
                 },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
@@ -463,8 +468,7 @@ fun AppNavigation(
             
             ReportsScreen(
                 onNotificationClick = { 
-                    val encodedRole = java.net.URLEncoder.encode(roleInfo, "UTF-8")
-                    navController.navigate("notifications/$encodedRole") 
+                    navController.navigate("notifications/${Uri.encode(roleInfo)}")
                 },
                 onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
@@ -472,7 +476,8 @@ fun AppNavigation(
 
         composable(Screen.GlobalUpdates.route) {
             GlobalUpdateScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
             )
         }
 
