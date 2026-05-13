@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.project.markmyday.data.model.Article
+import com.project.markmyday.data.model.GNewsArticle
 import com.project.markmyday.databinding.ItemNewsBinding
 import com.project.markmyday.R
 
-class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCallback()) {
+class NewsAdapter : ListAdapter<GNewsArticle, NewsAdapter.NewsViewHolder>(NewsDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val binding = ItemNewsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -24,19 +24,19 @@ class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCal
     }
 
     class NewsViewHolder(private val binding: ItemNewsBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(article: Article) {
+        fun bind(article: GNewsArticle) {
             binding.tvNewsTitle.text = article.title ?: binding.root.context.getString(R.string.no_title)
             binding.tvNewsDescription.text = article.description ?: binding.root.context.getString(R.string.no_description)
-            binding.tvPubDate.text = article.pubDate ?: ""
+            binding.tvPubDate.text = article.publishedAt ?: ""
 
             Glide.with(binding.ivNewsImage.context)
-                .load(article.imageUrl)
+                .load(article.image)
                 .placeholder(android.R.color.darker_gray)
                 .error(android.R.color.darker_gray)
                 .into(binding.ivNewsImage)
 
             binding.root.setOnClickListener {
-                article.link?.let { url ->
+                article.url?.let { url ->
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     binding.root.context.startActivity(intent)
                 }
@@ -44,12 +44,12 @@ class NewsAdapter : ListAdapter<Article, NewsAdapter.NewsViewHolder>(NewsDiffCal
         }
     }
 
-    class NewsDiffCallback : DiffUtil.ItemCallback<Article>() {
-        override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
-            return oldItem.link == newItem.link
+    class NewsDiffCallback : DiffUtil.ItemCallback<GNewsArticle>() {
+        override fun areItemsTheSame(oldItem: GNewsArticle, newItem: GNewsArticle): Boolean {
+            return oldItem.url == newItem.url
         }
 
-        override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+        override fun areContentsTheSame(oldItem: GNewsArticle, newItem: GNewsArticle): Boolean {
             return oldItem == newItem
         }
     }

@@ -37,6 +37,7 @@ fun AttendanceScreen(
     var showSuccessDialog by remember { mutableStateOf(false) }
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     val selectedClass = if (assignedClasses.isNotEmpty() && selectedTabIndex < assignedClasses.size) {
         assignedClasses[selectedTabIndex]
     } else ""
