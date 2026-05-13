@@ -25,7 +25,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -49,6 +50,7 @@ dependencies {
     implementation(libs.swiperefreshlayout)
     implementation(libs.recyclerview)
     implementation(libs.cardview)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.compose.remote.creation.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
