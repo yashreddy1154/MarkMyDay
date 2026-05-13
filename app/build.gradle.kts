@@ -67,6 +67,7 @@ dependencies {
     
     // Google Play Services
     implementation(libs.play.services.base)
+    implementation(libs.play.services.location)
     
     // CameraX
     implementation(libs.androidx.camera.camera2)

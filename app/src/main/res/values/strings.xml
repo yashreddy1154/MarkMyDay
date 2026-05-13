@@ -39,7 +39,7 @@
     <string name="search_anything">Search anything…</string>
     <string name="keep_learning">Keep Learning! 🚀</string>
     <string name="assignments_due">You have 3 assignments due soon.</string>
-    <string name="all_caught_up">All caught up! No assignments due.</string>
+    <string name="all_caught_up" translatable="false">All caught up! No assignments due.</string>
     <string name="class_in_session">Class In Session 👩‍🏫</string>
     <string name="next_class_starts">Your next class starts in 15 mins.</string>
 
@@ -288,8 +288,13 @@
 
     <!-- Global Updates Screen -->
     <string name="title_global_updates">Global Updates</string>
-    <string name="hot_news">HOT NEWS</string>
+    <string name="hot_news">🔥 HOT NEWS</string>
     <string name="more_updates">More Updates 📰</string>
+    <string name="intl_news" translatable="false">International</string>
+    <string name="national_news" translatable="false">National</string>
+    <string name="school_news" translatable="false">School &amp; Education</string>
+    <string name="gk_news" translatable="false">GK for Students</string>
+    <string name="ssc_news" translatable="false">SSC Related News</string>
 
     <!-- Role Selector Screen -->
     <string name="app_tagline">Your School, Managed Simply</string>
@@ -326,16 +331,16 @@
     <string name="assign_teachers_error">Please assign teachers to all subjects in the Weekly Quota first.</string>
 
     <!-- Digital Diary -->
-    <string name="digital_diary">Digital Diary</string>
-    <string name="homework_section">Homework Section</string>
-    <string name="no_homework_yet">No homework added yet.</string>
-    <string name="taught_label">Taught: %1$s</string>
-    <string name="homework_label">Homework: %1$s</string>
-    <string name="what_was_taught">What was taught?</string>
-    <string name="homework_for_tomorrow">Homework for tomorrow</string>
-    <string name="post_to_diary">Post to Diary</string>
-    <string name="diary_post_success">Diary entry posted successfully!</string>
+    <string name="digital_diary" translatable="false">Digital Diary</string>
+    <string name="homework_section" translatable="false">Homework Section</string>
+    <string name="no_homework_yet" translatable="false">No homework added yet.</string>
+    <string name="taught_label" translatable="false">Taught: %1$s</string>
+    <string name="homework_label" translatable="false">Homework: %1$s</string>
+    <string name="what_was_taught" translatable="false">What was taught?</string>
+    <string name="homework_for_tomorrow" translatable="false">Homework for tomorrow</string>
+    <string name="post_to_diary" translatable="false">Post to Diary</string>
+    <string name="diary_post_success" translatable="false">Diary entry posted successfully!</string>
 
     <!-- School Info -->
-    <string name="logo_motto">Excellence in Education</string>
+    <string name="logo_motto" translatable="false">Excellence in Education</string>
 </resources>
