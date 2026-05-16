@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.project.markmyday.algorithm.TimetableGenerator
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.data.model.Teacher
 import com.project.markmyday.data.model.Timetable
@@ -24,7 +25,8 @@ class TimetableViewModel(
     private val teacherRepository: TeacherRepository = TeacherRepository(),
     private val studentRepository: StudentRepository = StudentRepository(),
     private val timetableRepository: com.project.markmyday.data.repository.TimetableRepository = com.project.markmyday.data.repository.TimetableRepository(),
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val timetableGenerator: TimetableGenerator = com.project.markmyday.algorithm.TimetableGenerator()
 ) : ViewModel() {
 
     private val _currentStep = MutableStateFlow(1)
@@ -374,4 +376,32 @@ class TimetableViewModel(
     fun resetState() {
         _state.value = TimetableState.Idle
     }
+
+
+
+    // 1. Fetch defaults for the UI to display
+    fun getPreFilledQuota(category: String, homeTeacher: Teacher?): Map<String, com.project.markmyday.data.model.SubjectQuota> {
+        return timetableGenerator.generateDefaultQuota(category, homeTeacher, _allTeachers.value)
+    }
+
+    // 2. Generate the grid using the finalized Quota
+    fun generateAndSaveScheduleFromQuota(className: String, category: String, quotaMap: Map<String, com.project.markmyday.data.model.SubjectQuota>, homeTeacherId: String) {
+        viewModelScope.launch {
+            _state.value = TimetableState.Loading
+            try {
+                val generatedSchedule = timetableGenerator.generateScheduleForClass(
+                    category = category,
+                    quotaMap = quotaMap,
+                    homeTeacherId = homeTeacherId,
+                    allExistingTimetables = _allTimetables.value,
+                    currentClassName = className
+                )
+                saveWeeklySchedule(className, generatedSchedule)
+            } catch (e: Exception) {
+                Log.e("TimetableViewModel", "Auto-Generate Failed: ${e.message}")
+                _state.value = TimetableState.Error(e.localizedMessage ?: "Failed to generate timetable")
+            }
+        }
+    }
+
 }

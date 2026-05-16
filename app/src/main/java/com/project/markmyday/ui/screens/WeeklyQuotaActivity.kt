@@ -116,11 +116,22 @@ fun WeeklyQuotaContent(
     // Initialize local state from existing data or defaults
     val existingTimetable = timetables.find { it.className == className }
     val homeTeacherId = existingTimetable?.homeTeacherId ?: ""
-    
+
+    val category = when {
+        classNum in 1..5 -> "Primary"
+        classNum in 6..7 -> "Secondary"
+        else -> "High School"
+    }
+    val homeTeacher = allTeachers.find { it.teacherId == homeTeacherId }
+
     var localQuotas by remember(existingTimetable) {
-        val initialMap = subjects.associateWith { subject ->
-            existingTimetable?.weeklyQuota?.get(subject) ?: SubjectQuota(subject = subject)
-        }.toMutableMap()
+        val initialMap = if (existingTimetable?.weeklyQuota.isNullOrEmpty()) {
+            viewModel.getPreFilledQuota(category, homeTeacher).toMutableMap()
+        } else {
+            subjects.associateWith { subject ->
+                existingTimetable?.weeklyQuota?.get(subject) ?: SubjectQuota(subject = subject)
+            }.toMutableMap()
+        }
         mutableStateOf(initialMap)
     }
 
@@ -159,9 +170,16 @@ fun WeeklyQuotaContent(
         bottomBar = {
             val localContext = androidx.compose.ui.platform.LocalContext.current
             Button(
-                onClick = { 
+                onClick = {
                     if (currentTotal <= maxClasses) {
+                        // 1. Save the finalized quota
                         viewModel.saveWeeklyQuota(className, localQuotas, currentTotal)
+
+                        // 🪄 AI STEP 2: Generate the Timetable Grid in the background!
+                        if (homeTeacherId.isNotEmpty()) {
+                            viewModel.generateAndSaveScheduleFromQuota(className, category, localQuotas, homeTeacherId)
+                        }
+
                         onBack()
                     } else {
                         Toast.makeText(localContext, localContext.getString(R.string.quota_limit_error), Toast.LENGTH_SHORT).show()

@@ -88,6 +88,7 @@ fun CreateTimetableScreen(
     val teachers by viewModel.allTeachers.collectAsState()
     val students by viewModel.allStudents.collectAsState()
     val allTimetables by viewModel.allTimetables.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(currentStep) {
         viewModel.resetState()
@@ -117,7 +118,17 @@ fun CreateTimetableScreen(
                     )
                 } else {
                     Button(
-                        onClick = { viewModel.nextStep() },
+                        onClick = { if (currentStep == 3) {
+                            android.widget.Toast.makeText(
+                                context,
+                                "All timetables saved successfully!",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                            onBack()
+                        } else {
+                            viewModel.nextStep()
+                        }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
