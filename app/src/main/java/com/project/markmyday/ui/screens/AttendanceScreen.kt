@@ -17,6 +17,8 @@ import com.project.markmyday.R
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.tooling.preview.Preview
+import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.viewmodel.AttendanceSubmissionState
 import com.project.markmyday.viewmodel.AttendanceViewModel
@@ -32,10 +34,37 @@ fun AttendanceScreen(
     val submissionState by viewModel.submissionState.collectAsState()
     val presentStudentsList by viewModel.presentStudentsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    AttendanceContent(
+        assignedClasses = assignedClasses,
+        studentsByClass = studentsByClass,
+        submissionState = submissionState,
+        presentStudentsList = presentStudentsList,
+        isLoading = isLoading,
+        attendanceStates = viewModel.attendanceStates,
+        onBack = onBack,
+        onSubmitAttendance = { viewModel.submitAttendance(it) },
+        onToggleAttendance = { uid, isPresent -> viewModel.toggleAttendance(uid, isPresent) },
+        onResetSubmissionState = { viewModel.resetSubmissionState() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AttendanceContent(
+    assignedClasses: List<String>,
+    studentsByClass: Map<String, List<Student>>,
+    submissionState: AttendanceSubmissionState,
+    presentStudentsList: List<String>,
+    isLoading: Boolean,
+    attendanceStates: Map<String, Boolean>,
+    onBack: () -> Unit,
+    onSubmitAttendance: (String) -> Unit,
+    onToggleAttendance: (String, Boolean) -> Unit,
+    onResetSubmissionState: () -> Unit
+) {
     val context = LocalContext.current
-
     var showSuccessDialog by remember { mutableStateOf(false) }
-
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     val selectedClass = if (assignedClasses.isNotEmpty() && selectedTabIndex < assignedClasses.size) {
@@ -47,11 +76,11 @@ fun AttendanceScreen(
         when (submissionState) {
             is AttendanceSubmissionState.Success -> {
                 showSuccessDialog = true
-                viewModel.resetSubmissionState()
+                onResetSubmissionState()
             }
             is AttendanceSubmissionState.Error -> {
-                Toast.makeText(context, (submissionState as AttendanceSubmissionState.Error).message, Toast.LENGTH_LONG).show()
-                viewModel.resetSubmissionState()
+                Toast.makeText(context, submissionState.message, Toast.LENGTH_LONG).show()
+                onResetSubmissionState()
             }
             else -> {}
         }
@@ -81,7 +110,7 @@ fun AttendanceScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Button(
-                            onClick = { viewModel.submitAttendance(selectedClass) },
+                            onClick = { onSubmitAttendance(selectedClass) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -163,8 +192,8 @@ fun AttendanceScreen(
                         items(studentsInSelectedClass, key = { it.uid }) { student ->
                             StudentAttendanceRow(
                                 student = student,
-                                isPresent = viewModel.attendanceStates[student.uid] ?: true,
-                                onToggle = { viewModel.toggleAttendance(student.uid, it) }
+                                isPresent = attendanceStates[student.uid] ?: true,
+                                onToggle = { onToggleAttendance(student.uid, it) }
                             )
                         }
                     }
@@ -173,6 +202,7 @@ fun AttendanceScreen(
         }
     }
 }
+
 
 @Composable
 fun StudentAttendanceRow(
@@ -217,3 +247,4 @@ fun StudentAttendanceRow(
         }
     }
 }
+

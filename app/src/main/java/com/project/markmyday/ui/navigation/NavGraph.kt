@@ -20,7 +20,7 @@ import com.project.markmyday.viewmodel.LocalSettingsViewModel
 
 sealed class Screen(val route: String) {
     object Authentication : Screen("auth")
-    object RoleSelector : Screen("role_selector")
+
     object StudentDashboard : Screen("student_dashboard/{name}/{role}/{studentId}/{uid}")
     object TeacherDashboard : Screen("teacher_dashboard/{name}/{role}/{section}/{subject}")
     object AdminDashboard : Screen("admin_dashboard/{name}/{role}")
@@ -115,12 +115,7 @@ fun AppNavigation(
             })
         }
 
-        composable(Screen.RoleSelector.route) {
-            RoleSelectorScreen(onRoleSelected = { role ->
-                // Navigate to Login (AuthenticationScreen will show LoginContent)
-                navController.navigate(Screen.Authentication.route)
-            })
-        }
+
 
         // Screen.Login is no longer used as a separate route
         

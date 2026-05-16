@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
+import androidx.compose.ui.tooling.preview.Preview
+import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.data.model.QuizResult
 import com.project.markmyday.ui.components.DashboardBottomBar
 import com.project.markmyday.viewmodel.LeaderboardViewModel
@@ -44,13 +46,33 @@ fun LeaderboardScreen(
     val viewModel: LeaderboardViewModel = viewModel()
     val filteredResults by viewModel.filteredResults.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
-    
-    val isAdmin = role.lowercase() == "admin" || role.lowercase() == "principal"
-    val purpleTheme = Color(0xFF917BFF)
 
     LaunchedEffect(Unit) {
         viewModel.filterAndSort("Overall", userRole = role, userClass = userClass)
     }
+
+    LeaderboardContent(
+        role = role,
+        filteredResults = filteredResults,
+        onBack = onBack,
+        onNavigate = onNavigate,
+        onDownloadCsv = { downloadLeaderboardCsv(context, it) },
+        onClearLeaderboard = { viewModel.clearLeaderboard() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LeaderboardContent(
+    role: String,
+    filteredResults: List<QuizResult>,
+    onBack: () -> Unit,
+    onNavigate: (String) -> Unit,
+    onDownloadCsv: (List<QuizResult>) -> Unit,
+    onClearLeaderboard: () -> Unit
+) {
+    val isAdmin = role.lowercase() == "admin" || role.lowercase() == "principal"
+    val purpleTheme = Color(0xFF917BFF)
 
     Scaffold(
         containerColor = purpleTheme,
@@ -65,12 +87,12 @@ fun LeaderboardScreen(
                 actions = {
                     if (isAdmin) {
                         IconButton(onClick = { 
-                            downloadLeaderboardCsv(context, filteredResults)
+                            onDownloadCsv(filteredResults)
                         }) {
                             Icon(Icons.Default.Download, contentDescription = "Download CSV", tint = Color.White)
                         }
                         IconButton(onClick = { 
-                            viewModel.clearLeaderboard()
+                            onClearLeaderboard()
                         }) {
                             Icon(Icons.Default.Delete, contentDescription = "Clear All", tint = Color.White)
                         }
@@ -281,6 +303,54 @@ fun downloadLeaderboardCsv(context: android.content.Context, results: List<QuizR
     } catch (e: Exception) {
         android.util.Log.e("LeaderboardCSV", "Error exporting CSV", e)
         android.widget.Toast.makeText(context, "Error exporting CSV: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LeaderboardScreenPreview() {
+    val sampleResults = listOf(
+        QuizResult(studentName = "Alice", score = 95, totalQuestions = 100, studentId = "S1"),
+        QuizResult(studentName = "Bob", score = 88, totalQuestions = 100, studentId = "S2"),
+        QuizResult(studentName = "Charlie", score = 82, totalQuestions = 100, studentId = "S3"),
+        QuizResult(studentName = "David", score = 75, totalQuestions = 100, studentId = "S4"),
+        QuizResult(studentName = "Eve", score = 70, totalQuestions = 100, studentId = "S5")
+    )
+    MarkMyDayTheme {
+        LeaderboardContent(
+            role = "student",
+            filteredResults = sampleResults,
+            onBack = {},
+            onNavigate = {},
+            onDownloadCsv = {},
+            onClearLeaderboard = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Top3PodiumPreview() {
+    val top3 = listOf(
+        QuizResult(studentName = "Alice", score = 95, totalQuestions = 100),
+        QuizResult(studentName = "Bob", score = 88, totalQuestions = 100),
+        QuizResult(studentName = "Charlie", score = 82, totalQuestions = 100)
+    )
+    MarkMyDayTheme {
+        Box(modifier = Modifier.background(Color(0xFF917BFF)).padding(16.dp)) {
+            Top3Podium(top3 = top3)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RemainingLeaderboardItemPreview() {
+    MarkMyDayTheme {
+        RemainingLeaderboardItem(
+            rank = 4,
+            result = QuizResult(studentName = "David", score = 75, totalQuestions = 100, studentId = "S4", className = "10")
+        )
     }
 }
 

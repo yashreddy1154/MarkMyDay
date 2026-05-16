@@ -412,6 +412,18 @@ fun AddStudentContent(
 @Composable
 fun AddStudentScreenPreview() {
     MarkMyDayTheme {
-        AddStudentScreen(onBack = {}, onSubmit = {})
+        AddStudentContent(
+            title = "Add New Student",
+            state = AddStudentFormState(
+                name = "John Doe",
+                dob = "01 January 2015",
+                gender = "Male",
+                studentClass = "5"
+            ),
+            onStateChange = {},
+            onBack = {},
+            onSubmit = {},
+            registrationState = StudentRegistrationState.Idle
+        )
     }
 }

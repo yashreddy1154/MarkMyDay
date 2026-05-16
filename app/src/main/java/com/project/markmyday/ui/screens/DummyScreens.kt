@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.project.markmyday.R
+import androidx.compose.ui.tooling.preview.Preview
+import com.project.markmyday.ui.theme.MarkMyDayTheme
 import com.project.markmyday.ui.components.DashboardBottomBar
 import com.project.markmyday.ui.components.DashboardTopBar
 
@@ -114,6 +116,46 @@ fun DummyBaseScreen(
             verticalArrangement = Arrangement.Center
         ) {
             content()
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TermsScreenPreview() {
+    MarkMyDayTheme {
+        TermsScreen(onBack = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HappeningsScreenPreview() {
+    MarkMyDayTheme {
+        HappeningsScreen(onNotificationClick = {}, onNavigate = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ReportsScreenPreview() {
+    MarkMyDayTheme {
+        ReportsScreen(onNotificationClick = {}, onNavigate = {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DummyBaseScreenPreview() {
+    MarkMyDayTheme {
+        DummyBaseScreen(
+            title = "Preview Title",
+            icon = Icons.Default.Campaign,
+            currentRoute = "preview",
+            onNotificationClick = {},
+            onNavigate = {},
+        ) {
+            Text("Preview Content")
         }
     }
 }

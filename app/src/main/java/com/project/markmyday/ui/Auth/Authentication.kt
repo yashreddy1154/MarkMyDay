@@ -1,5 +1,6 @@
 package com.project.markmyday.ui.Auth
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -35,6 +35,8 @@ import androidx.compose.ui.res.stringResource
 import com.project.markmyday.R
 import com.project.markmyday.viewmodel.AuthResult
 import com.project.markmyday.viewmodel.AuthViewModel
+import androidx.compose.ui.tooling.preview.Preview
+import com.project.markmyday.ui.theme.MarkMyDayTheme
 
 enum class AuthState {
     PRE_LOGIN, LOGIN
@@ -54,8 +56,7 @@ fun AuthenticationScreen(onLoginSuccess: (String, String, String?, String?, Stri
         when (state) {
             AuthState.PRE_LOGIN -> PreLoginContent(onStart = { authState = AuthState.LOGIN })
             AuthState.LOGIN -> LoginContent(
-                onLogin = onLoginSuccess,
-                onBack = { authState = AuthState.PRE_LOGIN }
+                onLogin = onLoginSuccess
             )
         }
     }
@@ -65,7 +66,7 @@ fun AuthenticationScreen(onLoginSuccess: (String, String, String?, String?, Stri
 fun PreLoginContent(onStart: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.preloginbackground),
+            painter = painterResource(id = R.drawable.preloginbackground),//have to change this screen
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -128,14 +129,27 @@ fun PreLoginContent(onStart: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginContent(
-    onLogin: (String, String, String?, String?, String?, String) -> Unit,
-    onBack: () -> Unit
+    onLogin: (String, String, String?, String?, String?, String) -> Unit
 ) {
     val viewModel: AuthViewModel = viewModel()
     val authResult by viewModel.authState.collectAsState()
+
+    LoginContentInternal(
+        authResult = authResult,
+        onLogin = onLogin,
+        onLoginClick = { email, password -> viewModel.loginUser(email, password) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginContentInternal(
+    authResult: AuthResult,
+    onLogin: (String, String, String?, String?, String?, String) -> Unit,
+    onLoginClick: (String, String) -> Unit
+) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val isDarkMode = isSystemInDarkTheme()
@@ -147,11 +161,10 @@ fun LoginContent(
     LaunchedEffect(authResult) {
         when (authResult) {
             is AuthResult.Success -> {
-                val result = authResult as AuthResult.Success
-                onLogin(result.name, result.role, result.studentId, result.homeSection, result.subject, result.uid)
+                onLogin(authResult.name, authResult.role, authResult.studentId, authResult.homeSection, authResult.subject, authResult.uid)
             }
             is AuthResult.Error -> {
-                val errorKey = (authResult as AuthResult.Error).message
+                val errorKey = authResult.message
                 val displayMessage = when(errorKey) {
                     "error_login_failed" -> context.getString(R.string.error_login_failed)
                     "error_user_not_found" -> context.getString(R.string.error_user_not_found)
@@ -165,51 +178,17 @@ fun LoginContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image with better dark mode handling
+        // Background Image
         Image(
             painter = painterResource(id = R.drawable.loginscreenbackground),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            alpha = if (isDarkMode) 0.6f else 1f
+            alpha = if (isDarkMode) 0.9f else 1f
         )
-
-        // Enhanced dark mode overlay with gradient for better visual appeal
-        if (isDarkMode) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.7f),
-                                Color(0xFF1A1A2E).copy(alpha = 0.85f),
-                                Color.Black.copy(alpha = 0.8f)
-                            ),
-                            startY = 0f,
-                            endY = Float.POSITIVE_INFINITY
-                        )
-                    )
-            )
-        }
 
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            topBar = {
-                TopAppBar(
-                    title = { },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                tint = if (isDarkMode) Color.White else Color(0xFF1A1A2E)
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-                )
-            },
             containerColor = Color.Transparent
         ) { padding ->
             Box(
@@ -353,7 +332,7 @@ fun LoginContent(
                         Button(
                             onClick = {
                                 if (email.isNotEmpty() && password.isNotEmpty()) {
-                                    viewModel.loginUser(email, password)
+                                    onLoginClick(email, password)
                                 } else {
                                     Toast.makeText(context, context.getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show()
                                 }
@@ -414,5 +393,45 @@ fun LoginContent(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AuthenticationScreenPreview() {
+    MarkMyDayTheme {
+        AuthenticationScreen(onLoginSuccess = { _, _, _, _, _, _ -> })
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreLoginContentPreview() {
+    MarkMyDayTheme {
+        PreLoginContent(onStart = {})
+    }
+}
+
+@Preview(showBackground = true,uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun LoginContentPreview() {
+    MarkMyDayTheme {
+        LoginContentInternal(
+            authResult = AuthResult.Idle,
+            onLogin = { _, _, _, _, _, _ -> },
+            onLoginClick = { _, _ -> }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginContentLoadingPreview() {
+    MarkMyDayTheme {
+        LoginContentInternal(
+            authResult = AuthResult.Loading,
+            onLogin = { _, _, _, _, _, _ -> },
+            onLoginClick = { _, _ -> }
+        )
     }
 }

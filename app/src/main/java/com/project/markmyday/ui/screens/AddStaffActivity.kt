@@ -53,6 +53,7 @@ class AddStaffActivity : AppCompatActivity() {
         setContent {
             val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
             val teacherViewModel: TeacherViewModel = viewModel()
+            val registrationState by teacherViewModel.registrationState.collectAsState()
 
             CompositionLocalProvider(LocalSettingsViewModel provides settingsViewModel) {
                 MarkMyDayTheme(darkTheme = isDarkMode) {
@@ -65,7 +66,8 @@ class AddStaffActivity : AppCompatActivity() {
                             onSubmit = { formState ->
                                 teacherViewModel.registerTeacher(formState)
                             },
-                            viewModel = teacherViewModel
+                            registrationState = registrationState,
+                            onResetRegistrationState = { teacherViewModel.resetRegistrationState() }
                         )
                     }
                 }
@@ -79,10 +81,10 @@ class AddStaffActivity : AppCompatActivity() {
 fun AddStaffScreen(
     onBack: () -> Unit,
     onSubmit: (AddStaffFormState) -> Unit,
-    viewModel: TeacherViewModel = viewModel()
+    registrationState: TeacherRegistrationState,
+    onResetRegistrationState: () -> Unit
 ) {
     var state by remember { mutableStateOf(AddStaffFormState()) }
-    val registrationState by viewModel.registrationState.collectAsState()
     val context = LocalContext.current
 
     // Show success Dialog and reset form
@@ -94,7 +96,7 @@ fun AddStaffScreen(
                 .setMessage(context.getString(R.string.staff_added_success, teacherId))
                 .setPositiveButton(context.getString(R.string.ok)) { dialog, _ ->
                     state = AddStaffFormState()
-                    viewModel.resetRegistrationState()
+                    onResetRegistrationState()
                     dialog.dismiss()
                 }
                 .show()
@@ -447,6 +449,11 @@ private fun formatDateForDisplay(date: Date?): String {
 @Composable
 fun AddStaffScreenPreview() {
     MarkMyDayTheme {
-        AddStaffScreen(onBack = {}, onSubmit = {})
+        AddStaffScreen(
+            onBack = {},
+            onSubmit = {},
+            registrationState = TeacherRegistrationState.Idle,
+            onResetRegistrationState = {}
+        )
     }
 }
