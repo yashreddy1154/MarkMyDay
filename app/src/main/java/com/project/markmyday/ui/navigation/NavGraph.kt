@@ -33,7 +33,7 @@ sealed class Screen(val route: String) {
     }
     object AttendanceMarking : Screen("attendance_marking")
     object StudentManagement : Screen("student_management")
-    object TeacherHomeSection : Screen("teacher_home_section")
+    object MyHomeStudents : Screen("myhome_students")
     object AdminLeaveManagement : Screen("admin_leave_management")
     object TeacherLeaveView : Screen("teacher_leave_view")
     object AdminCreateNotification : Screen("admin_create_notification")
@@ -220,7 +220,7 @@ fun AppNavigation(
                         "leave" -> navController.navigate(Screen.TeacherLeaveView.route)
                         "attendance" -> navController.navigate(Screen.AttendanceMarking.route)
                         "course_manager" -> navController.navigate(Screen.CourseManager.route)
-                        "myhome_students" -> navController.navigate(Screen.TeacherHomeSection.route)
+                        "myhome_students" -> navController.navigate(Screen.MyHomeStudents.route)
                         // Add more routing as screens are implemented
                     }
                 },
@@ -315,8 +315,8 @@ fun AppNavigation(
             AttendanceScreen(onBack = { navController.popBackStack() })
         }
 
-        composable(Screen.TeacherHomeSection.route) {
-            TeacherHomeSectionScreen(onBack = { navController.popBackStack() })
+        composable(Screen.MyHomeStudents.route) {
+            MyHomeStudents(onBack = { navController.popBackStack() })
         }
 
         composable(Screen.StudentManagement.route) {

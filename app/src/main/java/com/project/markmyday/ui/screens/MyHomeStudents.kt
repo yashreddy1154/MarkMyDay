@@ -15,13 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.viewmodel.TeacherHomeViewModel
 
 @Composable
-fun TeacherHomeSectionScreen(
+fun MyHomeStudents(
     onBack: () -> Unit = {},
     viewModel: TeacherHomeViewModel = viewModel()
 ) {
@@ -29,7 +28,7 @@ fun TeacherHomeSectionScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    TeacherHomeSectionContent(
+    MyHomeStudentsContent(
         students = students,
         searchQuery = searchQuery,
         isLoading = isLoading,
@@ -40,7 +39,7 @@ fun TeacherHomeSectionScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TeacherHomeSectionContent(
+fun MyHomeStudentsContent(
     students: List<Student>,
     searchQuery: String,
     isLoading: Boolean,
@@ -50,8 +49,8 @@ fun TeacherHomeSectionContent(
     Scaffold(
         topBar = {
             Column {
-                TopAppBar(
-                    title = { Text("Home Section Students", fontWeight = FontWeight.Bold) },
+                CenterAlignedTopAppBar(
+                    title = { Text("MyHome Students", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -71,8 +70,8 @@ fun TeacherHomeSectionContent(
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                        unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
                     ),
                     shape = MaterialTheme.shapes.medium
                 )
@@ -192,7 +191,7 @@ fun StudentCard(student: Student) {
 @Preview(showBackground = true)
 @Composable
 fun Prev(){
-    TeacherHomeSectionContent(
+    MyHomeStudentsContent(
         students = listOf(
             Student(name = "John Doe", studentId = "A101", motherName = "Jane Doe", fatherName = "Jim Doe", motherPhone = "1234567890"),
             Student(name = "Alice Smith", studentId = "A102", motherName = "Mary Smith", fatherName = "Robert Smith", fatherPhone = "0987654321")
