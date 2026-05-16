@@ -6,25 +6,31 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.HistoryEdu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.R
 import com.project.markmyday.data.model.Period
@@ -223,16 +229,17 @@ fun TeacherTimetableContent(
 @Composable
 fun TeacherPeriodCard(className: String, period: Period, onPostDiary: () -> Unit) {
     val sectionColor = com.project.markmyday.ui.utils.TeacherUtils.getClassColor(className)
-    val subjectColor = getSubjectColorForTeacher(period.subject)
     
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, sectionColor.copy(alpha = 0.3f))
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = sectionColor.copy(alpha = 0.12f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, sectionColor.copy(alpha = 0.2f))
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -240,61 +247,72 @@ fun TeacherPeriodCard(className: String, period: Period, onPostDiary: () -> Unit
             ) {
                 Column {
                     Text(
-                        text = period.subject,
-                        style = MaterialTheme.typography.titleLarge,
+                        text = className,
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.ExtraBold,
-                        color = subjectColor
+                        color = sectionColor
                     )
                     Text(
-                        text = className,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Bold
+                        text = period.subject,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = sectionColor.copy(alpha = 0.8f)
                     )
                 }
                 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        color = subjectColor.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = "P${period.periodNumber}",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = subjectColor
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    IconButton(onClick = onPostDiary) {
-                        Icon(
-                            Icons.Default.ArrowForward,
-                            contentDescription = "Post Diary",
-                            tint = subjectColor
-                        )
-                    }
+                Surface(
+                    color = sectionColor.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "P${period.periodNumber}",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = sectionColor
+                    )
                 }
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.AccessTime,
-                    contentDescription = null,
-                    tint = sectionColor,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "${period.startTime} - ${period.endTime}",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = sectionColor
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.AccessTime,
+                        contentDescription = null,
+                        tint = sectionColor,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "${period.startTime} - ${period.endTime}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = sectionColor
+                    )
+                }
+                
+                Surface(
+                    onClick = onPostDiary,
+                    shape = CircleShape,
+                    color = Color.Transparent,
+                    border = BorderStroke(1.dp, sectionColor.copy(alpha = 0.6f)),
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.HistoryEdu,
+                            contentDescription = "Post Diary",
+                            tint = sectionColor,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    }
+                }
             }
         }
     }

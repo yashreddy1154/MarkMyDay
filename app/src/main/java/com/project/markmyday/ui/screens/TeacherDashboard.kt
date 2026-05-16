@@ -250,14 +250,16 @@ fun TeacherDashboard(
 
             // 3. Timetable Section
             item(span = { GridItemSpan(2) }) {
+                val openTimetable = {
+                    val intent = Intent(context, TeacherTimetableActivity::class.java).apply {
+                        putExtra("teacherName", userName)
+                    }
+                    context.startActivity(intent)
+                }
                 TeacherTimetableSection(
                     entries = teacherTodayEntries,
-                    onViewAllClick = {
-                        val intent = Intent(context, TeacherTimetableActivity::class.java).apply {
-                            putExtra("teacherName", userName)
-                        }
-                        context.startActivity(intent)
-                    }
+                    onViewAllClick = openTimetable,
+                    onEntryClick = { openTimetable() }
                 )
             }
 

@@ -311,7 +311,11 @@ fun TimetableSection(entries: List<TimetableEntry>, onViewAllClick: () -> Unit) 
 }
 
 @Composable
-fun TeacherTimetableSection(entries: List<TimetableEntry>, onViewAllClick: () -> Unit) {
+fun TeacherTimetableSection(
+    entries: List<TimetableEntry>, 
+    onViewAllClick: () -> Unit,
+    onEntryClick: (TimetableEntry) -> Unit = {}
+) {
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -341,7 +345,10 @@ fun TeacherTimetableSection(entries: List<TimetableEntry>, onViewAllClick: () ->
         } else {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(entries) { entry ->
-                    TeacherDashboardTimetableCard(entry)
+                    TeacherDashboardTimetableCard(
+                        entry = entry,
+                        onClick = { onEntryClick(entry) }
+                    )
                 }
             }
         }
@@ -349,11 +356,13 @@ fun TeacherTimetableSection(entries: List<TimetableEntry>, onViewAllClick: () ->
 }
 
 @Composable
-fun TeacherDashboardTimetableCard(entry: TimetableEntry) {
+fun TeacherDashboardTimetableCard(entry: TimetableEntry, onClick: () -> Unit = {}) {
     val sectionColor = com.project.markmyday.ui.utils.TeacherUtils.getClassColor(entry.room)
     
     Card(
-        modifier = Modifier.width(260.dp),
+        modifier = Modifier
+            .width(260.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(32.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
