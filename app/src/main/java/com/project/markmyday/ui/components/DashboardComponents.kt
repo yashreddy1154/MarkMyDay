@@ -263,11 +263,6 @@ fun WelcomeSection(
                     )
                 }
             }
-            ProfileInitialsIcon(
-                name = decodedName,
-                size = 60.dp,
-                shape = RoundedCornerShape(20.dp)
-            )
         }
     }
 }

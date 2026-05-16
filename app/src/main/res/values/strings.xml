@@ -57,6 +57,8 @@
     <string name="tile_leave_request">Leave Request</string>
     <string name="tile_manage_exams">Manage Exams</string>
     <string name="tile_notices">Notices</string>
+    <string name="tile_teacher_attendance">Teacher Attendance</string>
+    <string name="tile_my_home_students">MyHome Students</string>
     <string name="tile_new_admission">New Admission</string>
     <string name="tile_messages">Messages</string>
     <string name="tile_admissions">Admissions</string>
@@ -141,7 +143,7 @@
     <string name="password">Password</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="login_button">Login</string>
-    <string name="logging_in">Logging you in...</string>
+    <string name="logging_in">Logging you in&#8230;</string>
     <string name="dont_know_details">Don\'t know details? </string>
     <string name="forget_credentials">forget credentials</string>
     <string name="error_empty_fields">Please enter User ID and password</string>
@@ -197,7 +199,7 @@
     <string name="primary_subject_label">Primary Sub: %1$s</string>
     <string name="category_label_simple">Category: %1$s</string>
     <string name="home_teacher_assigned">Home teacher assigned successfully</string>
-    <string name="loading_step">Loading...</string>
+    <string name="loading_step">Loading&#8230;</string>
     <string name="select_students_title">Select %1$s Students</string>
     <string name="list_of_students">List of Students</string>
     <string name="home_teacher_label">HT: %1$s</string>
@@ -307,13 +309,13 @@
     <string name="admin_desc">Full school hub management</string>
     <!-- Global Updates Screen Dummy Data -->
     <string name="dummy_news_title_1">New Education Policy Announced</string>
-    <string name="dummy_news_desc_1">India introduces new digital learning reforms for schools...</string>
+    <string name="dummy_news_desc_1">India introduces new digital learning reforms for schools&#8230;</string>
     <string name="dummy_news_title_2">AI in Schools</string>
-    <string name="dummy_news_desc_2">Schools are introducing AI as a subject for early grades...</string>
+    <string name="dummy_news_desc_2">Schools are introducing AI as a subject for early grades&#8230;</string>
     <string name="dummy_news_title_3">Exam Pattern Changed</string>
-    <string name="dummy_news_desc_3">CBSE updates exam pattern for 2026 academic year...</string>
+    <string name="dummy_news_desc_3">CBSE updates exam pattern for 2026 academic year&#8230;</string>
     <string name="dummy_news_title_4">Digital Library Access</string>
-    <string name="dummy_news_desc_4">Students to get free access to national digital library...</string>
+    <string name="dummy_news_desc_4">Students to get free access to national digital library&#8230;</string>
     <string name="dummy_news_title_5">Summer Break 2024</string>
     <string name="dummy_news_desc_5">Official schedule for upcoming summer holidays released.</string>
     <string name="dummy_news_title_6">Sports Meet 2024</string>

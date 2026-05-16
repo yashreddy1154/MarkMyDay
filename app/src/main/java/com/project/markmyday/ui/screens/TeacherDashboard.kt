@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.HistoryEdu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.School
@@ -151,6 +152,8 @@ fun TeacherDashboard(
 
     val teacherTiles = listOf(
         DashboardTile("attendance", stringResource(R.string.tile_mark_attendance), Icons.Default.Checklist, badgeText = "80%"),
+        DashboardTile("teacher_attendance", stringResource(R.string.tile_teacher_attendance), Icons.Default.Checklist),
+        DashboardTile("myhome_students", stringResource(R.string.tile_my_home_students), Icons.Default.People),
         DashboardTile("assignments", stringResource(R.string.tile_assignments), Icons.AutoMirrored.Filled.Assignment, badgeCount = 12),
         DashboardTile("results", stringResource(R.string.tile_post_results), Icons.Default.Description),
         DashboardTile("leave", stringResource(R.string.tile_leave_request), Icons.Default.HistoryEdu),
@@ -201,53 +204,6 @@ fun TeacherDashboard(
                 SearchBar(query = searchQuery, onQueryChange = { searchQuery = it })
             }
 
-            // 2. Banner
-            item(span = { GridItemSpan(2) }) {
-                Card(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.class_in_session),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    stringResource(R.string.next_class_starts),
-                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            Surface(
-                                modifier = Modifier.size(50.dp),
-                                shape = CircleShape,
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        Icons.Default.Timer,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onPrimary,
-                                        modifier = Modifier.size(28.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             // 3. Timetable Section
             item(span = { GridItemSpan(2) }) {
                 val openTimetable = {
@@ -273,17 +229,6 @@ fun TeacherDashboard(
                 )
             }
 
-            // 5. Watchlist Card
-            if (homeSection != "N/A") {
-                item(span = { GridItemSpan(2) }) {
-                    HomeStudentsCard(
-                        section = homeSection,
-                        students = homeStudents,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onViewAllClick = { onNavigate("teacher_home_section") }
-                    )
-                }
-            }
 
             // 6. Section Title
             item(span = { GridItemSpan(2) }) {

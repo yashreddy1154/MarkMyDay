@@ -36,7 +36,7 @@
     <string name="view_all">ਸਾਰੇ ਦੇਖੋ</string>
     <string name="my_dashboard">ਮੇਰਾ ਡੈਸ਼ਬੋਰਡ</string>
     <string name="faculty_portal">ਫੈਕਲਟੀ ਪੋਰਟਲ</string>
-    <string name="search_anything">ਕੁਝ ਵੀ ਖੋਜੋ...</string>
+    <string name="search_anything">ਕੁਝ ਵੀ ਖੋਜੋ&#8230;</string>
     <string name="keep_learning">ਸਿੱਖਦੇ ਰਹੋ! 🚀</string>
     <string name="assignments_due">ਤੁਹਾਡੇ 3 ਅਸਾਈਨਮੈਂਟ ਜਲਦੀ ਜਮ੍ਹਾਂ ਹੋਣ ਵਾਲੇ ਹਨ।</string>
     <string name="class_in_session">ਕਲਾਸ ਚੱਲ ਰਹੀ ਹੈ 👩‍🏫</string>
@@ -56,6 +56,8 @@
     <string name="tile_leave_request">ਛੁੱਟੀ ਦੀ ਬੇਨਤੀ</string>
     <string name="tile_manage_exams">ਪ੍ਰੀਖਿਆ ਪ੍ਰਬੰਧਨ</string>
     <string name="tile_notices">ਨੋਟਿਸ</string>
+    <string name="tile_teacher_attendance">ਅਧਿਆਪਕ ਹਾਜ਼ਰੀ</string>
+    <string name="tile_my_home_students">ਮੇਰੇ ਹੋਮ ਵਿਦਿਆਰਥੀ</string>
     <string name="tile_new_admission">ਨਵਾਂ ਦਾਖਲਾ</string>
     <string name="tile_messages">ਸੁਨੇਹੇ</string>
     <string name="tile_admissions">ਦਾਖਲੇ</string>
@@ -139,7 +141,7 @@
     <string name="password">ਪਾਸਵਰਡ</string>
     <string name="forgot_password">ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?</string>
     <string name="login_button">ਲੌਗਇਨ</string>
-    <string name="logging_in">ਤੁਹਾਨੂੰ ਲੌਗਇਨ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...</string>
+    <string name="logging_in">ਤੁਹਾਨੂੰ ਲੌਗਇਨ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ&#8230;</string>
     <string name="dont_know_details">ਵੇਰਵੇ ਨਹੀਂ ਪਤਾ? </string>
     <string name="forget_credentials">ਕ੍ਰੇਡੈਂਸ਼ੀਅਲ ਭੁੱਲ ਗਏ</string>
     <string name="error_empty_fields">ਕਿਰਪਾ ਕਰਕੇ ਯੂਜ਼ਰ ਆਈਡੀ ਅਤੇ ਪਾਸਵਰਡ ਦਰਜ ਕਰੋ</string>
@@ -195,7 +197,7 @@
     <string name="primary_subject_label">ਮੁੱਖ ਵਿਸ਼ਾ: %1$s</string>
     <string name="category_label_simple">ਸ਼੍ਰੇਣੀ: %1$s</string>
     <string name="home_teacher_assigned">ਹੋਮ ਟੀਚਰ ਸਫਲਤਾਪੂਰਵਕ ਨਿਯੁਕਤ ਕੀਤਾ ਗਿਆ</string>
-    <string name="loading_step">ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...</string>
+    <string name="loading_step">ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ&#8230;</string>
     <string name="select_students_title">%1$s ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਚੋਣ ਕਰੋ</string>
     <string name="list_of_students">ਵਿਦਿਆਰਥੀਆਂ ਦੀ ਸੂਚੀ</string>
     <string name="home_teacher_label">HT: %1$s</string>
@@ -300,13 +302,13 @@
     <string name="admin_desc">ਪੂਰਾ ਸਕੂਲ ਹਬ ਪ੍ਰਬੰਧਨ</string>
     <!-- Global Updates Screen Dummy Data -->
     <string name="dummy_news_title_1">ਨਵੀਂ ਸਿੱਖਿਆ ਨੀਤੀ ਦਾ ਐਲਾਨ</string>
-    <string name="dummy_news_desc_1">ਭਾਰਤ ਨੇ ਸਕੂਲਾਂ ਲਈ ਨਵੇਂ ਡਿਜੀਟਲ ਸਿੱਖਿਆ ਸੁਧਾਰ ਪੇਸ਼ ਕੀਤੇ ਹਨ...</string>
+    <string name="dummy_news_desc_1">ਭਾਰਤ ਨੇ ਸਕੂਲਾਂ ਲਈ ਨਵੇਂ ਡਿਜੀਟਲ ਸਿੱਖਿਆ ਸੁਧਾਰ ਪੇਸ਼ ਕੀਤੇ ਹਨ&#8230;</string>
     <string name="dummy_news_title_2">ਸਕੂਲਾਂ ਵਿੱਚ ਏਆਈ (AI)</string>
-    <string name="dummy_news_desc_2">ਸਕੂਲ ਸ਼ੁਰੂਆਤੀ ਕਲਾਸਾਂ ਲਈ ਏਆਈ ਨੂੰ ਇੱਕ ਵਿਸ਼ੇ ਵਜੋਂ ਪੇਸ਼ ਕਰ ਰਹੇ ਹਨ...</string>
+    <string name="dummy_news_desc_2">ਸਕੂਲ ਸ਼ੁਰੂਆਤੀ ਕਲਾਸਾਂ ਲਈ ਏਆਈ ਨੂੰ ਇੱਕ ਵਿਸ਼ੇ ਵਜੋਂ ਪੇਸ਼ ਕਰ ਰਹੇ ਹਨ&#8230;</string>
     <string name="dummy_news_title_3">ਪ੍ਰੀਖਿਆ ਪੈਟਰਨ ਵਿੱਚ ਬਦਲਾਅ</string>
-    <string name="dummy_news_desc_3">CBSE ਨੇ 2026 ਅਕਾਦਮਿਕ ਸਾਲ ਲਈ ਪ੍ਰੀਖਿਆ ਪੈਟਰਨ ਅਪਡੇਟ ਕੀਤਾ ਹੈ...</string>
+    <string name="dummy_news_desc_3">CBSE ਨੇ 2026 ਅਕਾਦਮਿਕ ਸਾਲ ਲਈ ਪ੍ਰੀਖਿਆ ਪੈਟਰਨ ਅਪਡੇਟ ਕੀਤਾ ਹੈ&#8230;</string>
     <string name="dummy_news_title_4">ਡਿਜੀਟਲ ਲਾਇਬ੍ਰੇਰੀ ਤੱਕ ਪਹੁੰਚ</string>
-    <string name="dummy_news_desc_4">ਵਿਦਿਆਰਥੀਆਂ ਨੂੰ ਰਾਸ਼ਟਰੀ ਡਿਜੀਟਲ ਲਾਇਬ੍ਰੇਰੀ ਤੱਕ ਮੁਫਤ ਪਹੁੰਚ ਮਿਲੇਗੀ...</string>
+    <string name="dummy_news_desc_4">ਵਿਦਿਆਰਥੀਆਂ ਨੂੰ ਰਾਸ਼ਟਰੀ ਡਿਜੀਟਲ ਲਾਇਬ੍ਰੇਰੀ ਤੱਕ ਮੁਫਤ ਪਹੁੰਚ ਮਿਲੇਗੀ&#8230;</string>
     <string name="dummy_news_title_5">ਗਰਮੀਆਂ ਦੀਆਂ ਛੁੱਟੀਆਂ 2024</string>
     <string name="dummy_news_desc_5">ਆਉਣ ਵਾਲੀਆਂ ਗਰਮੀਆਂ ਦੀਆਂ ਛੁੱਟੀਆਂ ਦਾ ਅਧਿਕਾਰਤ ਸ਼ਡਿਊਲ ਜਾਰੀ ਕਰ ਦਿੱਤਾ ਗਿਆ ਹੈ।</string>
     <string name="dummy_news_title_6">ਸਪੋਰਟਸ ਮੀਟ 2024</string>

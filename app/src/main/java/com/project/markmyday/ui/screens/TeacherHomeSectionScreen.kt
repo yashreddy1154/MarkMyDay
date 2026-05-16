@@ -17,11 +17,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import com.project.markmyday.data.model.Student
 import com.project.markmyday.viewmodel.TeacherHomeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherHomeSectionScreen(
     onBack: () -> Unit = {},
@@ -31,6 +29,24 @@ fun TeacherHomeSectionScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    TeacherHomeSectionContent(
+        students = students,
+        searchQuery = searchQuery,
+        isLoading = isLoading,
+        onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+        onBack = onBack
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TeacherHomeSectionContent(
+    students: List<Student>,
+    searchQuery: String,
+    isLoading: Boolean,
+    onSearchQueryChange: (String) -> Unit,
+    onBack: () -> Unit
+) {
     Scaffold(
         topBar = {
             Column {
@@ -44,7 +60,7 @@ fun TeacherHomeSectionScreen(
                 )
                 TextField(
                     value = searchQuery,
-                    onValueChange = { viewModel.onSearchQueryChange(it) },
+                    onValueChange = onSearchQueryChange,
                     placeholder = { Text("Search by student name...") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     modifier = Modifier
@@ -93,8 +109,8 @@ fun TeacherHomeSectionScreen(
 
 @Composable
 fun StudentCard(student: Student) {
-    val parentName = student.motherName.ifBlank { student.fatherName }.ifBlank { "N/A" }
-    val contact = student.motherPhone.ifBlank { student.fatherPhone }.ifBlank { "N/A" }
+    val parents = listOf(student.motherName, student.fatherName).filter { it.isNotBlank() }.joinToString(" & ")
+    val contacts = listOf(student.motherPhone, student.fatherPhone).filter { it.isNotBlank() }.joinToString(", ")
 
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -118,34 +134,54 @@ fun StudentCard(student: Student) {
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(12.dp))
-            
+
+            // Admission Row
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Parent:",
+                    text = "Admission No:",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.width(80.dp),
-                    color = Color.Black
+                    modifier = Modifier.width(105.dp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = parentName,
+                    text = student.studentId.ifBlank { "N/A" },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
+            
+            // Parent Row
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Parents:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(105.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = parents.ifBlank { "N/A" },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Contact Row
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Contact:",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.width(80.dp),
-                    color = Color.Black
+                    modifier = Modifier.width(105.dp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = contact,
+                    text = contacts.ifBlank { "N/A" },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -153,8 +189,17 @@ fun StudentCard(student: Student) {
 }
 
 
-@Preview()
+@Preview(showBackground = true)
 @Composable
 fun Prev(){
-    TeacherHomeSectionScreen()
+    TeacherHomeSectionContent(
+        students = listOf(
+            Student(name = "John Doe", studentId = "A101", motherName = "Jane Doe", fatherName = "Jim Doe", motherPhone = "1234567890"),
+            Student(name = "Alice Smith", studentId = "A102", motherName = "Mary Smith", fatherName = "Robert Smith", fatherPhone = "0987654321")
+        ),
+        searchQuery = "",
+        isLoading = false,
+        onSearchQueryChange = {},
+        onBack = {}
+    )
 }

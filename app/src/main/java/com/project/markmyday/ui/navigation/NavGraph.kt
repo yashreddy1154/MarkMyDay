@@ -220,6 +220,7 @@ fun AppNavigation(
                         "leave" -> navController.navigate(Screen.TeacherLeaveView.route)
                         "attendance" -> navController.navigate(Screen.AttendanceMarking.route)
                         "course_manager" -> navController.navigate(Screen.CourseManager.route)
+                        "myhome_students" -> navController.navigate(Screen.TeacherHomeSection.route)
                         // Add more routing as screens are implemented
                     }
                 },
