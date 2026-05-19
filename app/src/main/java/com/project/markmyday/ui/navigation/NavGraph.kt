@@ -48,6 +48,10 @@ sealed class Screen(val route: String) {
             "quiz_list/$className/${Uri.encode(userName)}/$studentId"
     }
     object Leaderboard : Screen("leaderboard")
+    object AdminTimetableClasses : Screen("admin_timetable_classes")
+    object AdminTimetableGrid : Screen("admin_timetable_grid/{className}") {
+        fun createRoute(className: String) = "admin_timetable_grid/$className"
+    }
     
     // Bottom Bar Screens
     object Happenings : Screen("happenings")
@@ -268,6 +272,7 @@ fun AppNavigation(
                         "create_timetable" -> {
                             context.startActivity(android.content.Intent(context, CreateTimetableActivity::class.java))
                         }
+                        "timetable" -> navController.navigate(Screen.AdminTimetableClasses.route)
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
                         "attendance_reports" -> navController.navigate(Screen.AdminAttendanceReport.route)
                         "attendance_overview" -> {
@@ -298,6 +303,26 @@ fun AppNavigation(
 
         composable(Screen.AdminAttendanceReport.route) {
             AdminAttendanceReportScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.AdminTimetableClasses.route) {
+            AdminTimetableClassesScreen(
+                onClassSelected = { className ->
+                    navController.navigate(Screen.AdminTimetableGrid.createRoute(className))
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            Screen.AdminTimetableGrid.route,
+            arguments = listOf(navArgument("className") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val className = backStackEntry.arguments?.getString("className") ?: ""
+            AdminTimetableGridScreen(
+                className = className,
+                onBack = { navController.popBackStack() }
+            )
         }
 
         composable(
