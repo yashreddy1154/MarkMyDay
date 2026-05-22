@@ -35,6 +35,7 @@ sealed class Screen(val route: String) {
     object StudentAttendanceDashboard : Screen("student_attendance_dashboard/{studentId}") {
         fun createRoute(studentId: String) = "student_attendance_dashboard/$studentId"
     }
+    object StudentLeave : Screen("student_leave")
     object AttendanceMarking : Screen("attendance_marking")
     object StudentManagement : Screen("student_management")
     object MyHomeStudents : Screen("myhome_students")
@@ -91,7 +92,7 @@ fun AppNavigation(
     // Track the last dashboard route to know where "Home" should go
     var lastDashboardRoute by rememberSaveable { mutableStateOf(initialDashboardRoute ?: "") }
 
-    NavHost(navController = navController, startDestination = Screen.Authentication.route) {
+    NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Authentication.route) {
             AuthenticationScreen(onLoginSuccess = { name, role, studentId, section, subject, uid ->
                 // Routing logic based on user role
@@ -291,7 +292,8 @@ fun AppNavigation(
                         // Add more routing as screens are implemented
                     }
                 },
-                onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
+                onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) },
+                navController = navController
             )
         }
         
@@ -355,6 +357,10 @@ fun AppNavigation(
                 studentId = studentId,
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable(Screen.StudentLeave.route) {
+            LeaveScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Screen.AttendanceMarking.route) {
