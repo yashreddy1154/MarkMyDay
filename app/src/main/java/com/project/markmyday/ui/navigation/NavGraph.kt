@@ -28,8 +28,12 @@ sealed class Screen(val route: String) {
     object Admissions : Screen("admissions")
     object StaffManagement : Screen("staff_management")
     object AdminAttendanceReport : Screen("admin_attendance_report")
+    object AdminAttendanceStats : Screen("admin_attendance_stats")
     object StudentAttendanceReport : Screen("student_attendance_report/{uid}") {
         fun createRoute(uid: String) = "student_attendance_report/$uid"
+    }
+    object StudentAttendanceDashboard : Screen("student_attendance_dashboard/{studentId}") {
+        fun createRoute(studentId: String) = "student_attendance_dashboard/$studentId"
     }
     object AttendanceMarking : Screen("attendance_marking")
     object StudentManagement : Screen("student_management")
@@ -178,7 +182,8 @@ fun AppNavigation(
                         "settings" -> navController.navigate(Screen.Settings.route)
                     }
                 },
-                onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) }
+                onNavigate = { route -> handleBottomNav(route, navController, lastDashboardRoute) },
+                navController = navController
             )
         }
         
@@ -275,6 +280,7 @@ fun AppNavigation(
                         "timetable" -> navController.navigate(Screen.AdminTimetableClasses.route)
                         "staff_management" -> navController.navigate(Screen.StaffManagement.route)
                         "attendance_reports" -> navController.navigate(Screen.AdminAttendanceReport.route)
+                        "attendance_stats" -> navController.navigate(Screen.AdminAttendanceStats.route)
                         "attendance_overview" -> {
                             context.startActivity(android.content.Intent(context, AdminAttendanceOverviewActivity::class.java))
                         }
@@ -305,6 +311,10 @@ fun AppNavigation(
             AdminAttendanceReportScreen(onBack = { navController.popBackStack() })
         }
 
+        composable(Screen.AdminAttendanceStats.route) {
+            AdminAttendanceStatsScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(Screen.AdminTimetableClasses.route) {
             AdminTimetableClassesScreen(
                 onClassSelected = { className ->
@@ -332,6 +342,17 @@ fun AppNavigation(
             val uid = backStackEntry.arguments?.getString("uid") ?: ""
             StudentAttendanceReportScreen(
                 studentUid = uid,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = Screen.StudentAttendanceDashboard.route,
+            arguments = listOf(navArgument("studentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val studentId = backStackEntry.arguments?.getString("studentId") ?: ""
+            StudentAttendanceDashboardScreen(
+                studentId = studentId,
                 onBack = { navController.popBackStack() }
             )
         }

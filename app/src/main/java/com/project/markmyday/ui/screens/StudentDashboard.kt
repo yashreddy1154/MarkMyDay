@@ -45,6 +45,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.markmyday.viewmodel.NotificationViewModel
+import com.project.markmyday.ui.navigation.Screen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +59,7 @@ fun StudentDashboard(
     onNotificationClick: () -> Unit,
     onTileClick: (String) -> Unit,
     onNavigate: (String) -> Unit,
+    navController: NavHostController = rememberNavController()
 ) {
     val notificationViewModel: NotificationViewModel = viewModel()
     val hasUnread by notificationViewModel.hasUnreadNotices.collectAsState()
@@ -119,16 +123,28 @@ fun StudentDashboard(
                         searchQuery = searchQuery,
                         onTileClick = { id ->
                             when (id) {
-                                "attendance" -> currentSubScreen = "attendance"
+                                "attendance" -> {
+                                    navController.navigate(Screen.StudentAttendanceDashboard.createRoute(uid))
+                                }
                                 "leave" -> currentSubScreen = "leave"
                                 else -> onTileClick(id)
                             }
                         }
                     )
                 }
-                "attendance" -> StudentAttendanceDashboardScreen(
+                "attendance" -> StudentDashboardHomeContent(
+                    userName = userName,
+                    userRole = userRole,
+                    studentId = studentId,
                     uid = uid,
-                    onBack = { currentSubScreen = "home" }
+                    searchQuery = searchQuery,
+                    onTileClick = { id ->
+                        when (id) {
+                            "attendance" -> currentSubScreen = "attendance"
+                            "leave" -> currentSubScreen = "leave"
+                            else -> onTileClick(id)
+                        }
+                    }
                 )
                 "leave" -> LeaveScreen(onBack = { currentSubScreen = "home" })
             }
@@ -281,6 +297,11 @@ fun StudentDashboardHomeContent(
                     }
                 }
             }
+        }
+
+        // 2.5 Absence Alerts
+        item(span = { GridItemSpan(2) }) {
+            AbsenceAlertList(studentUid = uid)
         }
 
         // 3. Timetable Section
