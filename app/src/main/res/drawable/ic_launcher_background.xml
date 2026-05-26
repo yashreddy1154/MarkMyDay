@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- res/drawable/ic_launcher_background.xml -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
@@ -15,7 +14,7 @@
     <!-- Subtle gradient for depth -->
     <path
         android:pathData="M 54,54 m -60,0 a 60,60 0 1,1 120,0 a 60,60 0 1,1 -120,0">
-        <aapt:attr name="android:fillColor">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
             <gradient
                 android:type="radial"
                 android:centerX="54"
